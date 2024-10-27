@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 0}
+  m_Name: SwordHitVFX
+  m_EditorClassIdentifier: Assembly-CSharp:Effects:ParticleEffect
+  effectData:
+  - material: {fileID: 13400000, guid: d85c7e236a4579d468c4f15c2143393c, type: 2}
+    associatedEffects:
+    - {fileID: 4586914460678078953, guid: 6f7fde35609d2c242b667faada9b39e9, type: 3}
+  - material: {fileID: 13400000, guid: a19b3d256fec6294d9f9f6e4f7e91ddf, type: 2}
+    associatedEffects:
+    - {fileID: 8007369982305464528, guid: 85efed574c74bb24181b819f88da97b5, type: 3}

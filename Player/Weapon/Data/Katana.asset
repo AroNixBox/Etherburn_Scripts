@@ -1,0 +1,84 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d164168c70144434918e5e1214bd1cac, type: 3}
+  m_Name: Katana
+  m_EditorClassIdentifier: 
+  weaponName: Moonlight Fang Katana
+  weaponDescription: 'A sleek katana with a blade that shimmers like moonlight on
+    still water. Its edge, honed to perfection by master swordsmiths, cuts through
+    flesh and bone with terrifying ease. '
+  weaponSprite: {fileID: 21300000, guid: 798ea1bd952f7cc4591e51bdde95dd8e, type: 3}
+  animatorOverrideController: {fileID: 22100000, guid: 4f44f65c8dbabd140b34d7b9ed89d95e,
+    type: 2}
+  lightAttack:
+    attackClips:
+    - animationClip: {fileID: 7400002, guid: dcc9e62421efda540a8560e2feb50553, type: 3}
+      effect:
+        particleSystem: {fileID: 6583847099528966013, guid: 6c27feda76e78f14a8ba01763d80fe37,
+          type: 3}
+        spawnPosition: {x: 0, y: -0.2, z: -0.45}
+        spawnRotation: {x: 40, y: 300, z: -170}
+        spawnSound: {fileID: 8300000, guid: d5ddc299fb8467049bc6813d073b3c9d, type: 3}
+    - animationClip: {fileID: 7400000, guid: e927f71e4c899994db11ce3a360cc18f, type: 3}
+      effect:
+        particleSystem: {fileID: 8830235002883943167, guid: 32e210ef6c382854284192fdc2154624,
+          type: 3}
+        spawnPosition: {x: -0.1, y: -0.1, z: -0.395}
+        spawnRotation: {x: -4.242, y: 14.276, z: 1.368}
+        spawnSound: {fileID: 8300000, guid: 27a814a906672444092ee0092d62710a, type: 3}
+    - animationClip: {fileID: 7400000, guid: ce3199d2f74ebd247a098128951bb48f, type: 3}
+      effect:
+        particleSystem: {fileID: 6583847099528966013, guid: 6c27feda76e78f14a8ba01763d80fe37,
+          type: 3}
+        spawnPosition: {x: 0, y: 0, z: 0}
+        spawnRotation: {x: 74.053, y: -75.888, z: -151.9}
+        spawnSound: {fileID: 8300000, guid: 8d53d58fd4509444c89b5537ad084f12, type: 3}
+    attributeData:
+      damage: 20
+      stamina: 20
+      ultimate: 20
+  heavyAttack:
+    attackClips:
+    - animationClip: {fileID: 7400000, guid: 5029b485ac85ca0478e8877b25e6dec6, type: 3}
+      effect:
+        particleSystem: {fileID: 7545861978278369162, guid: 7f55b30f52208ed45b2ef4546a824a6a,
+          type: 3}
+        spawnPosition: {x: 0, y: 0, z: 0}
+        spawnRotation: {x: 90, y: 0, z: -150}
+        spawnSound: {fileID: 8300000, guid: d5ddc299fb8467049bc6813d073b3c9d, type: 3}
+    - animationClip: {fileID: 7400000, guid: c0480b651a7cb4a488f314c83deae349, type: 3}
+      effect:
+        particleSystem: {fileID: 8830235002883943167, guid: 32e210ef6c382854284192fdc2154624,
+          type: 3}
+        spawnPosition: {x: -0.1, y: -0.1, z: -0.395}
+        spawnRotation: {x: -4.242, y: 14.276, z: 1.368}
+        spawnSound: {fileID: 8300000, guid: 27a814a906672444092ee0092d62710a, type: 3}
+    - animationClip: {fileID: 7400000, guid: d2a5135c3d3b5dc4ab7691b390c5b332, type: 3}
+      effect:
+        particleSystem: {fileID: 7545861978278369162, guid: 7f55b30f52208ed45b2ef4546a824a6a,
+          type: 3}
+        spawnPosition: {x: 0, y: 0, z: 0}
+        spawnRotation: {x: 90, y: -80, z: -240}
+        spawnSound: {fileID: 8300000, guid: 8d53d58fd4509444c89b5537ad084f12, type: 3}
+    attributeData:
+      damage: 40
+      stamina: 40
+      ultimate: 40
+  finisherData:
+    finisherWarpAnimation:
+    - {fileID: 11400000, guid: 57d3275b61e635c499b21e46e1c4b6ff, type: 2}
+    - {fileID: 11400000, guid: 73681539dc895fa4db99980bf7b93332, type: 2}
+    - {fileID: 11400000, guid: 7d6178d4018366d44bc5ab48d01d01e4, type: 2}
+    attributeData:
+      damage: 100
+      stamina: 100
+      ultimate: 100
