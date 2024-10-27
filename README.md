@@ -1,4 +1,4 @@
-# Etherburn: Game Scripts Collection
+# Etherburn: Game Scripts Collection for Unity
 
 ![GitHub Forks](https://img.shields.io/github/forks/AroNixBox/Etherburn_Scripts)  ![GitHub Contributors](https://img.shields.io/github/contributors/AroNixBox/Etherburn_Scripts)  ![GitHub Stars](https://img.shields.io/github/stars/AroNixBox/Etherburn_Scripts)  ![GitHub Repo Size](https://img.shields.io/github/repo-size/AroNixBox/Etherburn_Scripts)  
 
