@@ -1,6 +1,6 @@
 # Etherburn: Game Scripts Collection
 
-![GitHub Forks](https://img.shields.io/github/forks/AroNixBox/Etherburn_Scripts-main)  ![GitHub Contributors](https://img.shields.io/github/contributors/AroNixBox/Etherburn_Scripts-main)  ![GitHub Stars](https://img.shields.io/github/stars/AroNixBox/Etherburn_Scripts-main)  ![GitHub Repo Size](https://img.shields.io/github/repo-size/AroNixBox/Etherburn_Scripts-main)  
+![GitHub Forks](https://img.shields.io/github/forks/AroNixBox/Etherburn_Scripts)  ![GitHub Contributors](https://img.shields.io/github/contributors/AroNixBox/Etherburn_Scripts)  ![GitHub Stars](https://img.shields.io/github/stars/AroNixBox/Etherburn_Scripts)  ![GitHub Repo Size](https://img.shields.io/github/repo-size/AroNixBox/Etherburn_Scripts)  
 
 ## Overview
 
@@ -19,14 +19,14 @@
 ### Prerequisites
 
 To get started with **Etherburn**, ensure you have the following tools installed:
-- Unity 2021 or later
-- C# development environment (e.g., Visual Studio)
+- Unity 6 or later
+- C# development environment (e.g., Visual Studio or Rider)
 
 ### Installation
 
 1. Clone the repository using the command:
    ```bash
-   git clone https://github.com/Ddemon26/Etherburn_Scripts-main.git
+   git clone https://github.com/Ddemon26/Etherburn_Scripts.git
    ```
 2. Open the project in Unity.
 3. Attach the desired scripts to appropriate GameObjects in your scene to implement their functionality.
