@@ -1,4 +1,4 @@
-﻿using Attribute;
+﻿using Attributes;
 using Effects;
 using Extensions.FSM;
 using Interfaces.Attribute;

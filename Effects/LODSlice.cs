@@ -5,8 +5,10 @@ using UnityEngine;
 [RequireComponent(typeof(MeshFilter))]
 [RequireComponent(typeof(MeshRenderer))]
 public class LODSlice : MonoBehaviour {
+#if ENABLE_OPEN_FRACTURE
     public SliceOptions sliceOptions;
     public CallbackOptions callbackOptions;
+#endif
 
     /// <summary>
     /// The number of times this fragment has been re-sliced.
@@ -24,6 +26,7 @@ public class LODSlice : MonoBehaviour {
     /// <param name="sliceNormalWorld">The cut plane normal vector in world coordinates.</param>
     /// <param name="sliceOriginWorld">The cut plane origin in world coordinates.</param>
     public void ComputeSlice(Vector3 sliceNormalWorld, Vector3 sliceOriginWorld) {
+#if ENABLE_OPEN_FRACTURE
         if(!GetComponent<MeshFilter>()) { return; }
         if(!transform.TryGetComponentInParent(out Rigidbody parentRigidBody)) { return; }
         
@@ -94,6 +97,7 @@ public class LODSlice : MonoBehaviour {
         
         // Deactivate the original object
         gameObject.SetActive(false);
+#endif
     }
 
     /// <summary>
@@ -101,6 +105,7 @@ public class LODSlice : MonoBehaviour {
     /// </summary>
     /// <returns></returns>
     GameObject CreateSliceTemplate(Rigidbody parentRigidbody) {
+#if ENABLE_OPEN_FRACTURE
         var obj = new GameObject {
             name = "Slice",
             tag = tag
@@ -140,6 +145,9 @@ public class LODSlice : MonoBehaviour {
         }
 
         return obj;
+#else
+        return null;
+#endif
     }
 
     /// <summary>
@@ -147,11 +155,13 @@ public class LODSlice : MonoBehaviour {
     /// </summary>
     /// <param name="obj">The GameObject to copy this component to</param>
     void CopySliceComponent(GameObject obj) {
+#if ENABLE_OPEN_FRACTURE
         var sliceComponent = obj.AddComponent<LODSlice>();
 
         sliceComponent.sliceOptions = sliceOptions;
         sliceComponent.callbackOptions = callbackOptions;
         sliceComponent._currentSliceCount = _currentSliceCount + 1;
         sliceComponent._fragmentRoot = _fragmentRoot;
+#endif
     }
 }

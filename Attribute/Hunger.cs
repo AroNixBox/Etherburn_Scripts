@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Attribute {
+namespace Attributes {
     public class Hunger : EnergyBase {
         [SerializeField] float hungerDecreaseTimeout = 1f;
         [SerializeField] float hungerUsagePerSecond = 2.5f;

@@ -1,7 +1,7 @@
 ﻿using Interfaces.Attribute;
 using UnityEngine;
 
-namespace Attribute {
+namespace Attributes {
     public class Health : EnergyBase, IHealth {
         public Vector3 HitPosition { get; private set; }
         public bool HasTakenDamage { get; set; }
