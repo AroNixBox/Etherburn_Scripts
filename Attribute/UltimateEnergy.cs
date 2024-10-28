@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Attribute {
+namespace Attributes {
     public class UltimateEnergy : EnergyBase {
         [SerializeField] float startEnergy;
         void Awake() {

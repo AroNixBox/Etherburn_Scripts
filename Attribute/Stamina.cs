@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Attribute {
+namespace Attributes {
     public class Stamina : EnergyBase {
         [SerializeField] float energyRegenPerSecond = 5;
         [SerializeField] float regenTimeOut = 1;

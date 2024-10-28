@@ -4,7 +4,7 @@ using Unity.Behavior;
 using UnityEngine;
 using Sirenix.OdinInspector;
 
-namespace Attribute {
+namespace Attributes {
     public class EnergyBase : MonoBehaviour, IEnergy {
         [SerializeField] protected float maxEnergy = 100;
         protected float CurrentEnergy;

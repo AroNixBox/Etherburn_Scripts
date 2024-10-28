@@ -1,4 +1,4 @@
-﻿using Attribute;
+﻿using Attributes;
 using Sirenix.OdinInspector;
 using UnityEngine;
 

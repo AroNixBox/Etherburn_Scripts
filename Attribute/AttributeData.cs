@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Attribute {
+namespace Attributes {
     [System.Serializable]
     public class AttributeData {
         [Range(0, 100)] public float damage;

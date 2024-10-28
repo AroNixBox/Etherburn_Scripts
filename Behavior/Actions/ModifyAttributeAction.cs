@@ -1,4 +1,4 @@
-using Attribute;
+using Attributes;
 using System;
 using Unity.Behavior;
 using UnityEngine;
