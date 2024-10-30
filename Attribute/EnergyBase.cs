@@ -60,5 +60,12 @@ namespace Attribute {
         public bool HasEnough(float requiredAmount) {
             return CurrentEnergy >= requiredAmount;
         }
+        
+        public void ZeroCurrentEnergy() {
+            CurrentEnergy = 0;
+            OnAttributeValueDecresed?.Invoke(CurrentEnergy);
+            
+            _energyValueChangedInstance?.SendEventMessage(CurrentEnergy);
+        }
     }
 }

@@ -1,6 +1,4 @@
-﻿using Attribute;
-using Effects;
-using Extensions.FSM;
+﻿using Extensions.FSM;
 using Interfaces.Attribute;
 using Player.Animation;
 using Player.Cam;

@@ -23,7 +23,7 @@ namespace Effects.VFX {
         }
         
         void SpawnDecal() {
-            Debug.Log("Spawn Decal");
+            Debug.LogError("Spawn Decal");
             var rayCastResults = new RaycastHit[10];
             int hitCount = Physics.RaycastNonAlloc(transform.position, Vector3.down, rayCastResults);
 

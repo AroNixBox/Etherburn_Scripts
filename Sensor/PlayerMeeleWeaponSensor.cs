@@ -22,6 +22,7 @@ namespace Sensor {
         
         protected override void ApplyHit(Collider other, IHealth health) {
             base.ApplyHit(other, health);
+            
 
             if (_ultimateAttribute == null) {
                 Debug.LogError("InitializeSensor() was not called, will not gain Ultimate Attribute");

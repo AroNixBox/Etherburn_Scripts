@@ -9,9 +9,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 0}
+  m_Script: {fileID: 11500000, guid: ed0c2f41f4e34780aff5dd9ae0b55597, type: 3}
   m_Name: SwordHitVFX
-  m_EditorClassIdentifier: Assembly-CSharp:Effects:ParticleEffect
+  m_EditorClassIdentifier: 
   effectData:
   - material: {fileID: 13400000, guid: d85c7e236a4579d468c4f15c2143393c, type: 2}
     associatedEffects:
