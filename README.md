@@ -26,7 +26,7 @@ To get started with **Etherburn**, ensure you have the following tools installed
 
 1. Clone the repository using the command:
    ```bash
-   git clone https://github.com/Ddemon26/Etherburn_Scripts.git
+   git clone https://github.com/AroNixBox/Etherburn_Scripts.git
    ```
 2. Open the project in Unity.
 3. Attach the desired scripts to appropriate GameObjects in your scene to implement their functionality.
