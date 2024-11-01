@@ -6,13 +6,12 @@ using Action = Unity.Behavior.Action;
 using Unity.Properties;
 
 [Serializable, GeneratePropertyBag]
-[NodeDescription(name: "WaitForEndOfAnimation", story: "Wait for end of running Animation on [Animator]", category: "Action", id: "6c7d980a47ea6b5ce81e4e037edd6555")]
+[NodeDescription(name: "WaitForEndOfAnimation", story: "Wait for end of Animation on [Animator]", category: "Action", id: "6c7d980a47ea6b5ce81e4e037edd6555")]
 public partial class WaitForEndOfAnimationAction : Action {
     [SerializeReference] public BlackboardVariable<Animator> Animator;
     
     CountdownTimer _countdownTimer;
-    protected override Status OnStart()
-    {
+    protected override Status OnStart() {
         var timeOfCurrentClip = Animator.Value.GetCurrentAnimatorStateInfo(0).length;
         var timeUntilClipEnds = timeOfCurrentClip - Animator.Value.GetCurrentAnimatorStateInfo(0).normalizedTime;
         _countdownTimer = new CountdownTimer(timeUntilClipEnds);

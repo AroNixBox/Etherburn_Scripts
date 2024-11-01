@@ -30,6 +30,7 @@ public partial class DetectTargetAction : Action {
         if(target == null) return Status.Running;
         
         Target.Value = target.gameObject;
+        Debug.Log($"Detected target: {target.name}");
         return Status.Success;
     }
 
