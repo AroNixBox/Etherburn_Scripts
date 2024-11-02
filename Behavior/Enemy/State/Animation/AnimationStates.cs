@@ -5,7 +5,8 @@ using Unity.Behavior;
 public enum AnimationStates {
 	None,
     GroundLocomotion,
-	Attack,
+	Attack_A,
+	Attack_B,
 	Eat,
 	Hurt,
 	Die

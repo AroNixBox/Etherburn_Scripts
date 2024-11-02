@@ -1,5 +1,5 @@
 using System;
-using System.Threading.Tasks;
+using Behavior.Enemy.State.Animation;
 using Unity.Behavior;
 using UnityEngine;
 using Action = Unity.Behavior.Action;
@@ -12,10 +12,12 @@ public partial class WaitForEndOfAnimationAction : Action {
     
     CountdownTimer _countdownTimer;
     protected override Status OnStart() {
-        var timeOfCurrentClip = Animator.Value.GetCurrentAnimatorStateInfo(0).length;
-        var timeUntilClipEnds = timeOfCurrentClip - Animator.Value.GetCurrentAnimatorStateInfo(0).normalizedTime;
-        _countdownTimer = new CountdownTimer(timeUntilClipEnds);
+        var stateInfo = Animator.Value.GetCurrentAnimatorStateInfo(0);
+        var waitTime = stateInfo.length - stateInfo.normalizedTime;
+        
+        _countdownTimer = new CountdownTimer(waitTime);
         _countdownTimer.Start();
+
         return Status.Running;
     }
 

@@ -979,7 +979,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""name"": ""MiddleClick"",
                     ""type"": ""Button"",
                     ""id"": ""58d6d2d5-e2fa-45fa-ad77-ee11724af00c"",
-                    ""expectedControlType"": ""Button"",
+                    ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
