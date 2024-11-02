@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Behavior;
+using UnityEngine;
 
 namespace Attribute {
     public class Hunger : EnergyBase {
@@ -21,10 +22,6 @@ namespace Attribute {
         public override void Increase(float amount) {
             _healthDecreaseTimeoutTimer.Start();
             base.Increase(amount);
-        }
-        
-        protected override string GetBlackboardVariableName() {
-            return "OnHungerChangedEvent";
         }
     }
 }

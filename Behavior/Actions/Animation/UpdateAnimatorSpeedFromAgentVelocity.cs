@@ -5,9 +5,11 @@ using UnityEngine.AI;
 using Action = Unity.Behavior.Action;
 using Unity.Properties;
 
-// If using this class, make sure to Reset the Agent Path when reaching the destination, since this class depends on it.
 [Serializable, GeneratePropertyBag]
-[NodeDescription(name: "Update Animator Speed from Agent Velocity", story: "Sets the [Animator] BlendSpeed [Speed] with param [AnimatorSpeedParam] based on [Agent] velocity", category: "Action", id: "2c1bb4cb3a7ae46bf8f28c20070c0e2d")]
+[NodeDescription(name: "Update Animator Speed from Agent Velocity", 
+                story: "Sets the [Animator] BlendSpeed [Speed] with param [AnimatorSpeedParam] based on [Agent] velocity", 
+                category: "Action", 
+                id: "2c1bb4cb3a7ae46bf8f28c20070c0e2d")]
 public partial class UpdateAnimatorSpeedFromAgentVelocity : Action {
     [SerializeReference] public BlackboardVariable<NavMeshAgent> Agent;
     [SerializeReference] public BlackboardVariable<Animator> Animator;
@@ -37,52 +39,45 @@ public partial class UpdateAnimatorSpeedFromAgentVelocity : Action {
             HandleNoPath();
             return Status.Running;
         }
-        
         UpdateAnimationSpeed();
     
         return Status.Running;
     }
 
     void HandleNoPath() {
-        SlowDownToStop();
-    
-        if (_velocity.magnitude < 0.01f) {
-            ResetVelocity();
-            return;
-        }
-    
-        // Update Animator with Current Velocity
-        Animator.Value.SetFloat(
-            AnimatorSpeedParam.Value, 
-            _velocity.magnitude, 
-            VelocitySmoothing, 
-            Time.deltaTime
-        );
-    }
-
-    void SlowDownToStop() {
-        _velocity = Vector3.Lerp(_velocity, Vector3.zero, 5f * Time.deltaTime);
-    }
-
-    void ResetVelocity() {
         _velocity = Vector3.zero;
         Animator.Value.SetFloat(AnimatorSpeedParam.Value, 0);
     }
 
     void UpdateAnimationSpeed() {
         Vector3 worldDeltaPosition = Agent.Value.desiredVelocity;
+        float distanceToTarget = Agent.Value.remainingDistance;
+        float slowdownDistance = Agent.Value.stoppingDistance * 4f;
+        
+        // TODO: Handle properly slowing down, currently its based on a hardcoded value.
+        // Slow down in the last part of the path
+        if (distanceToTarget <= slowdownDistance) {
+            // Ensure we reach the target, even tho target could be very close to us and we are starting to run.
+            float normalizedDistance = Mathf.Clamp01(distanceToTarget / slowdownDistance);
+            // Lerp between half speed and full speed (Because Idle = 0, Walk is Half and Run is Full)
+            float targetSpeed = Mathf.Lerp(Agent.Value.speed / 2f, Agent.Value.speed, normalizedDistance);
+        
+            worldDeltaPosition = worldDeltaPosition.normalized * targetSpeed;
+        }
+
         _smoothDeltaPosition = Vector3.SmoothDamp(
             _smoothDeltaPosition,
             worldDeltaPosition,
             ref _velocity,
             VelocitySmoothing
         );
-    
+
         var speed = _smoothDeltaPosition.magnitude;
-        Animator.Value.SetFloat(AnimatorSpeedParam.Value, speed, .5f, Time.deltaTime);
+        Animator.Value.SetFloat(AnimatorSpeedParam.Value, speed, 0.5f, Time.deltaTime);
     }
 
     protected override void OnEnd() {
-        ResetVelocity();
+        _velocity = Vector3.zero;
+        Animator.Value.SetFloat(AnimatorSpeedParam.Value, 0);
     }
 }
