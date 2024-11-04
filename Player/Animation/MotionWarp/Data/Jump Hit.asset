@@ -13,12 +13,12 @@ MonoBehaviour:
   m_Name: Jump Hit
   m_EditorClassIdentifier: 
   clip: {fileID: 7400000, guid: 15bceccfbd862164cb8ca9acc311b983, type: 3}
+  targetObject: {fileID: 100160, guid: 5ae02fce3fd08f140888c4d8f1f2cfc3, type: 3}
+  totalRootMotion: {x: -0.029895928, y: 0, z: 3.1914463}
   startFrame: 45
   endFrame: 148
-  objectToWarp: {fileID: 100160, guid: 5ae02fce3fd08f140888c4d8f1f2cfc3, type: 3}
-  totalRootMotionUntilWarpStartFrame: {x: 0.031729136, y: 0, z: 1.4622016}
-  totalRootMotionBetweenWarpStartAndEndFrame: {x: -0.070110306, y: 0, z: 1.9381099}
-  totalRootMotion: {x: -0.029896084, y: 0, z: 3.1914463}
+  totalRootMotionUntilWarpStartFrame: {x: 0.03172917, y: 0, z: 1.4622016}
+  totalRootMotionBetweenWarpStartAndEndFrame: {x: -0.07011028, y: 0, z: 1.9381099}
   effectInstance:
     particleSystem: {fileID: 5275736863541973407, guid: fc424d8197b2dbd478aa8d4e59142e2c,
       type: 3}

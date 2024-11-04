@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d7536576a54f42a99171278044874441, type: 3}
+  m_Name: Zombie_Attack_B_Data
+  m_EditorClassIdentifier: 
+  clip: {fileID: 7400000, guid: cecce227b38a51b4596f6f5fdbbac8a3, type: 2}
+  targetObject: {fileID: 4599355923057015996, guid: cb11f558b7990f94a835da06ac05b41f,
+    type: 3}
+  totalRootMotion: {x: 0, y: -0.0007954112, z: 0.27519608}

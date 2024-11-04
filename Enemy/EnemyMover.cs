@@ -10,8 +10,10 @@ namespace Enemy {
             agent.updateRotation = true;
         }
         public void AnimatorMove(Vector3 rootPosition) {
-            transform.position = rootPosition;
-            agent.nextPosition = rootPosition;
+            var newPosition = rootPosition;
+            newPosition.y = transform.position.y;
+            transform.position = newPosition;
+            agent.nextPosition = newPosition;
         }
     }
 }

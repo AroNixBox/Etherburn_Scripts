@@ -13,12 +13,12 @@ MonoBehaviour:
   m_Name: Dash Hit
   m_EditorClassIdentifier: 
   clip: {fileID: 7400000, guid: 8e5e7a257c81eca4d8fc764f135d7564, type: 3}
+  targetObject: {fileID: 100160, guid: 5ae02fce3fd08f140888c4d8f1f2cfc3, type: 3}
+  totalRootMotion: {x: -0.051295288, y: 0, z: 5.13778}
   startFrame: 110
   endFrame: 150
-  objectToWarp: {fileID: 100160, guid: 5ae02fce3fd08f140888c4d8f1f2cfc3, type: 3}
-  totalRootMotionUntilWarpStartFrame: {x: 0.060858205, y: 0, z: 0.44202957}
-  totalRootMotionBetweenWarpStartAndEndFrame: {x: -0.04876441, y: 0, z: 4.401134}
-  totalRootMotion: {x: -0.051295213, y: 0, z: 5.13778}
+  totalRootMotionUntilWarpStartFrame: {x: 0.060858175, y: 0, z: 0.44202963}
+  totalRootMotionBetweenWarpStartAndEndFrame: {x: -0.04876436, y: 0, z: 4.401134}
   effectInstance:
     particleSystem: {fileID: 5275736863541973407, guid: fc424d8197b2dbd478aa8d4e59142e2c,
       type: 3}

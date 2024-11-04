@@ -12,6 +12,7 @@ public partial class RootMotionNavigateToLocationAction : Action
     [SerializeReference] public BlackboardVariable<NavMeshAgent> Agent;
     [SerializeReference] public BlackboardVariable<Vector3> Location;
     
+    
     Vector3 _lastTargetPosition;
     Vector3 _colliderAdjustedTargetPosition;
 
