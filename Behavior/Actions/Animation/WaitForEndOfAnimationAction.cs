@@ -1,5 +1,4 @@
 using System;
-using Behavior.Enemy.State.Animation;
 using Unity.Behavior;
 using UnityEngine;
 using Action = Unity.Behavior.Action;
@@ -13,8 +12,7 @@ public partial class WaitForEndOfAnimationAction : Action {
     CountdownTimer _countdownTimer;
     protected override Status OnStart() {
         var stateInfo = Animator.Value.GetCurrentAnimatorStateInfo(0);
-        var waitTime = stateInfo.length - stateInfo.normalizedTime;
-        
+        var waitTime = stateInfo.length;        
         _countdownTimer = new CountdownTimer(waitTime);
         _countdownTimer.Start();
 
@@ -29,7 +27,6 @@ public partial class WaitForEndOfAnimationAction : Action {
         return Status.Running;
     }
 
-    protected override void OnEnd() {
-    }
+    protected override void OnEnd() { }
 }
 
