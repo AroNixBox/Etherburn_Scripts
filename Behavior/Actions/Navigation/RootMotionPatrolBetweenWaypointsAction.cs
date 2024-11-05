@@ -32,21 +32,28 @@ public partial class RootMotionPatrolBetweenWaypointsAction : Action
     }
 
     protected override Status OnUpdate() {
-        if (_waitTimer.IsRunning) {
-            // Handle wait time at each point
-            _waitTimer.Tick(Time.deltaTime);
-            return Status.Running;
-        }
-        
-        if(Agent.Value.remainingDistance <= Agent.Value.stoppingDistance) {
-            Agent.Value.ResetPath();
-            
-            // Start waiting until the wait time is over
-            _waitTimer.Start();
-        }
-
+    if (_waitTimer.IsRunning) {
+        // Handle wait time at each point
+        _waitTimer.Tick(Time.deltaTime);
         return Status.Running;
     }
+    
+    if (Agent.Value.remainingDistance <= Agent.Value.stoppingDistance) {
+        Agent.Value.ResetPath();
+        
+        // Start waiting until the wait time is over
+        _waitTimer.Start();
+    } else {
+        // Smoothly rotate towards the target
+        Vector3 direction = (Agent.Value.steeringTarget - Agent.Value.transform.position).normalized;
+        if (direction != Vector3.zero) {
+            Quaternion targetRotation = Quaternion.LookRotation(direction);
+            Agent.Value.transform.rotation = Quaternion.Slerp(Agent.Value.transform.rotation, targetRotation, Time.deltaTime * 2.5f);
+        }
+    }
+
+    return Status.Running;
+}
 
     void MoveToNextPoint() {
         // Set the next patrol point as the agent's destination

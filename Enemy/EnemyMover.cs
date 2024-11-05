@@ -7,7 +7,7 @@ namespace Enemy {
         void Awake() {
             agent.updatePosition = false;
             // TODO: If wanna control rotation, set this to true
-            agent.updateRotation = true;
+            agent.updateRotation = false;
         }
         public void AnimatorMove(Vector3 rootPosition) {
             var newPosition = rootPosition;

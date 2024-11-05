@@ -21,16 +21,37 @@ public partial class SetRootMotionTargetPositionAction : Action
 
     protected override Status OnStart()
 {
-    if (ReferenceEquals(RootMotionEndPosition, null) 
-        || ReferenceEquals(RootMotionDataWrapper, null)
-        || ReferenceEquals(Self, null)
-        || ReferenceEquals(Target, null)
-        || ReferenceEquals(AnimationController, null)) {
+    if (AreReferencesMissing())
+    {
         Debug.LogError("RootMotionEndPosition, RootMotionDataWrapper, Target, AnimatorController or Self is missing.");
         return Status.Failure;
     }
-    
+
     Vector3 selfPosition = Self.Value.transform.position;
+    RootMotionAnimationDataSO bestRootMotionData = FindBestRootMotionData(selfPosition);
+
+    if (bestRootMotionData == null) {
+        Debug.LogError("No fitting Root Motion Data found.");
+        return Status.Failure;
+    }
+    
+    // Which position is the Animation ending
+    RootMotionEndPosition.Value = selfPosition + Self.Value.transform.TransformDirection(bestRootMotionData.totalRootMotion);
+    
+    // Replace the current Animation Clip with the best fitting Root Motion Data
+    var oldAnimationClip = AnimationController.Value.GetInitialAttackClip(CurrentAnimationState.Value);
+    AnimationController.Value.ReplaceClipFromOverrideController(oldAnimationClip, bestRootMotionData.clip);
+    
+    return Status.Success;
+}
+
+bool AreReferencesMissing() => ReferenceEquals(RootMotionEndPosition, null)
+                               || ReferenceEquals(RootMotionDataWrapper, null)
+                               || ReferenceEquals(Self, null)
+                               || ReferenceEquals(Target, null)
+                               || ReferenceEquals(AnimationController, null);
+
+RootMotionAnimationDataSO FindBestRootMotionData(Vector3 selfPosition) {
     RootMotionAnimationDataSO bestRootMotionData = null;
     float bestDistance = float.MaxValue;
 
@@ -38,30 +59,20 @@ public partial class SetRootMotionTargetPositionAction : Action
         var rmWorldRootMotion = Self.Value.transform.TransformDirection(rmData.totalRootMotion);
         rmWorldRootMotion.y = 0;
 
-        var distanceToTarget = (Target.Value.transform.position - selfPosition).magnitude;
+        var distanceToTarget = (Target.Value.transform.position - (selfPosition + rmWorldRootMotion)).magnitude;
 
+        // Is the target position reachable?
         if (!NavMesh.SamplePosition(selfPosition + rmWorldRootMotion, out NavMeshHit hit, 0.1f, NavMesh.AllAreas)) {
             continue;
         }
 
-        if (distanceToTarget < bestDistance) {
-            bestDistance = distanceToTarget;
+        if (Mathf.Abs(distanceToTarget - MinAttackDistance) < bestDistance) {
+            bestDistance = Mathf.Abs(distanceToTarget - MinAttackDistance);
             bestRootMotionData = rmData;
         }
     }
 
-    if (bestRootMotionData == null) {
-        Debug.LogError("No fitting Root Motion Data found.");
-        return Status.Failure;
-    }
-
-    RootMotionEndPosition.Value = selfPosition + Self.Value.transform.TransformDirection(bestRootMotionData.totalRootMotion);
-    GameObject debugObject = new GameObject("DebugRootMotionEndPosition");
-    debugObject.transform.position = RootMotionEndPosition.Value;
-
-    var oldAnimationClip = AnimationController.Value.GetInitialAttackClip(CurrentAnimationState.Value);
-    AnimationController.Value.ReplaceClipFromOverrideController(oldAnimationClip, bestRootMotionData.clip);
-    return Status.Success;
+    return bestRootMotionData;
 }
 
     protected override Status OnUpdate() {
