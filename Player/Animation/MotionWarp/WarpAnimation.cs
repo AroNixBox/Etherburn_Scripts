@@ -1,4 +1,5 @@
 ﻿using Effects.VFX;
+using Motion.RootMotion;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.Serialization;

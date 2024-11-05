@@ -13,6 +13,7 @@ public partial class WaitForEndOfAnimationAction : Action {
     protected override Status OnStart() {
         var stateInfo = Animator.Value.GetCurrentAnimatorStateInfo(0);
         var waitTime = stateInfo.length;        
+        Debug.Log($"Waiting for {waitTime} seconds.");
         _countdownTimer = new CountdownTimer(waitTime);
         _countdownTimer.Start();
 

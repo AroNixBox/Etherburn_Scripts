@@ -11,7 +11,7 @@ namespace Enemy {
         }
         public void AnimatorMove(Vector3 rootPosition) {
             var newPosition = rootPosition;
-            newPosition.y = transform.position.y;
+            newPosition.y = agent.nextPosition.y;
             transform.position = newPosition;
             agent.nextPosition = newPosition;
         }

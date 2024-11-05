@@ -1,7 +1,7 @@
 ﻿using Sirenix.OdinInspector;
 using UnityEngine;
 
-namespace Player.Animation {
+namespace Motion.RootMotion {
     [CreateAssetMenu(fileName = "Root Motion Animation Data", menuName = "Animation Helper/Root Motion Animation Data")]
     public class RootMotionAnimationDataSO : ScriptableObject {
         [InfoBox("Specify the frame range to apply the root motion warp")]

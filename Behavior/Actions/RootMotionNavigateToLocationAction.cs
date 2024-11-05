@@ -21,7 +21,12 @@ public partial class RootMotionNavigateToLocationAction : Action
             Debug.LogError("Agent or Target is missing.");
             return Status.Failure;
         }
-        //var locationOnNavMesh = GetAdjustedPosition();
+        
+        if ((Agent.Value.transform.position - Location.Value).magnitude
+            <= Agent.Value.stoppingDistance) {
+            return Status.Success;
+        }
+        
         Agent.Value.SetDestination(Location.Value);
         
         return Status.Running;
@@ -32,14 +37,6 @@ public partial class RootMotionNavigateToLocationAction : Action
             ? Status.Success 
             : Status.Running;
     }
-    
-    /// <returns>Get closest position on the NavMeshSurface.</returns>
-    Vector3 GetAdjustedPosition() {
-        return NavMesh.FindClosestEdge(Location.Value, out NavMeshHit hit, NavMesh.AllAreas) 
-            ? hit.position 
-            : Location.Value;
-    }
-
     protected override void OnEnd() {
         if(ReferenceEquals(Agent?.Value, null)) { return; }
         
