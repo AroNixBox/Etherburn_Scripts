@@ -7,7 +7,7 @@ using Action = Unity.Behavior.Action;
 using Unity.Properties;
 
 [Serializable, GeneratePropertyBag]
-[NodeDescription(name: "RootMotion Patrol between Waypoints", story: "[Agent] root-patrols between [Waypoints]", category: "Action", id: "898860062991204839cd797780ebca0b")]
+[NodeDescription(name: "RootMotion Patrol between Waypoints", story: "[Agent] root-patrols between [Waypoints]", category: "Action/Navigation/RootMotion", id: "898860062991204839cd797780ebca0b")]
 public partial class RootMotionPatrolBetweenWaypointsAction : Action
 {
     [SerializeReference] public BlackboardVariable<NavMeshAgent> Agent;

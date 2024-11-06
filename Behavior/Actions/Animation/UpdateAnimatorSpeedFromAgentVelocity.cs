@@ -16,6 +16,7 @@ public partial class UpdateAnimatorSpeedFromAgentVelocity : Action {
     [SerializeReference] public BlackboardVariable<float> Speed;
     [SerializeReference] public BlackboardVariable<float> VelocitySmoothing = new (0.1f);
     [SerializeReference] public BlackboardVariable<string> AnimatorSpeedParam;
+    [SerializeReference] public BlackboardVariable<bool> MovingForward = new (true);
     
     Vector3 _smoothDeltaPosition;
     Vector3 _velocity;
@@ -51,19 +52,8 @@ public partial class UpdateAnimatorSpeedFromAgentVelocity : Action {
 
     void UpdateAnimationSpeed() {
         Vector3 worldDeltaPosition = Agent.Value.desiredVelocity;
-        float distanceToTarget = Agent.Value.remainingDistance;
-        float slowdownDistance = Agent.Value.stoppingDistance * 4f;
         
-        // TODO: Handle properly slowing down, currently its based on a hardcoded value.
-        // Slow down in the last part of the path
-        if (distanceToTarget <= slowdownDistance) {
-            // Ensure we reach the target, even tho target could be very close to us and we are starting to run.
-            float normalizedDistance = Mathf.Clamp01(distanceToTarget / slowdownDistance);
-            // Lerp between half speed and full speed (Because Idle = 0, Walk is Half and Run is Full)
-            float targetSpeed = Mathf.Lerp(Agent.Value.speed / 2f, Agent.Value.speed, normalizedDistance);
-        
-            worldDeltaPosition = worldDeltaPosition.normalized * targetSpeed;
-        }
+        // TODO: Slow down before reaching the target
 
         _smoothDeltaPosition = Vector3.SmoothDamp(
             _smoothDeltaPosition,
@@ -73,6 +63,11 @@ public partial class UpdateAnimatorSpeedFromAgentVelocity : Action {
         );
 
         var speed = _smoothDeltaPosition.magnitude;
+
+        if (!MovingForward) {
+            speed = -speed;
+        }
+        
         Animator.Value.SetFloat(AnimatorSpeedParam.Value, speed, 0.5f, Time.deltaTime);
     }
 

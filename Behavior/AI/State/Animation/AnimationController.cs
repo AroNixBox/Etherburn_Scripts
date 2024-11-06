@@ -21,7 +21,6 @@ namespace Behavior.Enemy.State.Animation {
                     return secondInitialAttackClip;
                 default:
                     throw new System.ArgumentOutOfRangeException(nameof(animationState), animationState, null);
-                    return null;
             }
         }
         public void ReplaceClipFromOverrideController(AnimationClip oldClip, AnimationClip newClip) {

@@ -1,29 +1,32 @@
 ﻿using UnityEngine;
 
 namespace Enemy {
-    public class Target{
-        readonly Transform _parentTransform;
-        readonly Transform _playerTransform;
-        readonly Transform _targetTransform;
+    public class Target {
+        // The pivot point around which the target rotates
+        readonly Transform _pivot;
+        // The reference object that defines the rotational relationship
+        readonly Transform _anchor;
+        // The actual target we set
+        readonly Transform _targetObject;
         readonly float _distanceFromParentOrigin;
 
-        public Target(Transform targetTransform, Transform playerTransform, Transform parentTransform, float distanceFromParentOrigin) {
-            _parentTransform = parentTransform;
-            _playerTransform = playerTransform;
-            _targetTransform = targetTransform;
+        public Target(Transform targetObject, Transform anchor, Transform pivot, float distanceFromParentOrigin) {
+            _pivot = pivot;
+            _anchor = anchor;
+            _targetObject = targetObject;
             _distanceFromParentOrigin = distanceFromParentOrigin;
         }
 
-        public Transform GetTransform() => _targetTransform;
+        public Transform GetTransform() => _targetObject;
 
         public void RotateAroundParent() {
-            Vector3 parentToPlayer = _playerTransform.position - _parentTransform.position;
-            _targetTransform.position = _parentTransform.position + parentToPlayer.normalized * _distanceFromParentOrigin;
+            Vector3 parentToPlayer = _anchor.position - _pivot.position;
+            _targetObject.position = _pivot.position + parentToPlayer.normalized * _distanceFromParentOrigin;
         }
 
         public void LookAtParent() {
-            Vector3 direction = (_parentTransform.position - _targetTransform.position).normalized;
-            _targetTransform.rotation = Quaternion.LookRotation(direction);
+            Vector3 direction = (_pivot.position - _targetObject.position).normalized;
+            _targetObject.rotation = Quaternion.LookRotation(direction);
         }
     }
 }

@@ -6,13 +6,15 @@ using Unity.Properties;
 using UnityEngine.AI;
 
 [Serializable, GeneratePropertyBag]
-[NodeDescription(name: "RootMotion Navigate to Target", story: "[Agent] root-moves to [Target]", category: "Action", id: "9e97d39273b3f1279f4549738afb9780")]
+[NodeDescription(name: "RootMotion Navigate to Target", story: "[Agent] root-moves to [Target]", category: "Action/Navigation/RootMotion", id: "9e97d39273b3f1279f4549738afb9780")]
 public partial class RootMotionNavigateToTargetAction : Action
 {
     [SerializeReference] public BlackboardVariable<NavMeshAgent> Agent;
     [SerializeReference] public BlackboardVariable<GameObject> Target;
     [SerializeReference] public BlackboardVariable<bool> ApplyRotation;
     [SerializeReference] public BlackboardVariable<float> RotationSpeed = new (5.0f);
+    [SerializeReference] public BlackboardVariable<bool> SignalOnArrival = new (true);
+
     
     Vector3 _lastTargetPosition;
     Vector3 _colliderAdjustedTargetPosition;
@@ -22,8 +24,17 @@ public partial class RootMotionNavigateToTargetAction : Action
             Debug.LogError("Agent or Target is missing.");
             return Status.Failure;
         }
-        
+
         Agent.Value.SetDestination(Target.Value.transform.position);
+
+        if (SignalOnArrival.Value) {
+            if ((Agent.Value.transform.position - Target.Value.transform.position).magnitude <= Agent.Value.stoppingDistance) {
+                // We need to set a destination none the less, because OnEnd forces us to at the steerTarget,
+                // which is from the Old Location if we dont override
+                Agent.Value.SetDestination(Target.Value.transform.position);
+                return Status.Success;
+            }
+        }
         
         return Status.Running;
     }
@@ -40,7 +51,7 @@ public partial class RootMotionNavigateToTargetAction : Action
             RotateTowardsTargetLocation();
         }
         
-        return Agent.Value.remainingDistance <= Agent.Value.stoppingDistance 
+        return SignalOnArrival.Value && Agent.Value.remainingDistance <= Agent.Value.stoppingDistance
             ? Status.Success 
             : Status.Running;
     }
@@ -70,7 +81,10 @@ public partial class RootMotionNavigateToTargetAction : Action
 
     protected override void OnEnd() {
         if(ReferenceEquals(Agent?.Value, null)) { return; }
-        
+        // Force LookAt Target
+        if (ApplyRotation) {
+            Agent.Value.transform.LookAt(Agent.Value.steeringTarget);
+        }
         if(Agent.Value.isOnNavMesh) {
             Agent.Value.ResetPath();
         }
