@@ -11,6 +11,8 @@ public partial class RootMotionNavigateToTargetAction : Action
 {
     [SerializeReference] public BlackboardVariable<NavMeshAgent> Agent;
     [SerializeReference] public BlackboardVariable<GameObject> Target;
+    [SerializeReference] public BlackboardVariable<bool> ApplyRotation;
+    [SerializeReference] public BlackboardVariable<float> RotationSpeed = new (5.0f);
     
     Vector3 _lastTargetPosition;
     Vector3 _colliderAdjustedTargetPosition;
@@ -28,18 +30,24 @@ public partial class RootMotionNavigateToTargetAction : Action
 
     protected override Status OnUpdate() {
         // Check if the target position has changed.
-        bool boolUpdateTargetPosition = !Mathf.Approximately(_lastTargetPosition.x, Target.Value.transform.position.x) 
-                                        || !Mathf.Approximately(_lastTargetPosition.y, Target.Value.transform.position.y) 
-                                        || !Mathf.Approximately(_lastTargetPosition.z, Target.Value.transform.position.z);
-        if (boolUpdateTargetPosition) {
+        if (HasTargetMoved()) {
             _lastTargetPosition = Target.Value.transform.position;
             _colliderAdjustedTargetPosition = GetPositionColliderAdjusted();
             Agent.Value.SetDestination(_colliderAdjustedTargetPosition);
+        }
+
+        if (ApplyRotation) {
+            RotateTowardsTargetLocation();
         }
         
         return Agent.Value.remainingDistance <= Agent.Value.stoppingDistance 
             ? Status.Success 
             : Status.Running;
+    }
+    bool HasTargetMoved() {
+        return !Mathf.Approximately(_lastTargetPosition.x, Target.Value.transform.position.x) 
+               || !Mathf.Approximately(_lastTargetPosition.y, Target.Value.transform.position.y) 
+               || !Mathf.Approximately(_lastTargetPosition.z, Target.Value.transform.position.z);
     }
     
     /// <returns>Get the position of the target adjusted to the collider.</returns>
@@ -50,6 +58,14 @@ public partial class RootMotionNavigateToTargetAction : Action
             return targetCollider.ClosestPoint(Agent.Value.transform.position);
         }
         return Target.Value.transform.position;
+    }
+    
+    void RotateTowardsTargetLocation() {
+        Vector3 direction = (Agent.Value.steeringTarget - Agent.Value.transform.position).normalized;
+        if (direction != Vector3.zero) {
+            Quaternion targetRotation = Quaternion.LookRotation(direction);
+            Agent.Value.transform.rotation = Quaternion.Slerp(Agent.Value.transform.rotation, targetRotation, Time.deltaTime * 2.5f);
+        }
     }
 
     protected override void OnEnd() {

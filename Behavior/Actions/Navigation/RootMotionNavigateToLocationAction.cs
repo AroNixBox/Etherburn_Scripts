@@ -11,10 +11,9 @@ public partial class RootMotionNavigateToLocationAction : Action
 {
     [SerializeReference] public BlackboardVariable<NavMeshAgent> Agent;
     [SerializeReference] public BlackboardVariable<Vector3> Location;
-    
-    
-    Vector3 _lastTargetPosition;
-    Vector3 _colliderAdjustedTargetPosition;
+
+    [SerializeReference] public BlackboardVariable<bool> ApplyRotation;
+    [SerializeReference] public BlackboardVariable<float> RotationSpeed = new (5.0f);
 
     protected override Status OnStart() {
         if (ReferenceEquals(Agent?.Value, null) || ReferenceEquals(Location, null)) {
@@ -22,8 +21,7 @@ public partial class RootMotionNavigateToLocationAction : Action
             return Status.Failure;
         }
         
-        if ((Agent.Value.transform.position - Location.Value).magnitude
-            <= Agent.Value.stoppingDistance) {
+        if ((Agent.Value.transform.position - Location.Value).magnitude <= Agent.Value.stoppingDistance) {
             return Status.Success;
         }
         
@@ -33,16 +31,31 @@ public partial class RootMotionNavigateToLocationAction : Action
     }
 
     protected override Status OnUpdate() {
-        return Agent.Value.remainingDistance <= Agent.Value.stoppingDistance 
-            ? Status.Success 
-            : Status.Running;
+        if (Agent.Value.remainingDistance <= Agent.Value.stoppingDistance) {
+            return Status.Success;
+        }
+
+        if (ApplyRotation) {
+            RotateTowardsTargetLocation();
+        }
+        
+        return Status.Running;
     }
+
     protected override void OnEnd() {
         if(ReferenceEquals(Agent?.Value, null)) { return; }
-        
+        // Force LookAt Target
+        Agent.Value.transform.LookAt(Agent.Value.steeringTarget);
         if(Agent.Value.isOnNavMesh) {
             Agent.Value.ResetPath();
         }
     }
+    
+    void RotateTowardsTargetLocation() {
+        Vector3 direction = (Agent.Value.steeringTarget - Agent.Value.transform.position).normalized;
+        if (direction != Vector3.zero) {
+            Quaternion targetRotation = Quaternion.LookRotation(direction);
+            Agent.Value.transform.rotation = Quaternion.Slerp(Agent.Value.transform.rotation, targetRotation, Time.deltaTime * 2.5f);
+        }
+    }
 }
-
