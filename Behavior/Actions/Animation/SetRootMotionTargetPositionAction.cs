@@ -23,7 +23,7 @@ public partial class SetRootMotionTargetPositionAction : Action
     [SerializeReference] public BlackboardVariable<AnimationController> AnimationController;
     [SerializeReference] public BlackboardVariable<GameObject> Self;
     [SerializeReference] public BlackboardVariable<GameObject> Target;
-    [SerializeReference] public BlackboardVariable<AnimationStates> CurrentAnimationState;
+    [SerializeReference] public BlackboardVariable<NPCAnimationStates> CurrentAnimationState;
     [SerializeReference] public BlackboardVariable<float> MinAttackDistance;
 
     protected override Status OnStart()

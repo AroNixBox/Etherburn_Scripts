@@ -2,11 +2,10 @@ using System;
 using Unity.Behavior;
 
 [BlackboardEnum]
-public enum AnimationStates {
+public enum NPCState {
 	None,
-    GroundLocomotion,
-	AttackA,
-	AttackB,
+    Patrol,
+	Combat,
 	Eat,
 	Hurt,
 	Die

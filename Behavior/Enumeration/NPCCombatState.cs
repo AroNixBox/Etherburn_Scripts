@@ -2,11 +2,10 @@ using System;
 using Unity.Behavior;
 
 [BlackboardEnum]
-public enum EnemyState {
-    Patrol,
-	Chase,
+public enum NPCCombatState
+{
+	None,
+    Chase,
 	Attack,
-	Eat,
-	Hurt,
-	Die
+	Retreat
 }

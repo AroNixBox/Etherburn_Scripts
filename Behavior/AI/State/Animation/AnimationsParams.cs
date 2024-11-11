@@ -16,17 +16,17 @@ namespace Behavior.Enemy.State.Animation {
         // public static readonly float SpeedMagnitude = Animator.StringToHash("SpeedMagnitude");
         
         // Animation Durations
-        static readonly Dictionary<AnimationStates, AnimationDetails> AnimationConditions = new() {
-            {AnimationStates.GroundLocomotion, new AnimationDetails {StateName = GroundLocomotion, BlendDuration = 0.125f}},
-            {AnimationStates.AttackA, new AnimationDetails {StateName = AttackA, BlendDuration = 0f}},
-            {AnimationStates.AttackB, new AnimationDetails {StateName = AttackB, BlendDuration = 0f}},
-            {AnimationStates.Hurt, new AnimationDetails {StateName = Hurt, BlendDuration = 0.1f}},
-            {AnimationStates.Die, new AnimationDetails {StateName = Die, BlendDuration = 0.1f}},
-            {AnimationStates.Eat, new AnimationDetails {StateName = Eat, BlendDuration = 0.1f}}
+        static readonly Dictionary<NPCAnimationStates, AnimationDetails> AnimationConditions = new() {
+            {NPCAnimationStates.GroundLocomotion, new AnimationDetails {StateName = GroundLocomotion, BlendDuration = 0.125f}},
+            {NPCAnimationStates.AttackA, new AnimationDetails {StateName = AttackA, BlendDuration = 0f}},
+            {NPCAnimationStates.AttackB, new AnimationDetails {StateName = AttackB, BlendDuration = 0f}},
+            {NPCAnimationStates.Hurt, new AnimationDetails {StateName = Hurt, BlendDuration = 0.1f}},
+            {NPCAnimationStates.Die, new AnimationDetails {StateName = Die, BlendDuration = 0.1f}},
+            {NPCAnimationStates.Eat, new AnimationDetails {StateName = Eat, BlendDuration = 0.1f}}
         };
         
         static readonly AnimationDetails EmptyDetails = new() { StateName = Empty, BlendDuration = 0.1f };
-        public static AnimationDetails GetAnimationDetails(AnimationStates state) {
+        public static AnimationDetails GetAnimationDetails(NPCAnimationStates state) {
             return AnimationConditions.GetValueOrDefault(state, EmptyDetails);
         }
 

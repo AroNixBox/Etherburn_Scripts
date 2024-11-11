@@ -13,14 +13,14 @@ namespace Behavior.Enemy.State.Animation {
             _currentStateHash = stateDetails.StateName;
             animator.CrossFade(_currentStateHash, stateDetails.BlendDuration);
         }
-        public AnimationClip GetInitialAttackClip(AnimationStates animationState) {
-            switch (animationState) {
-                case AnimationStates.AttackA:
+        public AnimationClip GetInitialAttackClip(NPCAnimationStates npcAnimationState) {
+            switch (npcAnimationState) {
+                case NPCAnimationStates.AttackA:
                     return firstInitialAttackClip;
-                case AnimationStates.AttackB:
+                case NPCAnimationStates.AttackB:
                     return secondInitialAttackClip;
                 default:
-                    throw new System.ArgumentOutOfRangeException(nameof(animationState), animationState, null);
+                    throw new System.ArgumentOutOfRangeException(nameof(npcAnimationState), npcAnimationState, null);
             }
         }
         public void ReplaceClipFromOverrideController(AnimationClip oldClip, AnimationClip newClip) {

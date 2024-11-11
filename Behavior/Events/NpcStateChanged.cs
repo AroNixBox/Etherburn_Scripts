@@ -11,18 +11,18 @@ using Unity.Properties;
 [EventChannelDescription(name: "NPC State Changed", message: "NPC State has changed to [Value]", category: "Events", id: "296b2c3feac0c09efa0da34cad491797")]
 public partial class NpcStateChanged : EventChannelBase
 {
-    public delegate void NpcStateChangedEventHandler(EnemyState Value);
+    public delegate void NpcStateChangedEventHandler(NPCState Value);
     public event NpcStateChangedEventHandler Event; 
 
-    public void SendEventMessage(EnemyState Value)
+    public void SendEventMessage(NPCState Value)
     {
         Event?.Invoke(Value);
     }
 
     public override void SendEventMessage(BlackboardVariable[] messageData)
     {
-        BlackboardVariable<EnemyState> ValueBlackboardVariable = messageData[0] as BlackboardVariable<EnemyState>;
-        var Value = ValueBlackboardVariable != null ? ValueBlackboardVariable.Value : default(EnemyState);
+        BlackboardVariable<NPCState> ValueBlackboardVariable = messageData[0] as BlackboardVariable<NPCState>;
+        var Value = ValueBlackboardVariable != null ? ValueBlackboardVariable.Value : default(NPCState);
 
         Event?.Invoke(Value);
     }
@@ -31,7 +31,7 @@ public partial class NpcStateChanged : EventChannelBase
     {
         NpcStateChangedEventHandler del = (Value) =>
         {
-            BlackboardVariable<EnemyState> var0 = vars[0] as BlackboardVariable<EnemyState>;
+            BlackboardVariable<NPCState> var0 = vars[0] as BlackboardVariable<NPCState>;
             if(var0 != null)
                 var0.Value = Value;
 
