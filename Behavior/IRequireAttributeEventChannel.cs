@@ -1,5 +1,5 @@
 namespace Behavior {
-    public interface IEnergyValueChannelModifier {
+    public interface IRequireAttributeEventChannel {
         void InitializeEnergyChannel(EnergyValueChanged energyValueChannel);
     }
 }

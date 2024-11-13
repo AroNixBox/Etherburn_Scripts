@@ -1,4 +1,5 @@
 using System;
+using Enemy;
 using Extensions.FSM;
 using Interfaces.Attribute;
 using Player.Ability;
@@ -22,7 +23,7 @@ namespace Player {
         #region Transition Condition References
 
         RootMotionWarpingController _rootMotionWarpingController;
-        AbilityTargetProvider _abilityTargetProvider;
+        AbilityTargetQuery _abilityTargetQuery;
         
         InputReader _input;
         
@@ -55,7 +56,7 @@ namespace Player {
             _input.EnablePlayerActions();
             
             _rootMotionWarpingController = _references.mover.RootMotionWarpingControllerController;
-            _abilityTargetProvider = _references.abilityTargetProvider;
+            _abilityTargetQuery = _references.abilityTargetQuery;
             
             SetupStateMachine();
         }
@@ -192,8 +193,13 @@ namespace Player {
             float UltimateAttributeCost() => _weaponManager.GetSelectedWeapon().finisherData.attributeData.ultimate;
             
             bool IsWarpPossible(){
-                var warpTargetProvider = _abilityTargetProvider.GetWarpTargetProvider();
-                if(warpTargetProvider == null) return false;
+                var enemy = _abilityTargetQuery.GetWarpTargetProvider(EntityType.Enemy);
+                if(enemy == null) return false;
+                
+                if(!enemy.TryGetComponent(out EnemyTargetProvider warpTargetProvider)) {
+                    Debug.LogError("Enemy does not have a Target Provider attached to it.");
+                    return false;
+                }
 
                 return _rootMotionWarpingController.IsWarpPossible(
                     warpTargetProvider.ProvideWarpTarget(_references.transform).GetTransform(), 

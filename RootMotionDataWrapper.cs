@@ -1,9 +1,20 @@
+using System;
 using System.Collections.Generic;
-using Motion;
 using Motion.RootMotion;
-using Player.Animation;
 using UnityEngine;
 
 public class RootMotionDataWrapper : MonoBehaviour {
-    [field: SerializeField] public List<RootMotionAnimationDataSO> RootMotionData { get; private set; }
+    [SerializeField] List<RootMotionAnimationDataSO> rootMotionAttackData;
+    [SerializeField] List<RootMotionAnimationDataSO> rootMotionHurtData;
+    public List<RootMotionAnimationDataSO> GetRootMotionData(RootMotionType rootMotionType) {
+        return rootMotionType switch {
+            RootMotionType.Attack => rootMotionAttackData,
+            RootMotionType.Hurt => rootMotionHurtData,
+            _ => throw new Exception("RootMotionType not found")
+        };
+    }
+    public enum RootMotionType {
+        Attack,
+        Hurt
+    }
 }

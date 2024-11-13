@@ -1,13 +1,12 @@
-﻿using System;
+﻿using System.Linq;
 using UnityEngine;
-using Enemy;
 using Extensions;
 using Player.Cam;
 using Sirenix.OdinInspector;
 
 namespace Player.Ability
 {
-    public class AbilityTargetProvider : MonoBehaviour {
+    public class AbilityTargetQuery : MonoBehaviour {
         [Header("References")]
         [SerializeField] References references;
         [SerializeField, Required] Transform headHeight;
@@ -16,7 +15,7 @@ namespace Player.Ability
         Transform[] _rayCheckOrigins;
         int _maxTargets;
         
-        VisionTargetQuery<EnemyWarpTargetProvider> _visionEnemyWarpTargetQuery;
+        VisionTargetQuery<Entity> _visionEnemyWarpTargetQuery;
 
         void Awake() {
             _orbitalController = references.orbitalController;
@@ -28,18 +27,21 @@ namespace Player.Ability
             var detectionRadius = references.detectionRadius;
             var visionConeAngle = references.visionConeAngle;
             
-            _visionEnemyWarpTargetQuery = new VisionTargetQuery<EnemyWarpTargetProvider>(headHeight, _rayCheckOrigins, _maxTargets, detectionRadius, visionConeAngle);
+            _visionEnemyWarpTargetQuery = new VisionTargetQuery<Entity>(headHeight, _rayCheckOrigins, _maxTargets, detectionRadius, visionConeAngle);
         }
 
-        public EnemyWarpTargetProvider GetWarpTargetProvider() {
-            var lockedOnTarget = _orbitalController.LockedOnTarget;
+        public Entity GetWarpTargetProvider(EntityType entityType) {
+            var lockedOnTarget = _orbitalController.LockedOnEnemyTarget;
             
             if(lockedOnTarget != null) {
                 // Return Early, because we have a locked on target
                 return lockedOnTarget;
             }
             
-            return _visionEnemyWarpTargetQuery.GetNearestTargetInVisionCone();
+            var entities = _visionEnemyWarpTargetQuery.GetAllTargetsInVisionConeSorted();
+            if(entities.Count == 0) { return null; }
+
+            return entities.FirstOrDefault(entity => entity.EntityType == entityType);
         }
         
         void OnDrawGizmos() {
@@ -48,7 +50,7 @@ namespace Player.Ability
             _visionEnemyWarpTargetQuery.DrawDetectionRadius();
             _visionEnemyWarpTargetQuery.DrawVisionCone();
             
-            var cameraTarget = _orbitalController.LockedOnTarget != null ? _orbitalController.LockedOnTarget.transform : null;
+            var cameraTarget = _orbitalController.LockedOnEnemyTarget != null ? _orbitalController.LockedOnEnemyTarget.transform : null;
             _visionEnemyWarpTargetQuery.DrawLineToTarget(cameraTarget);
         }
     }

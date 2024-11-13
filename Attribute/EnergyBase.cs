@@ -1,30 +1,25 @@
 using System;
 using Behavior;
 using Interfaces.Attribute;
-using Unity.Behavior;
 using UnityEngine;
-using Sirenix.OdinInspector;
 
 namespace Attribute {
-    public class EnergyBase : MonoBehaviour, IEnergy, IEnergyValueChannelModifier {
+    public class EnergyBase : MonoBehaviour, IEnergy, IRequireAttributeEventChannel {
         [SerializeField] protected float maxEnergy = 100;
         protected float CurrentEnergy;
         
         EnergyValueChanged _energyValueChanged;
         
-        public event Action<float> OnAttributeMaxValueSet;
         public event Action<float> OnAttributeValueIncreased;
         public event Action<float> OnAttributeValueDecresed;
 
         void Start() {
             CurrentEnergy = maxEnergy;
             
-            OnAttributeMaxValueSet?.Invoke(maxEnergy);
             OnAttributeValueIncreased?.Invoke(CurrentEnergy);
         }
         public void InitializeEnergyChannel(EnergyValueChanged energyValueChannel) {
             _energyValueChanged = energyValueChannel;
-            _energyValueChanged?.SendEventMessage(CurrentEnergy);
         }
         public virtual void Increase(float amount) {
             CurrentEnergy += amount;

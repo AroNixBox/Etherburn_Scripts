@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 
 namespace Enemy {
-    public class EnemyWarpTargetProvider : MonoBehaviour {
+    public class EnemyTargetProvider : MonoBehaviour {
         [SerializeField] GameObject warpTarget;
         [SerializeField] float distanceToWarpTarget = 1f;
         Target _warpTarget;

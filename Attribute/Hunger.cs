@@ -1,5 +1,4 @@
-﻿using Behavior;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Attribute {
     public class Hunger : EnergyBase {

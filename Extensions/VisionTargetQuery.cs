@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Extensions {
@@ -21,32 +22,30 @@ namespace Extensions {
             _colliders = new Collider[maxTargets];
         }
         
-        public T GetNearestTargetInVisionCone() {
+        public List<T> GetAllTargetsInVisionConeSorted() {
             int targetsFound = Physics.OverlapSphereNonAlloc(_headPosition.position, _detectionRadius, _colliders);
 
             if (targetsFound == 0) {
-                return null;
+                return new List<T>();
             }
 
-            var potentialTargets = _colliders
+            var validTargets = _colliders
                 .Take(targetsFound)
-                .Select(col => col.GetComponent<T>())
-                .Where(targetProvider => targetProvider != null && IsInVisionCone(targetProvider.transform.position))
-                .OrderBy(targetProvider => (_headPosition.position - targetProvider.transform.position).sqrMagnitude);
+                .Select(col => (targetProvider: col.GetComponent<T>(), collider: col))
+                .Where(item => 
+                    item.targetProvider != null &&
+                    IsInVisionCone(item.collider.ClosestPoint(_headPosition.position)) &&
+                    _rayCheckOrigins.Any(origin => {
+                        Vector3 direction = item.collider.ClosestPoint(origin.position) - origin.position;
+                        return Physics.Raycast(origin.position, direction, out var hit, _detectionRadius) 
+                               && hit.collider == item.collider;
+                    })
+                )
+                .OrderBy(item => (_headPosition.position - item.targetProvider.transform.position).sqrMagnitude)
+                .Select(item => item.targetProvider)
+                .ToList();
 
-            foreach (var target in potentialTargets) {
-                foreach (var origin in _rayCheckOrigins) {
-                    if (Physics.Raycast(origin.position, target.transform.position - origin.position, out var hit, _detectionRadius)) {
-                        if (hit.collider.TryGetComponent(out T enemyWarpTargetProvider)) {
-                            _currentTarget = enemyWarpTargetProvider;
-                            return _currentTarget;
-                        }
-                    }
-                }
-            }
-            
-            _currentTarget = null;
-            return null;
+            return validTargets;
         }
 
         // TODO: Make Vision Cone also check horizontal angle and let it start from the head position, currently it is drawn from the head, but fired from the root.

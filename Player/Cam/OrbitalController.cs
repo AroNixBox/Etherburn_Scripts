@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using Player.Input;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -8,6 +9,7 @@ namespace Player.Cam {
         #region Fields
         [SerializeField, Required] References references;
         [SerializeField, Required] Transform headHeight;
+        [SerializeField] EntityType lockOnEntityType = EntityType.Enemy;
 
         [Range(0f, 90f)] public float upperVerticalLimit = 35f;
         [Range(0f, 90f)] public float lowerVerticalLimit = 35f;
@@ -19,7 +21,7 @@ namespace Player.Cam {
         public bool smoothCameraRotation;
         [Range(1f, 50f)] public float cameraSmoothingFactor = 25f;
         
-        public Enemy.EnemyWarpTargetProvider LockedOnTarget { get; private set; }
+        public Entity LockedOnEnemyTarget { get; private set; }
 
         // Dynamic Values
         float _currentXAngle;
@@ -31,7 +33,7 @@ namespace Player.Cam {
         Transform _transform;
 
         InputReader _input;
-        Extensions.VisionTargetQuery<Enemy.EnemyWarpTargetProvider> _visionEnemyWarpTargetQuery;
+        Extensions.VisionTargetQuery<Entity> _visionEnemyWarpTargetQuery;
 
 
         #endregion
@@ -60,9 +62,9 @@ namespace Player.Cam {
         }
 
         void ToggleLockOnTarget() {
-            if (LockedOnTarget != null) {
+            if (LockedOnEnemyTarget != null) {
                 // No more target
-                LockedOnTarget = null;
+                LockedOnEnemyTarget = null;
                 
                 // Keep the current angles, so no weird flip happens
                 Vector3 currentEulerAngles = _transform.eulerAngles;
@@ -77,13 +79,16 @@ namespace Player.Cam {
                 _currentXAngle = Mathf.Clamp(_currentXAngle, -upperVerticalLimit, lowerVerticalLimit);
             } else {
                 // Lock on target
-                LockedOnTarget = _visionEnemyWarpTargetQuery.GetNearestTargetInVisionCone();
+                var allEntitiesInVisionCone = _visionEnemyWarpTargetQuery.GetAllTargetsInVisionConeSorted();
+                if(allEntitiesInVisionCone.Count == 0) { return; }
+
+                LockedOnEnemyTarget = allEntitiesInVisionCone.FirstOrDefault(entity => entity.EntityType == lockOnEntityType);
             }
         }
-        public bool IsLockedOnTarget() => LockedOnTarget != null;
+        public bool IsLockedOnTarget() => LockedOnEnemyTarget != null;
 
         void Update() {
-            if (LockedOnTarget != null) {
+            if (LockedOnEnemyTarget != null) {
                 if (IsTooFarAwayFromTarget()) {
                     ToggleLockOnTarget();
                     return;
@@ -95,7 +100,7 @@ namespace Player.Cam {
 
         void LookAtTarget() {
             // Look at target
-            Vector3 directionToTarget = LockedOnTarget.transform.position - _transform.position;
+            Vector3 directionToTarget = LockedOnEnemyTarget.transform.position - _transform.position;
             Quaternion targetRotation = Quaternion.LookRotation(directionToTarget);
 
             // Clamp vertical rotation
@@ -112,7 +117,7 @@ namespace Player.Cam {
 
         void RotateCameraWithLookInput(Vector2 lookDirection, bool isDeviceMouse) {
             // Only Rotate when we are not locked on a target
-            if (LockedOnTarget != null) { return;}
+            if (LockedOnEnemyTarget != null) { return;}
             
             // TODO: Maybe use the isDeviceMouse to control the rotation speed
             
@@ -139,7 +144,7 @@ namespace Player.Cam {
         
         bool IsTooFarAwayFromTarget() {
             // Compare Squared Distances to avoid the square root calculation
-            return (LockedOnTarget.transform.position - headHeight.position).sqrMagnitude > _detectionRadius * _detectionRadius;
+            return (LockedOnEnemyTarget.transform.position - headHeight.position).sqrMagnitude > _detectionRadius * _detectionRadius;
         }
     }
 }

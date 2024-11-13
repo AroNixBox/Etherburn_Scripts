@@ -22,9 +22,11 @@ public partial class SetRootMotionTargetPositionAction : Action
     [SerializeReference] public BlackboardVariable<RootMotionDataWrapper> RootMotionDataWrapper;
     [SerializeReference] public BlackboardVariable<AnimationController> AnimationController;
     [SerializeReference] public BlackboardVariable<GameObject> Self;
+    [SerializeReference] public BlackboardVariable<bool> BasedOnTarget;
     [SerializeReference] public BlackboardVariable<GameObject> Target;
     [SerializeReference] public BlackboardVariable<NPCAnimationStates> CurrentAnimationState;
     [SerializeReference] public BlackboardVariable<float> MinAttackDistance;
+    [SerializeReference] public BlackboardVariable<RootMotionDataWrapper.RootMotionType> RootMotionType;
 
     protected override Status OnStart()
     {
@@ -55,28 +57,38 @@ public partial class SetRootMotionTargetPositionAction : Action
     bool AreReferencesMissing() => ReferenceEquals(RootMotionEndPosition, null)
                                    || ReferenceEquals(RootMotionDataWrapper, null)
                                    || ReferenceEquals(Self, null)
-                                   || ReferenceEquals(Target, null)
-                                   || ReferenceEquals(AnimationController, null);
+                                   || ReferenceEquals(AnimationController, null)
+                                   || ReferenceEquals(CurrentAnimationState, null)
+                                   || ReferenceEquals(RootMotionType, null);
 
     RootMotionAnimationDataSO FindBestRootMotionData(Vector3 selfPosition) {
         RootMotionAnimationDataSO bestRootMotionData = null;
         float bestDistance = float.MaxValue;
+        var rmDataList = RootMotionDataWrapper.Value.GetRootMotionData(RootMotionType.Value);
+        rmDataList.Shuffle();
 
-        foreach (var rmData in RootMotionDataWrapper.Value.RootMotionData) {
+        foreach (var rmData in rmDataList) {
             var rmWorldRootMotion = Self.Value.transform.TransformDirection(rmData.totalRootMotion);
             rmWorldRootMotion.y = 0;
 
-            var distanceToTarget = (Target.Value.transform.position - (selfPosition + rmWorldRootMotion)).magnitude;
 
             // Is the target position reachable?
             if (!NavMesh.SamplePosition(selfPosition + rmWorldRootMotion, out NavMeshHit hit, 0.1f, NavMesh.AllAreas)) {
                 continue;
             }
 
-            if (Mathf.Abs(distanceToTarget - MinAttackDistance) < bestDistance) {
-                bestDistance = Mathf.Abs(distanceToTarget - MinAttackDistance);
-                bestRootMotionData = rmData;
+            if (BasedOnTarget.Value) {
+                var distanceToTarget = (Target.Value.transform.position - (selfPosition + rmWorldRootMotion)).magnitude;
+
+                if (Mathf.Abs(distanceToTarget - MinAttackDistance) < bestDistance) {
+                    bestDistance = Mathf.Abs(distanceToTarget - MinAttackDistance);
+                    bestRootMotionData = rmData;
+                }
+                continue;
             }
+            
+            bestRootMotionData = rmData;
+            break;
         }
 
         return bestRootMotionData;

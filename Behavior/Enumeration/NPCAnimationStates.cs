@@ -8,6 +8,7 @@ public enum NPCAnimationStates {
 	AttackA,
 	AttackB,
 	Eat,
-	Hurt,
+	HurtA,
+	HurtB,
 	Die
 }

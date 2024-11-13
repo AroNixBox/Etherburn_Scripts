@@ -3,7 +3,6 @@ using UnityEngine;
 
 namespace Interfaces.Attribute {
     public interface IAttribute {
-        public event Action<float> OnAttributeMaxValueSet;
         public event Action<float> OnAttributeValueIncreased;
         public event Action<float> OnAttributeValueDecresed;
         public void Increase(float amount);

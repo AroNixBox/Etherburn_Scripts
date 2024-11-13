@@ -7,6 +7,7 @@ using Player.Input;
 using Sirenix.OdinInspector;
 using UI;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Player {
     /* @ Explanation
@@ -20,7 +21,7 @@ namespace Player {
         public Weapon.WeaponManager weaponManager;
         public Animation.AnimationController animationController;
         public OrbitalController orbitalController;
-        public AbilityTargetProvider abilityTargetProvider;
+        [FormerlySerializedAs("abilityTargetProvider")] public AbilityTargetQuery abilityTargetQuery;
         
         [Header("Body Parts")]
         public Transform modelRoot;

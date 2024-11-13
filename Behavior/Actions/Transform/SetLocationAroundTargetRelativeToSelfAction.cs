@@ -23,7 +23,6 @@ public partial class SetLocationAroundTargetRelativeToSelfAction : Action
         }
         if(_targetProvider == null) {
             var newLocationProvider = new GameObject("LocationProvider " + Self.Value.name);
-            //var distanceBitBiggerThan
             _targetProvider = new Target(newLocationProvider.transform, Self.Value.transform, Target.Value.transform, DistanceToTarget.Value);
         }
         

@@ -1,4 +1,5 @@
-﻿using Extensions.FSM;
+﻿using Enemy;
+using Extensions.FSM;
 using Interfaces.Attribute;
 using Player.Ability;
 using Player.Animation.MotionWarp;
@@ -20,7 +21,7 @@ namespace Player.States {
         readonly Mover _mover;
         readonly Animation.AnimationController _animationController;
         readonly RootMotionWarpingController _rootMotionWarpingController;
-        readonly AbilityTargetProvider _abilityTargetProvider;
+        readonly AbilityTargetQuery _abilityTargetQuery;
         readonly IEnergy _stamina;
         readonly IEnergy _ultimate;
         
@@ -39,7 +40,7 @@ namespace Player.States {
             _animationController = _references.animationController;
             _weaponManager = _references.weaponManager;
             _rootMotionWarpingController = _mover.RootMotionWarpingControllerController;
-            _abilityTargetProvider = _references.abilityTargetProvider;
+            _abilityTargetQuery = _references.abilityTargetQuery;
             _stamina = _references.StaminaAttribute;
             _ultimate = _references.UltimateAttribute;
         }
@@ -53,8 +54,14 @@ namespace Player.States {
             // Warp requires Kinematic RigidBody
             _mover.SetKinematic(true);
             
+            var enemy = _references.abilityTargetQuery.GetWarpTargetProvider(EntityType.Enemy);
+            if(!enemy.TryGetComponent(out EnemyTargetProvider enemyTargetProvider)) {
+                Debug.LogError("Enemy does not have a Target Provider attached to it.");
+                return;
+            }
+
             _rootMotionWarpingController.SetWarpAnimationAndTarget(
-                _references.abilityTargetProvider.GetWarpTargetProvider().ProvideWarpTarget(_references.transform).GetTransform(),
+                enemyTargetProvider.ProvideWarpTarget(_references.transform).GetTransform(),
                 _weaponExecution, _references.transform.position);
             
             SetupWeaponCollision();

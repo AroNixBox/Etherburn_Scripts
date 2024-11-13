@@ -1,8 +1,9 @@
-﻿using System;
+﻿using System.Collections.Generic;
+using Extensions;
 using UnityEngine;
 
 namespace Sensor {
-    public class TargetDetectionSensor : MonoBehaviour {
+    public class EntityDetectionSensor : MonoBehaviour {
         [SerializeField] Transform modelHead;
         [SerializeField] Transform[] rayCheckOrigins;
         
@@ -10,14 +11,13 @@ namespace Sensor {
         [SerializeField] float detectionRadius = 5f;
         [SerializeField] float visionConeAngle = 45f;
         
-        Extensions.VisionTargetQuery<Enemy.EnemyWarpTargetProvider> _visionEnemyWarpTargetQuery;
+        VisionTargetQuery<Entity> _visionEnemyWarpTargetQuery;
         
         void Start() {
-            _visionEnemyWarpTargetQuery = new (modelHead, rayCheckOrigins, (int)maxTargets, detectionRadius, visionConeAngle);
+            _visionEnemyWarpTargetQuery = new VisionTargetQuery<Entity>(modelHead, rayCheckOrigins, (int)maxTargets, detectionRadius, visionConeAngle);
         }
-        
-        public Transform GetNearestTargetInVisionCone() {
-            return _visionEnemyWarpTargetQuery.GetNearestTargetInVisionCone()?.transform;
+        public List<Entity> GetAllTargetsInVisionConeSorted() {
+            return _visionEnemyWarpTargetQuery.GetAllTargetsInVisionConeSorted();
         }
 
         void OnDrawGizmos() {

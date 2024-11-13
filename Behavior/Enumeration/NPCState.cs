@@ -6,7 +6,6 @@ public enum NPCState {
 	None,
     Patrol,
 	Combat,
-	Eat,
 	Hurt,
 	Die
 }
