@@ -1,5 +1,4 @@
-﻿using Sirenix.OdinInspector;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Sensor {
     public class DamageDealingObject : BaseMeeleWeaponHitSensor {

@@ -8,7 +8,7 @@ using Unity.Properties;
 [Serializable, GeneratePropertyBag]
 [NodeDescription(name: "Update Animator Speed from Agent Velocity", 
                 story: "Sets the [Animator] BlendSpeed [Speed] with param [AnimatorSpeedParam] based on [Agent] velocity", 
-                category: "Action", 
+                category: "Action/Animation", 
                 id: "2c1bb4cb3a7ae46bf8f28c20070c0e2d")]
 public partial class UpdateAnimatorSpeedFromAgentVelocity : Action {
     [SerializeReference] public BlackboardVariable<NavMeshAgent> Agent;
@@ -22,7 +22,7 @@ public partial class UpdateAnimatorSpeedFromAgentVelocity : Action {
     Vector3 _velocity;
 
     protected override Status OnStart() {
-        if (Agent.Value == null || Animator.Value == null) {
+        if (ReferenceEquals(Agent.Value, null) || ReferenceEquals(Animator.Value, null)) {
             LogFailure("No Agent or Animator assigned.");
             return Status.Failure;
         }
