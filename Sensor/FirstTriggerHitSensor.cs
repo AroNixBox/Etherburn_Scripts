@@ -10,6 +10,8 @@ namespace Sensor {
         [SerializeField] Transform[] transformsAlongObject;
         public UnityEvent<Transform, PhysicsMaterial, Vector3, Vector3> collisionEvent = new ();
         Collider _collider;
+        
+        [SerializeField] protected LayerMask excludedLayers = 1 << 2; // Default to Ignore Raycast layer
 
         protected virtual void Awake() {
             _collider = GetComponent<Collider>();
@@ -22,6 +24,10 @@ namespace Sensor {
         
         // Base Call starts here, should identify collision before calling base.OnTriggerEnter(other)
         protected virtual void OnTriggerEnter(Collider other) {
+            if (((1 << other.gameObject.layer) & excludedLayers) != 0) {
+                return;
+            }
+            
             // Get the closest point of the collision (approximate contact point in world space)
             Vector3 collisionPoint = GetClosestPoint(other);
 

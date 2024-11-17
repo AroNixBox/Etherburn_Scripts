@@ -12,6 +12,10 @@ namespace Sensor {
         }
 
         protected override void OnTriggerEnter(Collider other) {
+            if (((1 << other.gameObject.layer) & excludedLayers) != 0) {
+                return;
+            }
+            
             if (DamageAmount == 0) { Debug.LogError("InitializeSensor() was not called, will deal no damage"); } 
             
             // Base Call is for VFX, SFX, etc.
