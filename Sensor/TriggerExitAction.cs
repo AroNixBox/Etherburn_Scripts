@@ -28,6 +28,3 @@ public class TriggerExitAction : MonoBehaviour, IRequireEntityColliderInteractio
         Exit
     }
 }
-public interface IRequireEntityColliderInteractionChannel {
-    void AssignEventChannel(EntityColliderInteractionChannel entityColliderInteractionChannel); 
-}

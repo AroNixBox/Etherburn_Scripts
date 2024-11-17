@@ -1,9 +1,11 @@
-﻿using UnityEngine;
+﻿using Behavior.Events;
+using UnityEngine;
 
 namespace Enemy {
-    public class EnemyTargetProvider : MonoBehaviour {
+    public class EnemyTargetProvider : MonoBehaviour, IRequireNPCStateChannel {
         [SerializeField] GameObject warpTarget;
         [SerializeField] float distanceToWarpTarget = 1f;
+        NpcStateChanged _npcStateChannel;
         Target _warpTarget;
         
         // Called on one Enemy is in vision cone of Player and is closest to the player.
@@ -16,6 +18,7 @@ namespace Enemy {
             _warpTarget.RotateAroundParent();
             _warpTarget.LookAtParent();
             
+            _npcStateChannel?.SendEventMessage(NPCState.WaitForExecution);
             return _warpTarget;
         }
 
@@ -23,6 +26,10 @@ namespace Enemy {
             var newTarget = Instantiate(warpTarget);
             var newWarpTarget = new Target(newTarget.transform, playerTransform, transform, distanceToWarpTarget);
             return newWarpTarget;
+        }
+
+        public void AssignEventChannel(NpcStateChanged npcStateChannel) {
+            _npcStateChannel = npcStateChannel;
         }
     }
 }

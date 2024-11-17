@@ -7,5 +7,6 @@ public enum NPCState {
     Patrol,
 	Combat,
 	Hurt,
-	Die
+	Die,
+	WaitForExecution
 }

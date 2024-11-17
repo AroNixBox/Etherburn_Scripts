@@ -12,6 +12,7 @@ namespace Behavior.Enemy.State.Animation {
         static readonly int Die = Animator.StringToHash("Die");
         static readonly int Eat = Animator.StringToHash("Eat");
         static readonly int Empty = Animator.StringToHash("Empty");
+        static readonly int WaitForExecution = Animator.StringToHash("WaitForExecution");
         
         // Blend Tree Values
         // public static readonly float SpeedMagnitude = Animator.StringToHash("SpeedMagnitude");
@@ -24,7 +25,8 @@ namespace Behavior.Enemy.State.Animation {
             {NPCAnimationStates.HurtA, new AnimationDetails {StateName = HurtA, BlendDuration = 0.1f}},
             {NPCAnimationStates.HurtB, new AnimationDetails {StateName = HurtB, BlendDuration = 0.1f}},
             {NPCAnimationStates.Die, new AnimationDetails {StateName = Die, BlendDuration = 0.1f}},
-            {NPCAnimationStates.Eat, new AnimationDetails {StateName = Eat, BlendDuration = 0.1f}}
+            {NPCAnimationStates.Eat, new AnimationDetails {StateName = Eat, BlendDuration = 0.1f}},
+            {NPCAnimationStates.WaitForExecution, new AnimationDetails {StateName = WaitForExecution, BlendDuration = 0.1f}},
         };
         
         static readonly AnimationDetails EmptyDetails = new() { StateName = Empty, BlendDuration = 0.1f };

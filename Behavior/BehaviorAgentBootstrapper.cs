@@ -1,3 +1,4 @@
+using Behavior.Events;
 using Sirenix.OdinInspector;
 using Unity.Behavior;
 using UnityEngine;
@@ -14,15 +15,37 @@ namespace Behavior {
         [RequireInterface(typeof(IRequireEntityColliderInteractionChannel))]
         [SerializeField] MonoBehaviour[] collisionRelatedChannels;
         [SerializeField] string entityCollisionChannelBbvName = "AgressionAreaChannel";
+        
+        [Title("Get Executed")]
+        [RequireInterface(typeof(IRequireNPCStateChannel))]
+        [SerializeField] MonoBehaviour[] npcStateRelatedChannels;
+        [SerializeField] string npcStateChannelBbvName = "NPCStateChanged";
 
         void Start() {
             if(behaviorGraphAgent == null) {
                 Debug.LogError("Behavior Agent is not set in the inspector");
                 return;
             }
-
+        
+            AssignNpcStateChannel();
             AssignHealthChannel();
             AssignEntityCollisionChannel();
+        }
+
+        void AssignNpcStateChannel() {
+            if (!behaviorGraphAgent.BlackboardReference.GetVariableValue(npcStateChannelBbvName, out NpcStateChanged npcStateChanged)) {
+                Debug.LogError($"Blackboard variable: {npcStateChannelBbvName} could not be set, the variable name is incorrect or the variable does not exist in the blackboard");
+                return;
+            }
+
+            foreach (var component in npcStateRelatedChannels) {
+                if (component is IRequireNPCStateChannel channel) {
+                    channel.AssignEventChannel(npcStateChanged);
+                }
+                else {
+                    Debug.LogError($"Component: {component.name} does not implement the IRequireNPCStateChannel interface");
+                }
+            }
         }
 
         void AssignEntityCollisionChannel() {

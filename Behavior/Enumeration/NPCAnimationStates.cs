@@ -10,5 +10,6 @@ public enum NPCAnimationStates {
 	Eat,
 	HurtA,
 	HurtB,
-	Die
+	Die,
+	WaitForExecution
 }
