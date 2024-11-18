@@ -9,37 +9,36 @@ namespace Attribute {
         protected float CurrentEnergy;
         
         EnergyValueChanged _energyValueChanged;
-        
-        public event Action<float> OnAttributeValueIncreased;
-        public event Action<float> OnAttributeValueDecresed;
 
-        void Start() {
+        public virtual void Awake() {
             CurrentEnergy = maxEnergy;
-            
-            OnAttributeValueIncreased?.Invoke(CurrentEnergy);
         }
-        public void InitializeEnergyChannel(EnergyValueChanged energyValueChannel) {
+
+        public void InitializeEnergyChannel(EnergyValueChanged energyValueChannel, ref Action allChannelsInitialized) {
+            
             _energyValueChanged = energyValueChannel;
+            
+            Vector3? effectDirection = null;
+            allChannelsInitialized += () => _energyValueChanged.SendEventMessage(CurrentEnergy, effectDirection);
         }
         public virtual void Increase(float amount) {
             CurrentEnergy += amount;
             CurrentEnergy = Mathf.Clamp(CurrentEnergy, 0, maxEnergy);
-            OnAttributeValueIncreased?.Invoke(CurrentEnergy);
             
-            _energyValueChanged?.SendEventMessage(CurrentEnergy);
+            // TODO: IncreasePosition can be used to determine the position from where the effect comes, should be directional vector
+            Vector3? increaseDirection = null;
+            _energyValueChanged?.SendEventMessage(CurrentEnergy, increaseDirection);
         }
 
         public virtual void Decrease(float amount, Vector3? hitPosition = null) {
             CurrentEnergy -= amount;
             CurrentEnergy = Mathf.Clamp(CurrentEnergy, 0, maxEnergy);
-            OnAttributeValueDecresed?.Invoke(CurrentEnergy);
             
-            _energyValueChanged?.SendEventMessage(CurrentEnergy);
+            _energyValueChanged?.SendEventMessage(CurrentEnergy, hitPosition);
         }
 
         public bool HasEnough(float requiredAmount) {
             return CurrentEnergy >= requiredAmount;
         }
-
     }
 }

@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Behavior.Flow.Conditions {
     [Serializable, Unity.Properties.GeneratePropertyBag]
-    [Condition(name: "Null Check", story: "[Entity] [NullComparison] null", category: "Variable Conditions", id: "28a70606683fa1e36a9a36db4e19cfc5")]
+    [Condition(name: "Entity Null Check", story: "[Entity] [NullComparison] null", category: "Variable Conditions", id: "28a70606683fa1e36a9a36db4e19cfc5")]
     public partial class NullCheckCondition : Condition {
         [SerializeReference] public BlackboardVariable<GameObject> Entity;
         [SerializeReference] public BlackboardVariable<Comparison> NullComparison;

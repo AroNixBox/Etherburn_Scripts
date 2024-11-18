@@ -21,7 +21,6 @@ namespace Player.States {
         readonly Mover _mover;
         readonly Animation.AnimationController _animationController;
         readonly RootMotionWarpingController _rootMotionWarpingController;
-        readonly AbilityTargetQuery _abilityTargetQuery;
         readonly IEnergy _stamina;
         readonly IEnergy _ultimate;
         
@@ -40,7 +39,6 @@ namespace Player.States {
             _animationController = _references.animationController;
             _weaponManager = _references.weaponManager;
             _rootMotionWarpingController = _mover.RootMotionWarpingControllerController;
-            _abilityTargetQuery = _references.abilityTargetQuery;
             _stamina = _references.StaminaAttribute;
             _ultimate = _references.UltimateAttribute;
         }
@@ -61,7 +59,7 @@ namespace Player.States {
             }
 
             _rootMotionWarpingController.SetWarpAnimationAndTarget(
-                enemyTargetProvider.ProvideWarpTarget(_references.transform).GetTransform(),
+                enemyTargetProvider.ProvideWarpTarget(_references.transform, false).GetTransform(),
                 _weaponExecution, _references.transform.position);
             
             SetupWeaponCollision();
@@ -84,11 +82,7 @@ namespace Player.States {
         void ConsumeAttributes() {
             // Consume Stamina
             var staminaCost = _currentWeapon.finisherData.attributeData.stamina;
-            _stamina.Decrease(staminaCost);
-            
-            // Consume Ultimate Attribute
-            var ultimateCost = _currentWeapon.finisherData.attributeData.ultimate;
-            _ultimate.Decrease(ultimateCost);
+            _stamina.Increase(staminaCost);
         }
         void SetupWeaponCollision() {
             // If the Weapon has Collision

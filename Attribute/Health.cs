@@ -7,10 +7,6 @@ namespace Attribute {
         public bool HasTakenDamage { get; set; }
         public bool HasDied { get; set; }
 
-        void Awake() {
-            CurrentEnergy = maxEnergy;
-        }
-
         public override void Decrease(float amount, Vector3? hitPosition = null) {
             base.Decrease(amount, hitPosition);
             

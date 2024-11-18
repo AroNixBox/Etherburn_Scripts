@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
 using Extensions;
-using Sensor;
-using Sirenix.OdinInspector;
 using Unity.Behavior;
 using UnityEngine;
 using Action = Unity.Behavior.Action;
@@ -29,7 +27,8 @@ public partial class DetectEntityAction : Action {
     VisionTargetQuery<Entity> _entityVisionTargetQuery;
 
     protected override Status OnStart() {
-        if(ReferenceEquals(Agent.Value, null) || ReferenceEquals(Target.Value, null) || ReferenceEquals(BodyParts.Value, null)) {
+        // TODO: Check if Target is assigned and not null
+        if(ReferenceEquals(Agent.Value, null) || ReferenceEquals(BodyParts.Value, null)) {
             LogFailure("No Agent, Target or BodyParts assigned.");
             return Status.Failure;
         }

@@ -11,14 +11,19 @@ namespace Enemy {
         // Called on one Enemy is in vision cone of Player and is closest to the player.
         // We position the target between the player and this (Enemy) with [distanceToWarpTarget] distance
         // and look at the this component (Enemy)
-        public Target ProvideWarpTarget(Transform playerTransform) {
-            _warpTarget ??= CreateWarpTarget(playerTransform);
+        public Target ProvideWarpTarget(Transform playerTransform, bool isQuery = true) {
+            // If we are querying, we dont know if we are going to warp or not
+            if (isQuery) {
+                _warpTarget ??= CreateWarpTarget(playerTransform);
             
-            // Only Rotate around Target & Look at it when the Target is requested. 
-            _warpTarget.RotateAroundParent();
-            _warpTarget.LookAtParent();
+                // Only Rotate around Target & Look at it when the Target is requested. 
+                _warpTarget.RotateAroundParent();
+                _warpTarget.LookAtParent();
+            }
+            else { // If we are not querying, we are going to warp, so we are taking the last target that was calculated.
+                _npcStateChannel?.SendEventMessage(NPCState.WaitForExecution);
+            }
             
-            _npcStateChannel?.SendEventMessage(NPCState.WaitForExecution);
             return _warpTarget;
         }
 

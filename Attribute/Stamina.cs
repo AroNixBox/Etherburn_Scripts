@@ -6,8 +6,7 @@ namespace Attribute {
         [SerializeField] float regenTimeOut = 1;
 
         CountdownTimer _regenTimeOutTimer;
-        void Awake() {
-            CurrentEnergy = maxEnergy;
+        void Start() {
             _regenTimeOutTimer = new CountdownTimer(regenTimeOut);
         }
 

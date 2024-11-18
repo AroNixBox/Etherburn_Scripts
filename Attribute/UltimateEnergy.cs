@@ -3,7 +3,8 @@
 namespace Attribute {
     public class UltimateEnergy : EnergyBase {
         [SerializeField] float startEnergy;
-        void Awake() {
+
+        public override void Awake() {
             CurrentEnergy = startEnergy;
         }
     }

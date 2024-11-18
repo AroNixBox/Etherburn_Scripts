@@ -2,6 +2,7 @@ using Behavior.Events;
 using Sirenix.OdinInspector;
 using Unity.Behavior;
 using UnityEngine;
+using Action = System.Action;
 
 namespace Behavior {
     public class BehaviorAgentBootstrapper : MonoBehaviour {
@@ -10,6 +11,7 @@ namespace Behavior {
         [RequireInterface(typeof(IRequireAttributeEventChannel))]
         [SerializeField] MonoBehaviour[] healthRelatedChannels;
         [SerializeField] string healthChannelBbvName = "HealthChanged";
+        public event Action AllHealthChannelsInitialized = delegate { };
         
         [Title("Collision")]
         [RequireInterface(typeof(IRequireEntityColliderInteractionChannel))]
@@ -70,11 +72,13 @@ namespace Behavior {
                 return;
             }
 
+
             foreach (var component in healthRelatedChannels) {
                 if (component is IRequireAttributeEventChannel channel) {
-                    channel.InitializeEnergyChannel(energyValueChanged);
+                    channel.InitializeEnergyChannel(energyValueChanged, ref AllHealthChannelsInitialized);
                 }
             }
+            AllHealthChannelsInitialized?.Invoke();
         }
     }
 }
