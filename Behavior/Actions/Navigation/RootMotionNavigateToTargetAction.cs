@@ -11,10 +11,8 @@ public partial class RootMotionNavigateToTargetAction : Action
 {
     [SerializeReference] public BlackboardVariable<NavMeshAgent> Agent;
     [SerializeReference] public BlackboardVariable<GameObject> Target;
-    [SerializeReference] public BlackboardVariable<bool> ApplyRotation;
-    [SerializeReference] public BlackboardVariable<float> RotationSpeed = new (5.0f);
+    [SerializeReference] public BlackboardVariable<MoveDirection> MovementDirection;
     [SerializeReference] public BlackboardVariable<bool> SignalOnArrival = new (true);
-
     
     Vector3 _lastTargetPosition;
     Vector3 _colliderAdjustedTargetPosition;
@@ -40,6 +38,7 @@ public partial class RootMotionNavigateToTargetAction : Action
     }
 
     protected override Status OnUpdate() {
+        
         // Check if the target position has changed.
         if (HasTargetMoved()) {
             _lastTargetPosition = Target.Value.transform.position;
@@ -47,9 +46,8 @@ public partial class RootMotionNavigateToTargetAction : Action
             Agent.Value.SetDestination(_colliderAdjustedTargetPosition);
         }
 
-        if (ApplyRotation) {
-            RotateTowardsTargetLocation();
-        }
+        RotateTowardsTargetLocation();
+
         
         return SignalOnArrival.Value && Agent.Value.remainingDistance <= Agent.Value.stoppingDistance
             ? Status.Success 
@@ -73,18 +71,23 @@ public partial class RootMotionNavigateToTargetAction : Action
     
     void RotateTowardsTargetLocation() {
         Vector3 direction = (Agent.Value.steeringTarget - Agent.Value.transform.position).normalized;
+        direction.y = 0;
         if (direction != Vector3.zero) {
-            Quaternion targetRotation = Quaternion.LookRotation(direction);
-            Agent.Value.transform.rotation = Quaternion.Slerp(Agent.Value.transform.rotation, targetRotation, Time.deltaTime * 2.5f);
+            if(MovementDirection.Value == MoveDirection.Backward) {
+                direction = -direction;
+            }
+            // Smoothly look at the target
+            float desiredRotationTimeFor360 = 60f / Agent.Value.angularSpeed;
+            float slerpSpeed = 1f / desiredRotationTimeFor360;
+            Agent.Value.transform.rotation = Quaternion.Slerp(
+                Agent.Value.transform.rotation, 
+                Quaternion.LookRotation(direction), 
+                Time.deltaTime * slerpSpeed);
         }
     }
 
     protected override void OnEnd() {
         if(ReferenceEquals(Agent?.Value, null)) { return; }
-        // Force LookAt Target
-        if (ApplyRotation) {
-            Agent.Value.transform.LookAt(Agent.Value.steeringTarget);
-        }
         if(Agent.Value.isOnNavMesh) {
             Agent.Value.ResetPath();
         }

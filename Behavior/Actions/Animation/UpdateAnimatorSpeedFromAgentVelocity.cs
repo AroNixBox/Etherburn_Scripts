@@ -16,7 +16,7 @@ public partial class UpdateAnimatorSpeedFromAgentVelocity : Action {
     [SerializeReference] public BlackboardVariable<float> Speed;
     [SerializeReference] public BlackboardVariable<float> VelocitySmoothing = new (0.1f);
     [SerializeReference] public BlackboardVariable<string> AnimatorSpeedParam;
-    [SerializeReference] public BlackboardVariable<bool> MovingForward = new (true);
+    [SerializeReference] public BlackboardVariable<MoveDirection> MovementDirection;
     
     Vector3 _smoothDeltaPosition;
     Vector3 _velocity;
@@ -63,8 +63,7 @@ public partial class UpdateAnimatorSpeedFromAgentVelocity : Action {
         );
 
         var speed = _smoothDeltaPosition.magnitude;
-
-        if (!MovingForward) {
+        if (MovementDirection.Value == MoveDirection.Backward) {
             speed = -speed;
         }
         
@@ -75,4 +74,9 @@ public partial class UpdateAnimatorSpeedFromAgentVelocity : Action {
         _velocity = Vector3.zero;
         Animator.Value.SetFloat(AnimatorSpeedParam.Value, 0);
     }
+    
+}
+public enum MoveDirection {
+    Forward,
+    Backward
 }

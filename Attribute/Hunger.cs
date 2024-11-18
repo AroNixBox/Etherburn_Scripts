@@ -6,8 +6,8 @@ namespace Attribute {
         [SerializeField] float hungerUsagePerSecond = 2.5f;
         
         CountdownTimer _healthDecreaseTimeoutTimer;
-        void Awake() {
-            CurrentEnergy = maxEnergy;
+
+        public void Start() {
             _healthDecreaseTimeoutTimer = new CountdownTimer(hungerDecreaseTimeout);
         }
 
