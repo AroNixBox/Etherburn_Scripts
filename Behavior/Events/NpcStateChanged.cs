@@ -1,5 +1,4 @@
 using System;
-using Unity.Behavior.GraphFramework;
 using Unity.Behavior;
 using UnityEngine;
 using Unity.Properties;
