@@ -41,6 +41,8 @@ namespace Behavior {
             }
 
             foreach (var component in npcStateRelatedChannels) {
+                if (!component.isActiveAndEnabled) { continue; }
+                
                 if (component is IRequireNPCStateChannel channel) {
                     channel.AssignEventChannel(npcStateChanged);
                 }
@@ -57,6 +59,8 @@ namespace Behavior {
             }
 
             foreach (var component in collisionRelatedChannels) {
+                if (!component.isActiveAndEnabled) { continue; }
+                
                 if (component is IRequireEntityColliderInteractionChannel channel) {
                     channel.AssignEventChannel(entityColliderInteractionChannel);
                 }
@@ -71,9 +75,10 @@ namespace Behavior {
                 Debug.LogError($"Blackboard variable: {healthChannelBbvName} could not be set, the variable name is incorrect or the variable does not exist in the blackboard");
                 return;
             }
-
-
+            
             foreach (var component in healthRelatedChannels) {
+                if (!component.isActiveAndEnabled) { continue; }
+                
                 if (component is IRequireAttributeEventChannel channel) {
                     channel.InitializeEnergyChannel(energyValueChanged, ref AllHealthChannelsInitialized);
                 }

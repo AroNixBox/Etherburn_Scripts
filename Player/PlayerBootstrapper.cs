@@ -31,6 +31,11 @@ namespace Player {
             ultEnergyChannel.name = "PlayerUltEnergyChangedChannel";
             
             foreach (var component in ultEnergyRelatedChannels) {
+                if (!component.isActiveAndEnabled) {
+                    Debug.LogWarning($"Component: {component.name} is not active and enabled, skipping assignment");
+                    continue;
+                }
+                
                 if (component is IRequireAttributeEventChannel channel) {
                     channel.InitializeEnergyChannel(ultEnergyChannel, ref AllUltEnergyListenersInitialized);
                 }
@@ -47,6 +52,11 @@ namespace Player {
             staminaChannel.name = "PlayerStaminaChangedChannel";
             
             foreach (var component in staminaRelatedChannels) {
+                if (!component.isActiveAndEnabled) {
+                    Debug.LogWarning($"Component: {component.name} is not active and enabled, skipping assignment");
+                    continue;
+                }
+                
                 if (component is IRequireAttributeEventChannel channel) {
                     channel.InitializeEnergyChannel(staminaChannel, ref AllStaminaListenersInitialized);
                 }
@@ -63,6 +73,11 @@ namespace Player {
             healthChannel.name = "PlayerHealthChangedChannel";
             
             foreach (var component in healthRelatedChannels) {
+                if (!component.isActiveAndEnabled) {
+                    Debug.LogWarning($"Component: {component.name} is not active and enabled, skipping assignment");
+                    continue;
+                }
+                
                 if (component is IRequireAttributeEventChannel channel) {
                     channel.InitializeEnergyChannel(healthChannel, ref AllHealthListenersInitialized);
                 }

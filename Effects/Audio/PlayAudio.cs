@@ -20,8 +20,6 @@ namespace Effects.Audio {
 
         void PlaySound(Transform collisionTransform, PhysicsMaterial physicMaterial, Vector3 position, Vector3 normal) {
             AudioClip randomClip = audioEffect.GetEffectData(physicMaterial);
-            Debug.Log(randomClip.name);
-            Debug.Log(_audioSource);
             // TODO: Could also play it at a position an din a direction...
             _audioSource.PlayOneShot(randomClip);
         }
