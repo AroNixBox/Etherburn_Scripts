@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using UnityEngine;
 using Extensions;
 using Player.Cam;
@@ -41,12 +40,18 @@ namespace Player.Ability
             
             var entities = _visionEnemyWarpTargetQuery.GetAllTargetsInVisionConeSorted();
             if(entities.Count == 0) { return null; }
-            
+
             return entities.FirstOrDefault(entity => entity.EntityType == entityType);
         }
-
-        void OnDestroy() {
-            _visionEnemyWarpTargetQuery.Dispose();
+        
+        void OnDrawGizmos() {
+            if(_visionEnemyWarpTargetQuery == null) { return; }
+            
+            _visionEnemyWarpTargetQuery.DrawDetectionRadius();
+            _visionEnemyWarpTargetQuery.DrawVisionCone();
+            
+            var cameraTarget = _orbitalController.LockedOnEnemyTarget != null ? _orbitalController.LockedOnEnemyTarget.transform : null;
+            _visionEnemyWarpTargetQuery.DrawLineToTarget(cameraTarget);
         }
     }
 }
