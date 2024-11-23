@@ -29,7 +29,6 @@ namespace Sensor {
                 Debug.LogError("InitializeSensor() was not called, will not gain Ultimate Attribute");
                 return;
             }
-            Debug.Log("Applying Ultimate Hit: " + _isUltimate);
             // Method is called by Light/ Heavy Attack & Ultimate Attacks gains Ultimate Attribute, Ultimate Ability consumes it
             switch (_isUltimate) {
                 case true:
