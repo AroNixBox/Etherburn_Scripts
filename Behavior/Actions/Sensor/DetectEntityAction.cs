@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using Extensions;
 using Unity.Behavior;
 using UnityEngine;
@@ -41,13 +40,16 @@ public partial class DetectEntityAction : Action {
             DetectionRadius.Value, 
             VisionConeAngle.Value
         );        
+        
+        Application.quitting += () => _entityVisionTargetQuery.Dispose(); // TODO: This is Bad... Need to find a way to dispose this properly
+
         return Status.Running;
     }
 
     protected override Status OnUpdate() {
         var targets = _entityVisionTargetQuery.GetAllTargetsInVisionConeSorted();
         if (targets.Count == 0) {
-            return Status.Running;
+            return Status.Failure;
         }
         foreach (var target in targets) {
             if (target.EntityType == TargetType.Value) {
@@ -55,7 +57,7 @@ public partial class DetectEntityAction : Action {
                 return Status.Success;
             }
         }
-        return Status.Running;
+        return Status.Failure;
     }
 
     protected override void OnEnd() { }

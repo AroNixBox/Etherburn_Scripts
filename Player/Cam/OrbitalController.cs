@@ -146,5 +146,9 @@ namespace Player.Cam {
             // Compare Squared Distances to avoid the square root calculation
             return (LockedOnEnemyTarget.transform.position - headHeight.position).sqrMagnitude > _detectionRadius * _detectionRadius;
         }
+
+        void OnDestroy() {
+            _visionEnemyWarpTargetQuery.Dispose();
+        }
     }
 }
