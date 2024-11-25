@@ -17,10 +17,15 @@ public partial class SetLocationAroundTargetRelativeToSelfAction : Action
     Target _targetProvider;
 
     protected override Status OnStart() {
-        if (ReferenceEquals(DistanceLocationProvider?.Value, null) || ReferenceEquals(Target?.Value, null) || ReferenceEquals(Self?.Value, null)) {
-            Debug.LogError("LocationProvider, Target or Self is missing.");
+        if(ReferenceEquals(Target?.Value, null)) {
+            Debug.LogError("Target is missing.");
             return Status.Failure;
         }
+        if(ReferenceEquals(Self?.Value, null)) {
+            Debug.LogError("Self is missing.");
+            return Status.Failure;
+        }
+        
         if(_targetProvider == null) {
             var newLocationProvider = new GameObject("LocationProvider " + Self.Value.name);
             _targetProvider = new Target(newLocationProvider.transform, Self.Value.transform, Target.Value.transform, DistanceToTarget.Value);

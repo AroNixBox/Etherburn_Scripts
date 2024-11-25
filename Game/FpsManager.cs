@@ -10,7 +10,7 @@ public class FpsManager : MonoBehaviour {
 
     void Awake() {
         if(vSync) {
-            Application.targetFrameRate = -1;
+            QualitySettings.vSyncCount = 1;
         } else {
             Application.targetFrameRate = targetFps;
         }
