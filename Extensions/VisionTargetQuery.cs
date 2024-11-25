@@ -22,9 +22,9 @@ namespace Extensions {
             
             _colliders = new Collider[maxTargets];
             
-            #if UNITY_EDITOR
+#if UNITY_EDITOR
             _redrawScope = new RedrawScope();
-            #endif
+#endif
         }
         
         public List<T> GetAllTargetsInVisionConeSorted() {
@@ -50,7 +50,7 @@ namespace Extensions {
                 .Select(item => item.targetProvider)
                 .ToList();
             
-            #if UNITY_EDITOR
+#if UNITY_EDITOR
             _redrawScope.Rewind();
             
             DrawDetectionRadius();
@@ -58,7 +58,7 @@ namespace Extensions {
             if (validTargets.Count > 0) {
                 DrawLineToTarget(validTargets.First().transform);
             }
-            #endif
+#endif
             
             return validTargets;
         }
@@ -134,7 +134,9 @@ namespace Extensions {
         #endif
         public void Dispose() {
 #if UNITY_EDITOR
-            Debug.Log("Disposing VisionTargetQuery");
+            bool isDefault = _redrawScope.Equals(default(RedrawScope));
+            if (isDefault) { return; }
+            
             _redrawScope.Dispose();
 #endif
         }
