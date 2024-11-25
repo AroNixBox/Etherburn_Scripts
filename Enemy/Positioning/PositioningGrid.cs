@@ -1,5 +1,5 @@
-﻿using System.Linq;
-using Drawing;
+﻿using System;
+using System.Linq;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.AI;
@@ -21,6 +21,8 @@ namespace Enemy.Positioning {
     
         [Tooltip("Four Corners of the Grid")]
         [SerializeField] Transform[] boundsTransforms;
+
+        [SerializeField] Transform exampleAgentOnNavMesh;
         
         
         // Grid, where each Cell is a PositioningGridObject
@@ -42,7 +44,7 @@ namespace Enemy.Positioning {
             var gridHeight = maxZ - minZ;
 
             // Center position of the grid
-            var centerPosition = new Vector3((minX + maxX) / 2, 0, (minZ + maxZ) / 2);
+            var centerPosition = new Vector3((minX + maxX) / 2, transform.position.y, (minZ + maxZ) / 2);
 
             // Calculate the number of cells that can fit in the width and height of the grid
             var cellCountWidth = Mathf.FloorToInt(gridWidth / cellSize);
@@ -55,37 +57,49 @@ namespace Enemy.Positioning {
                 cellSize,
                 centerPosition + new Vector3(gridOffset.x, 0, gridOffset.y),
                 (g, x, z) => {
-                    // Weltposition der Zelle ohne angepasste Y-Höhe
-                    Vector3 worldPosition = g.GetWorldPosition(x, z);
-
-                    // Anpassen der Y-Position auf die Höhe des NavMeshes
-                    Vector3 positionOnNavMesh = AdjustPositionToNavMesh(worldPosition);
-
-                    // NavMesh-Check (falls du die Existenz prüfen möchtest)
-                    bool isOnNavMesh = positionOnNavMesh != Vector3.zero;
-
-                    // Erstellen des PositioningGridObject
-                    return new PositioningGridObject(g, x, z, isOnNavMesh);
+                    // Get world position of the cell center
+                    Vector3 worldPosition = g.GetCellCenterPositionInWorldSpace(x, z);
+                    
+                    Vector3 highestReachableNavMeshPosition = GetHighestReachableNavMeshPosition(worldPosition);
+                    bool isOnNavMesh = highestReachableNavMeshPosition != Vector3.zero;
+                    if (isOnNavMesh) {
+                        Debug.DrawLine(highestReachableNavMeshPosition, highestReachableNavMeshPosition + Vector3.up * .5f, Color.red, Mathf.Infinity);
+                    }
+                    return new PositioningGridObject(g, x, z, isOnNavMesh, highestReachableNavMeshPosition);
                 },
                 drawDebugGrid
             );
 
 
         }
-        Vector3 AdjustPositionToNavMesh(Vector3 position) {
-            // TODO: Shoot a ray from that position up,
-            // TODO: check all hits and use the first hit position where the hit is on the navmesh
-            return new Vector3();
+        Vector3 GetHighestReachableNavMeshPosition(Vector3 position) {
+            var ray = new Ray(position, Vector3.down);
+            var hits = new RaycastHit[100];
+            var hitCount = Physics.RaycastNonAlloc(ray, hits, 500f);
+            var highestYPosition = float.MinValue;
+            Vector3 highestPosition = default;
+
+            var path = new NavMeshPath();
+            for (var i = 0; i < hitCount; i++) {
+                var samplePosition = hits[i].point;
+                if (!NavMesh.SamplePosition(samplePosition, out var navMeshHit, .25f, NavMesh.AllAreas)) { continue; }
+
+                if (!NavMesh.CalculatePath(exampleAgentOnNavMesh.position, navMeshHit.position, NavMesh.AllAreas,
+                        path) || path.status != NavMeshPathStatus.PathComplete) { continue; }
+                if (!(navMeshHit.position.y > highestYPosition)) { continue; }
+                
+                highestYPosition = navMeshHit.position.y;
+                highestPosition = navMeshHit.position;
+            }
+
+            return Mathf.Approximately(highestYPosition, float.MinValue) ? Vector3.zero : highestPosition;
         }
-
-
-
+        
         bool CheckIfPositionOnNavMesh(Vector3 position) {
             // TODO: Sample Position on NavMesh
             return default;
         }
 
-        
         public void OccupyCell(Vector3 worldPosition, bool isOccupied) {
             _grid.GetXZ(worldPosition, out var x, out var z);
             Vector2Int gridPosition = new Vector2Int(x, z);
@@ -106,7 +120,7 @@ namespace Enemy.Positioning {
             var gridWidth = maxX - minX;
             var gridHeight = maxZ - minZ;
 
-            var centerPosition = new Vector3((minX + maxX) / 2, 0, (minZ + maxZ) / 2);
+            var centerPosition = new Vector3((minX + maxX) / 2, transform.position.y, (minZ + maxZ) / 2);
 
             var cellCountWidth = Mathf.FloorToInt(gridWidth / cellSize);
             var cellCountHeight = Mathf.FloorToInt(gridHeight / cellSize);

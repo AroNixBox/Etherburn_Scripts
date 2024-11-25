@@ -66,14 +66,10 @@ namespace Enemy.Positioning {
                     case PositioningGridObject positioningGridObject:
                         // Change the debug text of a specific cell
                         // In 3D y represents z (because Unity is z forward)
-                    
-                        debugText.Append("Is Walkable: ");
-                        debugText.Append(positioningGridObject.IsWalkable.ToString());
-                    
-                        debugText.Append("\n");
-                    
-                        debugText.Append("Is Occupied: ");
-                        debugText.Append(positioningGridObject.IsOccupied.ToString());
+
+                        debugText.Append("<b>");
+                        debugText.Append(positioningGridObject.IsWalkable ? "<color=green>Walkable</color>" : "<color=red>Not Walkable</color>");
+                        debugText.Append("</b>");
                         break;
                     default:
                         debugText.Append("Debug Texttype not implemented");
@@ -145,6 +141,10 @@ namespace Enemy.Positioning {
         // Did we click on the Grid?
         public bool IsWithinBounds(int x, int z) {
             return x >= 0 && z >= 0 && x < _width && z < _height;
+        }
+
+        public Vector3 GetCellCenterPositionInWorldSpace(int x, int z) {
+            return GetWorldPosition(x, z) + new Vector3(_cellSize, 0, _cellSize) * 0.5f;
         }
 
         // Cell Size of the Cell

@@ -8,13 +8,15 @@ namespace Enemy.Positioning {
         readonly int _z;
         public bool IsWalkable { get; private set; }
         public bool IsOccupied { get; private set; }
+        public Vector3 NavMeshSamplePosition { get; private set; }
         
         // locally store this x, z and the grid reference
-        public PositioningGridObject(Grid<PositioningGridObject> grid, int x, int z, bool isWalkable) {
+        public PositioningGridObject(Grid<PositioningGridObject> grid, int x, int z, bool isWalkable, Vector3 navMeshSamplePosition) {
             _grid = grid;
             _x = x;
             _z = z;
             IsWalkable = isWalkable;
+            NavMeshSamplePosition = navMeshSamplePosition;
         }
             
         // Assign a building to this cell
