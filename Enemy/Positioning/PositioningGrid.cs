@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.AI;
@@ -21,19 +20,57 @@ namespace Enemy.Positioning {
     
         [Tooltip("Four Corners of the Grid")]
         [SerializeField] Transform[] boundsTransforms;
-
-        [SerializeField] Transform exampleAgentOnNavMesh;
         
+        [BoxGroup("SaveLoadGroup")]
+        [Tooltip("Position from where we check if a position is reachable on the NavMesh, should be an Enemy on the NavMesh")]
+        [SerializeField] Transform navMeshReachabilityChecker;
         
         // Grid, where each Cell is a PositioningGridObject
         Grid<PositioningGridObject> _grid;
-        
+
+        const string ResourcesPath = "Assets/Resources/";
+        const string FileName = "PositioningData/GridPositioningWrapper";
         void Start() {
-            CreateGrid();
+            LoadGridFromScriptableObject();
         }
 
-        void CreateGrid() {
-            // Create min and max values for X and Z based on the 4 Corners
+        void LoadGridFromScriptableObject() {
+            var savedGridData = Resources.Load<GridWrapper>(FileName);
+            if (savedGridData != null) {
+                _grid = savedGridData.ToGrid();
+                Debug.Log("Grid successfully loaded from Resources!"); 
+            }else {
+                Debug.LogError("No saved grid data found in Resources.");
+            }
+        }
+
+        [BoxGroup("SaveLoadGroup")]
+        [GUIColor(0.4f, 0.8f, 1.0f)]
+        [Button(ButtonSizes.Large)]
+        void SaveGridToScriptableObject() {
+            var grid = SaveGridPosition();
+
+            // New ScriptableObject
+            GridWrapper gridWrapper = ScriptableObject.CreateInstance<GridWrapper>();
+
+            // Convert Grid to GridWrapper
+            gridWrapper.InitializeFromGrid(grid);
+
+            // Save the ScriptableObject with the GridWrapperData
+#if UNITY_EDITOR
+            const string fullAssetPath = ResourcesPath + FileName + ".asset";
+            UnityEditor.AssetDatabase.CreateAsset(gridWrapper, fullAssetPath);
+            UnityEditor.AssetDatabase.SaveAssets();
+            Debug.Log($"Grid data saved to {ResourcesPath}");
+#endif
+        }
+
+        Grid<PositioningGridObject> SaveGridPosition() {
+            if (boundsTransforms is not {Length: 4}) {
+                Debug.LogError("Bounds Transforms are not set correctly.");
+                return null;
+            }
+            
             var minX = boundsTransforms.Min(t => t.position.x);
             var maxX = boundsTransforms.Max(t => t.position.x);
             var minZ = boundsTransforms.Min(t => t.position.z);
@@ -42,7 +79,7 @@ namespace Enemy.Positioning {
             // Calculate the width and height of the grid
             var gridWidth = maxX - minX;
             var gridHeight = maxZ - minZ;
-
+            
             // Center position of the grid
             var centerPosition = new Vector3((minX + maxX) / 2, transform.position.y, (minZ + maxZ) / 2);
 
@@ -50,28 +87,24 @@ namespace Enemy.Positioning {
             var cellCountWidth = Mathf.FloorToInt(gridWidth / cellSize);
             var cellCountHeight = Mathf.FloorToInt(gridHeight / cellSize);
 
-            
-            _grid = new Grid<PositioningGridObject>(
+            var grid = new Grid<PositioningGridObject>(
                 cellCountWidth,
                 cellCountHeight,
                 cellSize,
                 centerPosition + new Vector3(gridOffset.x, 0, gridOffset.y),
                 (g, x, z) => {
                     // Get world position of the cell center
-                    Vector3 worldPosition = g.GetCellCenterPositionInWorldSpace(x, z);
-                    
-                    Vector3 highestReachableNavMeshPosition = GetHighestReachableNavMeshPosition(worldPosition);
-                    bool isOnNavMesh = highestReachableNavMeshPosition != Vector3.zero;
-                    if (isOnNavMesh) {
-                        Debug.DrawLine(highestReachableNavMeshPosition, highestReachableNavMeshPosition + Vector3.up * .5f, Color.red, Mathf.Infinity);
-                    }
-                    return new PositioningGridObject(g, x, z, isOnNavMesh, highestReachableNavMeshPosition);
-                },
-                drawDebugGrid
-            );
+                    var worldPosition = g.GetCellCenterPositionInWorldSpace(x, z);
 
+                    var highestReachableNavMeshPosition = GetHighestReachableNavMeshPosition(worldPosition);
+                    var isOnNavMesh = highestReachableNavMeshPosition != Vector3.zero;
 
+                    return new PositioningGridObject(x, z, isOnNavMesh, highestReachableNavMeshPosition);
+                });
+            
+            return grid;
         }
+        
         Vector3 GetHighestReachableNavMeshPosition(Vector3 position) {
             var ray = new Ray(position, Vector3.down);
             var hits = new RaycastHit[100];
@@ -84,7 +117,7 @@ namespace Enemy.Positioning {
                 var samplePosition = hits[i].point;
                 if (!NavMesh.SamplePosition(samplePosition, out var navMeshHit, .25f, NavMesh.AllAreas)) { continue; }
 
-                if (!NavMesh.CalculatePath(exampleAgentOnNavMesh.position, navMeshHit.position, NavMesh.AllAreas,
+                if (!NavMesh.CalculatePath(navMeshReachabilityChecker.position, navMeshHit.position, NavMesh.AllAreas,
                         path) || path.status != NavMeshPathStatus.PathComplete) { continue; }
                 if (!(navMeshHit.position.y > highestYPosition)) { continue; }
                 
@@ -95,10 +128,6 @@ namespace Enemy.Positioning {
             return Mathf.Approximately(highestYPosition, float.MinValue) ? Vector3.zero : highestPosition;
         }
         
-        bool CheckIfPositionOnNavMesh(Vector3 position) {
-            // TODO: Sample Position on NavMesh
-            return default;
-        }
 
         public void OccupyCell(Vector3 worldPosition, bool isOccupied) {
             _grid.GetXZ(worldPosition, out var x, out var z);
@@ -108,7 +137,9 @@ namespace Enemy.Positioning {
         }
         
         void OnDrawGizmos() {
-            if (!drawDebugGrid || boundsTransforms == null || boundsTransforms.Length != 4) {
+            if (!drawDebugGrid) { return; }
+            if (boundsTransforms is not { Length: 4 }) {
+                // Bounds are not set correctly
                 return;
             }
 
@@ -127,8 +158,8 @@ namespace Enemy.Positioning {
 
             Gizmos.color = debugGridColor;
 
-            for (int x = 0; x < cellCountWidth; x++) {
-                for (int z = 0; z < cellCountHeight; z++) {
+            for (var x = 0; x < cellCountWidth; x++) {
+                for (var z = 0; z < cellCountHeight; z++) {
                     var cellCenter = centerPosition + new Vector3(
                         (x - cellCountWidth * 0.5f) * cellSize + cellSize * 0.5f,
                         0,
@@ -139,6 +170,5 @@ namespace Enemy.Positioning {
                 }
             }
         }
-
     }
 }
