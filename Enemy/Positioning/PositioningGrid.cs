@@ -4,7 +4,6 @@ using Drawing;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.AI;
-using UnityEngine.Serialization;
 
 namespace Enemy.Positioning {
     public class PositioningGrid : MonoBehaviour {
@@ -33,21 +32,24 @@ namespace Enemy.Positioning {
         [HorizontalGroup("Query Settings/Split", LabelWidth = 100)]
         [PreviewField(Alignment = ObjectFieldAlignment.Left)]
         [SerializeField] GameObject player;
-
-        [SerializeField] Transform testTarget;
-
+        
         [VerticalGroup("Query Settings/Split/Range")]
         [SerializeField] float minQueryRange;
 
         [VerticalGroup("Query Settings/Split/Range")]
         [SerializeField] float maxQueryRange;
         
+        public event Action OnPlayerGridPositionChanged;
+        PositioningGridObject _lastGridObject;
         
         // Grid, where each Cell is a PositioningGridObject
         Grid<PositioningGridObject> _grid;
 
         const string ResourcesPath = "Assets/Resources/";
         const string FileName = "PositioningData/GridPositioningWrapper";
+
+        #region Grid Creation
+
         void Start() {
             LoadGridFromScriptableObject();
         }
@@ -61,11 +63,6 @@ namespace Enemy.Positioning {
                 Debug.LogError("No saved grid data found in Resources.");
             }
         }
-
-        void Update() {
-            _ = GetClosestPositionInRange(testTarget);
-        }
-
 
         [BoxGroup("SaveLoadGroup")]
         [GUIColor(0.4f, 0.8f, 1.0f)]
@@ -88,16 +85,48 @@ namespace Enemy.Positioning {
 #endif
         }
 
-        
-        
-        public Vector3? GetClosestPositionInRange(Transform target) {
+        #endregion
+
+        void Update() {
+            TrackPlayerOnGrid();
+        }
+
+        void TrackPlayerOnGrid() {
+            if (player == null) return;
+
+            _grid.GetXZ(player.transform.position, out var currentX, out var currentZ);
+            var currentGridObject = _grid.GetGridObject(currentX, currentZ);
+
+            if (_lastGridObject == currentGridObject) {
+                return;
+            }
+
+            if (_lastGridObject != null) {
+                _lastGridObject.SetOccupyState(false);
+                _grid.TriggerGridObjectChanged(new Vector2Int(_lastGridObject.X, _lastGridObject.Z));
+            }
+
+            currentGridObject.SetOccupyState(true);
+            _grid.TriggerGridObjectChanged(new Vector2Int(currentX, currentZ));
+            
+
+            _lastGridObject = currentGridObject;
+            
+            // Needs to be called after the lastGridObject is set.
+            OnPlayerGridPositionChanged?.Invoke(); // Inform all listeners
+        }
+        public PositioningGridObject GetClosestGridObjectWithinMinMaxRange(Transform target) {
             if(target == null) {
                 Debug.LogError("Test Target is null.");
                 return null;
             }
-            
-            // Get Grid Coordinates of the Test Center
-            _grid.GetXZ(player.transform.position, out var centerX, out var centerZ);
+            if(_lastGridObject == null) {
+                Debug.LogError("Method called before lastGridObject was set.");
+                return null;
+            }
+            // Get Grid Coordinates of the Player Cell
+            var centerX = _lastGridObject.X;
+            var centerZ = _lastGridObject.Z;
 
             // Calculate the Grid Radius based on the Max Range
             var gridRadius = Mathf.CeilToInt(maxQueryRange / _grid.CellSize);
@@ -142,10 +171,13 @@ namespace Enemy.Positioning {
                     
                     // Draw a Box at the Cell Position
                     var cellPosition = gridObject.NavMeshSamplePosition;
-                    Draw.SolidBox(
-                        new Bounds(cellPosition, Vector3.one * (_grid.CellSize * 0.8f)),
-                        Color.cyan
-                    );
+                    using (Draw.WithDuration(2f)) {
+                        Draw.SolidBox(
+                            new Bounds(cellPosition, Vector3.one * (_grid.CellSize * 0.8f)),
+                            Color.cyan
+                        );
+                    }
+                    
                 }
             }
             // Draw the closest Cell red
@@ -154,13 +186,8 @@ namespace Enemy.Positioning {
                 Debug.LogError("No reachable position found.");
                 return null;
             }
-            
-            Draw.SolidBox(
-                new Bounds(closestGridObject.NavMeshSamplePosition, Vector3.one * (_grid.CellSize * 0.8f)),
-                Color.red
-            );
                 
-            return closestGridObject.NavMeshSamplePosition;
+            return closestGridObject;
         }
         
         Grid<PositioningGridObject> SaveGridPosition() {
@@ -226,12 +253,21 @@ namespace Enemy.Positioning {
             return Mathf.Approximately(highestYPosition, float.MinValue) ? Vector3.zero : highestPosition;
         }
         
-
         public void OccupyCell(Vector3 worldPosition, bool isOccupied) {
             _grid.GetXZ(worldPosition, out var x, out var z);
             Vector2Int gridPosition = new Vector2Int(x, z);
-            _grid.GetGridObject(worldPosition).SetOccupyState(isOccupied);
+            var gridObject = _grid.GetGridObject(worldPosition); 
+            gridObject.SetOccupyState(isOccupied);
             _grid.TriggerGridObjectChanged(gridPosition);
+        }
+        public void OccupyCell(int x, int z, bool isOccupied) {
+            var gridObject = _grid.GetGridObject(x, z);
+            gridObject.SetOccupyState(isOccupied);
+            _grid.TriggerGridObjectChanged(x, z);
+        }
+        public void OccupyCell(PositioningGridObject gridObject, bool isOccupied) {
+            gridObject.SetOccupyState(isOccupied);
+            _grid.TriggerGridObjectChanged(new Vector2Int(gridObject.X, gridObject.Z));
         }
         
         void OnDrawGizmos() {

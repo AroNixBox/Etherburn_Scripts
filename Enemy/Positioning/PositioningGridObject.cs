@@ -11,8 +11,8 @@ namespace Enemy.Positioning {
         
         // locally store this x, z and the grid reference
         public PositioningGridObject(int x, int z, bool isWalkable, Vector3 navMeshSamplePosition) {
-            this.X = x;
-            this.Z = z;
+            X = x;
+            Z = z;
             IsWalkable = isWalkable;
             NavMeshSamplePosition = navMeshSamplePosition;
         }

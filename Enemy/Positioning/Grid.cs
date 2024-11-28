@@ -8,7 +8,7 @@ namespace Enemy.Positioning {
     // Generic Base Grid Class to create a Grid with any type of Object.
     public class Grid<TGridObject> {
         // Invoked when building is placed, upgraded or deleted
-        public event EventHandler<Vector2Int> OnPlacedObjectChanged;
+        public event EventHandler<Vector2Int> OnGridCellValueChanged;
     
         // Entire Grid width
         public readonly int Width;
@@ -46,8 +46,6 @@ namespace Enemy.Positioning {
             }
             
             if(!Application.isPlaying) { return; }
-
-            return;
             
             // 2D Array of the Debug Text
             var debugTextArray = new TextMeshPro[width][];
@@ -56,7 +54,7 @@ namespace Enemy.Positioning {
             }
             
             // Subscribe to the OnPlacedObjectChanged event
-            OnPlacedObjectChanged += (_, eventArgs) => {
+            OnGridCellValueChanged += (_, eventArgs) => {
                 var posX = eventArgs.x;
                 var posZ = eventArgs.y;
                 
@@ -72,7 +70,7 @@ namespace Enemy.Positioning {
                         // In 3D y represents z (because Unity is z forward)
 
                         debugText.Append("<b>");
-                        debugText.Append(positioningGridObject.IsWalkable ? "<color=green>Walkable</color>" : "<color=red>Not Walkable</color>");
+                        debugText.Append(!positioningGridObject.IsOccupied ? "<color=green>Unoccupied</color>" : "<color=red>Occupied</color>");
                         debugText.Append("</b>");
                         break;
                     default:
@@ -157,7 +155,10 @@ namespace Enemy.Positioning {
             return GetWorldPosition(x, z) + new Vector3(CellSize, 0, CellSize) * 0.5f;
         }
         public void TriggerGridObjectChanged(Vector2Int gridPosition) {
-            OnPlacedObjectChanged?.Invoke(this, gridPosition);
+            OnGridCellValueChanged?.Invoke(this, gridPosition);
+        }
+        public void TriggerGridObjectChanged(int x, int z) {
+            TriggerGridObjectChanged(new Vector2Int(x, z));
         }
     }
     
