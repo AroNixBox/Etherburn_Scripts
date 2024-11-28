@@ -19,8 +19,8 @@ namespace Enemy.Positioning {
                 for (var z = 0; z < gridHeight; z++) {
                     var gridObject = grid.GridArray[x, z];
                     gridData[x * gridHeight + z] = new PositioningGridObjectData(
-                        gridObject.x,
-                        gridObject.z,
+                        gridObject.X,
+                        gridObject.Z,
                         gridObject.IsWalkable,
                         gridObject.NavMeshSamplePosition
                     );

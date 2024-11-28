@@ -1,7 +1,10 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
+using Drawing;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.Serialization;
 
 namespace Enemy.Positioning {
     public class PositioningGrid : MonoBehaviour {
@@ -25,6 +28,21 @@ namespace Enemy.Positioning {
         [Tooltip("Position from where we check if a position is reachable on the NavMesh, should be an Enemy on the NavMesh")]
         [SerializeField] Transform navMeshReachabilityChecker;
         
+        // Query
+        [BoxGroup("Query Settings")]
+        [HorizontalGroup("Query Settings/Split", LabelWidth = 100)]
+        [PreviewField(Alignment = ObjectFieldAlignment.Left)]
+        [SerializeField] GameObject player;
+
+        [SerializeField] Transform testTarget;
+
+        [VerticalGroup("Query Settings/Split/Range")]
+        [SerializeField] float minQueryRange;
+
+        [VerticalGroup("Query Settings/Split/Range")]
+        [SerializeField] float maxQueryRange;
+        
+        
         // Grid, where each Cell is a PositioningGridObject
         Grid<PositioningGridObject> _grid;
 
@@ -43,6 +61,11 @@ namespace Enemy.Positioning {
                 Debug.LogError("No saved grid data found in Resources.");
             }
         }
+
+        void Update() {
+            _ = GetClosestPositionInRange(testTarget);
+        }
+
 
         [BoxGroup("SaveLoadGroup")]
         [GUIColor(0.4f, 0.8f, 1.0f)]
@@ -65,6 +88,81 @@ namespace Enemy.Positioning {
 #endif
         }
 
+        
+        
+        public Vector3? GetClosestPositionInRange(Transform target) {
+            if(target == null) {
+                Debug.LogError("Test Target is null.");
+                return null;
+            }
+            
+            // Get Grid Coordinates of the Test Center
+            _grid.GetXZ(player.transform.position, out var centerX, out var centerZ);
+
+            // Calculate the Grid Radius based on the Max Range
+            var gridRadius = Mathf.CeilToInt(maxQueryRange / _grid.CellSize);
+    
+            PositioningGridObject closestGridObject = null;
+            var closestDistanceSqr = float.MaxValue;
+
+            for (var dx = -gridRadius; dx <= gridRadius; dx++) {
+                for (var dz = -gridRadius; dz <= gridRadius; dz++) {
+                    var x = centerX + dx;
+                    var z = centerZ + dz;
+
+                    // Just to prevent IndexOutOfBounds
+                    if (x < 0 || x >= _grid.Width || z < 0 || z >= _grid.Height) continue;
+                    
+                    var gridDistanceSqr = dx * _grid.CellSize * dx * _grid.CellSize + 
+                                            dz * _grid.CellSize * dz * _grid.CellSize;
+                    var minRangeSqr = minQueryRange * minQueryRange;
+                    var maxRangeSqr = maxQueryRange * maxQueryRange;
+                    
+                    // Skip Cells smaller than Min Range or bigger than Max Range
+                    if (gridDistanceSqr < minRangeSqr || gridDistanceSqr > maxRangeSqr) continue;
+                    // Get the Grid Object of all Cells in Range
+                    var gridObject = _grid.GetGridObject(x, z);
+
+                    if (gridObject == null) {
+                        Debug.LogWarning("Grid Object of Cell with X: " + x + " Z: " + z + " is null.");
+                        continue;
+                    }
+                    
+                    // Skip non-walkable cells
+                    if (!gridObject.IsWalkable) { continue; }
+
+                    // Skip Occupied Cells
+                    if (gridObject.IsOccupied) { continue; }
+                    
+                    var distanceSqr = (target.position - gridObject.NavMeshSamplePosition).sqrMagnitude;
+                    if (distanceSqr < closestDistanceSqr) {
+                        closestDistanceSqr = distanceSqr;
+                        closestGridObject = gridObject;
+                    }
+                    
+                    // Draw a Box at the Cell Position
+                    var cellPosition = gridObject.NavMeshSamplePosition;
+                    Draw.SolidBox(
+                        new Bounds(cellPosition, Vector3.one * (_grid.CellSize * 0.8f)),
+                        Color.cyan
+                    );
+                }
+            }
+            // Draw the closest Cell red
+            if (closestGridObject == null) {
+                // TODO: Implement Fallback
+                Debug.LogError("No reachable position found.");
+                return null;
+            }
+            
+            Draw.SolidBox(
+                new Bounds(closestGridObject.NavMeshSamplePosition, Vector3.one * (_grid.CellSize * 0.8f)),
+                Color.red
+            );
+                
+            return closestGridObject.NavMeshSamplePosition;
+        }
+        
         Grid<PositioningGridObject> SaveGridPosition() {
             if (boundsTransforms is not {Length: 4}) {
                 Debug.LogError("Bounds Transforms are not set correctly.");

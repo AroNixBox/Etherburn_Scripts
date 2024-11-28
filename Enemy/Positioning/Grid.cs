@@ -46,6 +46,8 @@ namespace Enemy.Positioning {
             }
             
             if(!Application.isPlaying) { return; }
+
+            return;
             
             // 2D Array of the Debug Text
             var debugTextArray = new TextMeshPro[width][];
