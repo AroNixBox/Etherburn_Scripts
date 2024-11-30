@@ -17,7 +17,6 @@ public partial class AnimationCrossfadeAction : Action {
         var animationDetails = AnimationsParams.GetAnimationDetails(AnimationState.Value);
         AnimationController.Value.CrossfadeToState(animationDetails);
         
-        
         _countdownTimer ??= new CountdownTimer(animationDetails.BlendDuration);
         return Status.Running;
     }

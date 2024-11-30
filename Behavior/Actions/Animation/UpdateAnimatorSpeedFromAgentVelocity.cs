@@ -17,6 +17,7 @@ public partial class UpdateAnimatorSpeedFromAgentVelocity : Action {
     [SerializeReference] public BlackboardVariable<float> VelocitySmoothing = new (0.1f);
     [SerializeReference] public BlackboardVariable<string> AnimatorSpeedParam;
     [SerializeReference] public BlackboardVariable<MoveDirection> MovementDirection;
+    [SerializeReference] public BlackboardVariable<bool> ResetOnEnd = new (true);
     
     Vector3 _smoothDeltaPosition;
     Vector3 _velocity;
@@ -26,7 +27,7 @@ public partial class UpdateAnimatorSpeedFromAgentVelocity : Action {
             LogFailure("No Agent or Animator assigned.");
             return Status.Failure;
         }
-        if(string.IsNullOrEmpty(AnimatorSpeedParam.Value) || Speed.Value == 0) {
+        if(string.IsNullOrEmpty(AnimatorSpeedParam.Value)) {
             LogFailure("No Animator Speed Param or Speed assigned.");
             return Status.Failure;
         }
@@ -71,8 +72,10 @@ public partial class UpdateAnimatorSpeedFromAgentVelocity : Action {
     }
 
     protected override void OnEnd() {
-        _velocity = Vector3.zero;
-        Animator.Value.SetFloat(AnimatorSpeedParam.Value, 0);
+        if(ResetOnEnd.Value) {
+            _velocity = Vector3.zero;
+            Animator.Value.SetFloat(AnimatorSpeedParam.Value, 0);
+        }
     }
     
 }

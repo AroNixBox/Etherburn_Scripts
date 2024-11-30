@@ -9,6 +9,7 @@ namespace Behavior.Enemy.State.Animation {
         [SerializeField] AnimationClip[] emptyHurtClips;
         
         readonly Dictionary<NPCAnimationStates, AnimationClip> _animationClipMap = new ();
+        int _currentStateHash;
 
         void Awake() {
             if (emptyAttackClips.Length > 0) {
@@ -25,9 +26,7 @@ namespace Behavior.Enemy.State.Animation {
                 Debug.LogError("emptyHurtClips array is empty.");
             }
         }
-
-
-        int _currentStateHash;
+        
         public void CrossfadeToState(AnimationsParams.AnimationDetails stateDetails) {
             if (_currentStateHash == stateDetails.StateName) return;
             _currentStateHash = stateDetails.StateName;

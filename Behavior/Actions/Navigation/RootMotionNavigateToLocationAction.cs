@@ -1,4 +1,5 @@
 using System;
+using Drawing;
 using Unity.Behavior;
 using UnityEngine;
 using UnityEngine.AI;
@@ -12,22 +13,19 @@ public partial class RootMotionNavigateToLocationAction : Action
     [SerializeReference] public BlackboardVariable<NavMeshAgent> Agent;
     [SerializeReference] public BlackboardVariable<Vector3> Location;
     [SerializeReference] public BlackboardVariable<bool> SignalOnArrival = new (true);
-
-    [SerializeReference] public BlackboardVariable<bool> ApplyRotation;
-    [SerializeReference] public BlackboardVariable<float> RotationSpeed = new (5.0f);
+    [SerializeReference] public BlackboardVariable<MoveDirection> MovementDirection;
 
     protected override Status OnStart() {
-        if (ReferenceEquals(Agent?.Value, null) || ReferenceEquals(Location, null)) {
-            Debug.LogError("Agent or Target is missing.");
+        if (ReferenceEquals(Agent?.Value, null)) {
+            Debug.LogError("Agent is missing.");
             return Status.Failure;
         }
         
         Agent.Value.SetDestination(Location.Value);
 
         if (SignalOnArrival.Value) {
+            // Already at the destination
             if ((Agent.Value.transform.position - Location.Value).magnitude <= Agent.Value.stoppingDistance) {
-                // We need to set a destination none the less, because OnEnd forces us to at the steerTarget,
-                // which is from the Old Location if we dont override
                 return Status.Success;
             }
         }
@@ -36,9 +34,13 @@ public partial class RootMotionNavigateToLocationAction : Action
     }
 
     protected override Status OnUpdate() {
-        if (ApplyRotation) {
-            RotateTowardsTargetLocation();
+        // If the Location has changed, update the destination
+        if (Agent.Value.destination != Location.Value) {
+            Debug.Log("Destination changed");
+            Agent.Value.SetDestination(Location.Value);
         }
+        
+        RotateTowardsTargetLocation();
         
         return Agent.Value.remainingDistance <= Agent.Value.stoppingDistance && SignalOnArrival.Value
             ? Status.Success 
@@ -47,10 +49,6 @@ public partial class RootMotionNavigateToLocationAction : Action
 
     protected override void OnEnd() {
         if(ReferenceEquals(Agent?.Value, null)) { return; }
-        // Force LookAt Target
-        if (ApplyRotation) {
-            Agent.Value.transform.LookAt(Agent.Value.steeringTarget);
-        }
         if(Agent.Value.isOnNavMesh) {
             Agent.Value.ResetPath();
         }
@@ -58,9 +56,33 @@ public partial class RootMotionNavigateToLocationAction : Action
     
     void RotateTowardsTargetLocation() {
         Vector3 direction = (Agent.Value.steeringTarget - Agent.Value.transform.position).normalized;
-        if (direction != Vector3.zero) {
-            Quaternion targetRotation = Quaternion.LookRotation(direction);
-            Agent.Value.transform.rotation = Quaternion.Slerp(Agent.Value.transform.rotation, targetRotation, Time.deltaTime * 2.5f);
+        direction.y = 0;
+        if (direction == Vector3.zero) { return; }
+        if(MovementDirection.Value == MoveDirection.Backward) {
+            direction = -direction;
+        }
+        // Smoothly look at the target
+        float desiredRotationTimeFor360 = 60f / Agent.Value.angularSpeed;
+        float slerpSpeed = 1f / desiredRotationTimeFor360;
+        Agent.Value.transform.rotation = Quaternion.Slerp(
+            Agent.Value.transform.rotation, 
+            Quaternion.LookRotation(direction), 
+            Time.deltaTime * slerpSpeed);
+        
+#if UNITY_EDITOR
+        DrawArrowToSteerTarget(direction);
+#endif
+    }
+    
+#if UNITY_EDITOR
+    void DrawArrowToSteerTarget(Vector3 direction) {
+        Vector3 heightPoint = Vector3.up * 2f;
+        Vector3 startPoint = Agent.Value.transform.position + heightPoint; // Starts above the head
+        Vector3 endPoint = Agent.Value.transform.position + heightPoint + direction * (Agent.Value.steeringTarget - Agent.Value.transform.position).magnitude;            // Draw an arrow from the agent to the target with Aline Asset
+        using (Draw.WithColor(Color.white)) {
+            Draw.Arrow(startPoint, endPoint);
+            Draw.WireBox(endPoint, Vector3.one * 0.1f);
         }
     }
+#endif
 }

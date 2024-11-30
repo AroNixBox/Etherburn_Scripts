@@ -1,39 +1,99 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Enemy.Positioning {
     // NO Instance needed, communication is via Event Channels
     public class EnemyAggressionManager : MonoBehaviour {
+        public static EnemyAggressionManager Instance;
         [SerializeField] PositioningGrid positioningGrid;
-        [SerializeField] Transform testEnemy;
-        PositioningGridObject _currentCell;
+        // Enemies
+        public List<EnemyData> _aggressiveEnemyDatas = new(); // Sleeping
+
+        void Awake() {
+            if (Instance == null) {
+                Instance = this;
+            }
+            else {
+                Destroy(gameObject);
+            }
+        }
 
         void Start() {
-            positioningGrid.OnPlayerGridPositionChanged += CheckIfCellIsStillOptimal;
+            positioningGrid.OnPlayerGridPositionChanged += ReevaluateEnemyBehavior;
         }
-        
-        void RequestCellForEnemy() {
-            _currentCell = positioningGrid.GetClosestGridObjectWithinMinMaxRange(testEnemy);
-            positioningGrid.OccupyCell(_currentCell, true);
-            testEnemy.position = _currentCell.NavMeshSamplePosition;
+
+        void ReevaluateEnemyBehavior() {
+            CheckAllEnemiesForOptimalCell();
         }
-        
-        void CheckIfCellIsStillOptimal() {
-            // If the player has Moved, check each occupied
-            if (_currentCell == null) {
-                RequestCellForEnemy();
+
+        public void RegisterEnemy(GameObject enemy, OptimalPositionChanged optimalPositionChangedChannel) {
+            if (!_aggressiveEnemyDatas.Exists(e => e.Enemy.name == enemy.name)) {
+                var enemyData = new EnemyData {
+                    Enemy = enemy,
+                    CurrentCell = null,
+                    OptimalPositionChangedChannel = optimalPositionChangedChannel
+                };
+                _aggressiveEnemyDatas.Add(enemyData);
+
+                CheckIfCellIsStillOptimal(enemyData);
+            }
+            else {
+                Debug.LogError("Enemy already registered");
+            }
+        }
+
+        public void UnregisterEnemy(GameObject enemy) {
+            var enemyData = _aggressiveEnemyDatas.Find(e => e.Enemy.name == enemy.name);
+            if (enemyData == null) {
                 return;
             }
-            
-            var optimalCell = positioningGrid.GetClosestGridObjectWithinMinMaxRange(testEnemy);
-            if (optimalCell == _currentCell) { return; }
-            positioningGrid.OccupyCell(_currentCell, false);
-            RequestCellForEnemy();
+
+            positioningGrid.OccupyCell(enemyData.CurrentCell.X, enemyData.CurrentCell.Z, false);
+            _aggressiveEnemyDatas.Remove(enemyData);
         }
-        
-        // TODOS:
-        // Evaluate Distance for each aggressive enemy to player
-        // Attacking Enemy:
-        // On Attack: Throw AttackStarted Event and AttackEnded Event. In between these two, no reevaluation of attack permission can be done
-        // If no event is thrown, each time OnPlayerGridPositionChanged the reevaluation of attack permission is done.
+
+        void CheckAllEnemiesForOptimalCell() {
+            foreach (var aggressiveEnemyData in _aggressiveEnemyDatas) {
+                CheckIfCellIsStillOptimal(aggressiveEnemyData);
+            }
+        }
+
+        // FIXED!!
+        void CheckIfCellIsStillOptimal(EnemyData enemyData) {
+            if (_aggressiveEnemyDatas.Count == 0) {
+                return;
+            }
+
+            var optimalCell = positioningGrid.GetClosestGridObjectWithinMinMaxRange(enemyData.Enemy);
+            // First Time
+            if (enemyData.CurrentCell == null) {
+                enemyData.CurrentCell = optimalCell;
+                positioningGrid.OccupyCell(enemyData.CurrentCell.X, enemyData.CurrentCell.Z, true);
+                enemyData.OptimalPositionChangedChannel.SendEventMessage(enemyData.CurrentCell.NavMeshSamplePosition);
+                return;
+            }
+
+            if (optimalCell == enemyData.CurrentCell) {
+                return;
+            } // Optimal Cell is still the same
+
+            // Unoccupy the current cell
+            positioningGrid.OccupyCell(enemyData.CurrentCell.X, enemyData.CurrentCell.Z, false);
+
+            //Request a new cell
+            enemyData.CurrentCell = optimalCell;
+
+            // Occupy the new cell
+            positioningGrid.OccupyCell(enemyData.CurrentCell.X, enemyData.CurrentCell.Z, true);
+
+            enemyData.OptimalPositionChangedChannel.SendEventMessage(enemyData.CurrentCell.NavMeshSamplePosition);
+        }
+
+        [System.Serializable]
+        public class EnemyData {
+            public GameObject Enemy;
+            public PositioningGridObject CurrentCell;
+            public OptimalPositionChanged OptimalPositionChangedChannel; // TODO: Rename Channel
+        }
     }
 }

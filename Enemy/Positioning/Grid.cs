@@ -46,7 +46,6 @@ namespace Enemy.Positioning {
             }
             
             if(!Application.isPlaying) { return; }
-            
             // 2D Array of the Debug Text
             var debugTextArray = new TextMeshPro[width][];
             for (int index = 0; index < width; index++) {
@@ -70,7 +69,8 @@ namespace Enemy.Positioning {
                         // In 3D y represents z (because Unity is z forward)
 
                         debugText.Append("<b>");
-                        debugText.Append(!positioningGridObject.IsOccupied ? "<color=green>Unoccupied</color>" : "<color=red>Occupied</color>");
+                        // debugText.Append(!positioningGridObject.IsOccupied ? "<color=green>Unoccupied</color>" : "<color=red>Occupied</color>");
+                        debugText.Append(positioningGridObject.IsWalkable ? "<color=green>Walkable</color>" : "<color=red>Not Walkable</color>");
                         debugText.Append("</b>");
                         break;
                     default:

@@ -27,10 +27,8 @@ public partial class RootMotionNavigateToTargetAction : Action
         Agent.Value.SetDestination(Target.Value.transform.position);
 
         if (SignalOnArrival.Value) {
+            // Already at the destination
             if ((Agent.Value.transform.position - Target.Value.transform.position).magnitude <= Agent.Value.stoppingDistance) {
-                // We need to set a destination none the less, because OnEnd forces us to at the steerTarget,
-                // which is from the Old Location if we dont override
-                Agent.Value.SetDestination(Target.Value.transform.position);
                 return Status.Success;
             }
         }

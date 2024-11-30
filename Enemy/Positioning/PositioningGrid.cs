@@ -31,7 +31,7 @@ namespace Enemy.Positioning {
         [BoxGroup("Query Settings")]
         [HorizontalGroup("Query Settings/Split", LabelWidth = 100)]
         [PreviewField(Alignment = ObjectFieldAlignment.Left)]
-        [SerializeField] GameObject player;
+        public GameObject positioningAnker;
         
         [VerticalGroup("Query Settings/Split/Range")]
         [SerializeField] float minQueryRange;
@@ -92,9 +92,9 @@ namespace Enemy.Positioning {
         }
 
         void TrackPlayerOnGrid() {
-            if (player == null) return;
+            if (positioningAnker == null) return;
 
-            _grid.GetXZ(player.transform.position, out var currentX, out var currentZ);
+            _grid.GetXZ(positioningAnker.transform.position, out var currentX, out var currentZ);
             var currentGridObject = _grid.GetGridObject(currentX, currentZ);
 
             if (_lastGridObject == currentGridObject) {
@@ -108,14 +108,13 @@ namespace Enemy.Positioning {
 
             currentGridObject.SetOccupyState(true);
             _grid.TriggerGridObjectChanged(new Vector2Int(currentX, currentZ));
-            
 
             _lastGridObject = currentGridObject;
             
             // Needs to be called after the lastGridObject is set.
             OnPlayerGridPositionChanged?.Invoke(); // Inform all listeners
         }
-        public PositioningGridObject GetClosestGridObjectWithinMinMaxRange(Transform target) {
+        public PositioningGridObject GetClosestGridObjectWithinMinMaxRange(GameObject target) {
             if(target == null) {
                 Debug.LogError("Test Target is null.");
                 return null;
@@ -163,7 +162,7 @@ namespace Enemy.Positioning {
                     // Skip Occupied Cells
                     if (gridObject.IsOccupied) { continue; }
                     
-                    var distanceSqr = (target.position - gridObject.NavMeshSamplePosition).sqrMagnitude;
+                    var distanceSqr = (target.transform.position - gridObject.NavMeshSamplePosition).sqrMagnitude;
                     if (distanceSqr < closestDistanceSqr) {
                         closestDistanceSqr = distanceSqr;
                         closestGridObject = gridObject;
@@ -264,10 +263,6 @@ namespace Enemy.Positioning {
             var gridObject = _grid.GetGridObject(x, z);
             gridObject.SetOccupyState(isOccupied);
             _grid.TriggerGridObjectChanged(x, z);
-        }
-        public void OccupyCell(PositioningGridObject gridObject, bool isOccupied) {
-            gridObject.SetOccupyState(isOccupied);
-            _grid.TriggerGridObjectChanged(new Vector2Int(gridObject.X, gridObject.Z));
         }
         
         void OnDrawGizmos() {
