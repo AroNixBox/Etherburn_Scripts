@@ -176,7 +176,6 @@ namespace Enemy.Positioning {
                             Color.cyan
                         );
                     }
-                    
                 }
             }
             // Draw the closest Cell red

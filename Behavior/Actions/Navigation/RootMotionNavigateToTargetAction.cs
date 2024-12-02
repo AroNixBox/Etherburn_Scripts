@@ -19,11 +19,10 @@ public partial class RootMotionNavigateToTargetAction : Action
     Vector3 _colliderAdjustedTargetPosition;
 
     protected override Status OnStart() {
-        if (ReferenceEquals(Agent?.Value, null) || ReferenceEquals(Target, null)) {
+        if (ReferenceEquals(Agent.Value, null) || ReferenceEquals(Target.Value, null)) {
             Debug.LogError("Agent or Target is missing.");
             return Status.Failure;
         }
-
         Agent.Value.SetDestination(Target.Value.transform.position);
 
         if (SignalOnArrival.Value) {
@@ -37,7 +36,6 @@ public partial class RootMotionNavigateToTargetAction : Action
     }
 
     protected override Status OnUpdate() {
-        
         // Check if the target position has changed.
         if (HasTargetMoved()) {
             _lastTargetPosition = Target.Value.transform.position;

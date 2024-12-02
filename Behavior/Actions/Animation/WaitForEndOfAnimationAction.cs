@@ -17,7 +17,6 @@ public partial class WaitForEndOfAnimationAction : Action {
         }
         
         var waitTime = GetCurrentOrNextClipLength(LayerIndex.Value);        
-        Debug.Log($"Waiting for {waitTime} seconds.");
         _countdownTimer = new CountdownTimer(waitTime);
         _countdownTimer.Start();
         return Status.Running;

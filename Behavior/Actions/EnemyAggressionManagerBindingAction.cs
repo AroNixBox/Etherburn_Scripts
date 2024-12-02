@@ -11,14 +11,16 @@ public partial class EnemyAggressionManagerBindingAction : Action {
     [SerializeReference] public BlackboardVariable<GameObject> self;
     [SerializeReference] public BlackboardVariable<BindingState> bindingState;
     [SerializeReference] public BlackboardVariable<OptimalPositionChanged> OptimalPositionChangedChannel;
+    [SerializeReference] public BlackboardVariable<ChangeAggressionChannel> ChangeAggressionChannel;
     protected override Status OnStart() {
         if(ReferenceEquals(self, null)) {
+            Debug.LogError("Missing Self, OptimalPositionChangedChannel or ChangeAggressionChannel");
             return Status.Failure;
         }
-        
+        Debug.Log(bindingState.Value);
         switch (bindingState.Value) {
             case BindingState.Register:
-                EnemyAggressionManager.Instance.RegisterEnemy(self.Value, OptimalPositionChangedChannel.Value);
+                EnemyAggressionManager.Instance.RegisterEnemy(self.Value, OptimalPositionChangedChannel.Value, ChangeAggressionChannel.Value);
                 break;
             
             case BindingState.Unregister:

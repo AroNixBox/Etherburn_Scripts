@@ -14,6 +14,7 @@ public partial class RootMotionNavigateToLocationAction : Action
     [SerializeReference] public BlackboardVariable<Vector3> Location;
     [SerializeReference] public BlackboardVariable<bool> SignalOnArrival = new (true);
     [SerializeReference] public BlackboardVariable<MoveDirection> MovementDirection;
+    [SerializeReference] public BlackboardVariable<bool> RotateTowardsTarget = new (true);
 
     protected override Status OnStart() {
         if (ReferenceEquals(Agent?.Value, null)) {
@@ -39,8 +40,10 @@ public partial class RootMotionNavigateToLocationAction : Action
             Debug.Log("Destination changed");
             Agent.Value.SetDestination(Location.Value);
         }
-        
-        RotateTowardsTargetLocation();
+
+        if (RotateTowardsTarget.Value) {
+            RotateTowardsTargetLocation();
+        }
         
         return Agent.Value.remainingDistance <= Agent.Value.stoppingDistance && SignalOnArrival.Value
             ? Status.Success 

@@ -11,9 +11,8 @@ public partial class SetTargetToPositionAction : Action
     [SerializeReference] public BlackboardVariable<GameObject> Target;
     [SerializeReference] public BlackboardVariable<Vector3> Position;
     GameObject _actualTarget;
-    protected override Status OnStart()
-    {
-        _actualTarget ??= new GameObject("Target");
+    protected override Status OnStart() {
+        _actualTarget ??= new GameObject("Target " + Time.time);
         Target.Value = _actualTarget;
         Target.Value.transform.position = Position.Value;
         return Status.Success;
