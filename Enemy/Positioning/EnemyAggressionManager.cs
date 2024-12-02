@@ -37,6 +37,8 @@ namespace Enemy.Positioning {
                     _inactiveEnemyDatas.Remove(closestEnemyToPlayer);
                     positioningGrid.OccupyCell(closestEnemyToPlayer.CurrentCell.X, closestEnemyToPlayer.CurrentCell.Z, false);
                     
+                    Debug.LogWarning("Setting " + closestEnemyToPlayer.Enemy.name + " as active enemy");
+                    
                     _activeEnemyData = closestEnemyToPlayer;
                     closestEnemyToPlayer.ChangeAggressionChannel.SendEventMessage(true);
                 }
@@ -47,16 +49,18 @@ namespace Enemy.Positioning {
                         // Handle ex-active enemy
                         var exActiveEnemyData = _activeEnemyData;
                         // STOP-ATTACK Event for ex-active enemy
-                        // TODO: Not getting triggered? Old Enemy ot looking for new position?!
                         exActiveEnemyData.ChangeAggressionChannel.SendEventMessage(false);
+                        
+                        // ORDER IMPORTANT:
+                        // Set active enemy with the closest enemy, if we dont do it here, the recursive call will set self to active enemy again, since _activeEnemyData is null
+                        _activeEnemyData = closestEnemyToPlayer;
+                        
                         // Reregister the ex-active enemy
                         RegisterEnemy(exActiveEnemyData.Enemy, exActiveEnemyData.OptimalPositionChangedChannel, exActiveEnemyData.ChangeAggressionChannel);
-                        // DO NOT REQUEST A NEW CELL HERE: THE ENEMY NEEDS TO RE-REGISTER!!!
                         
                         // Set the closest inactive enemy as active enemy
                         _inactiveEnemyDatas.Remove(closestEnemyToPlayer);
                         positioningGrid.OccupyCell(closestEnemyToPlayer.CurrentCell.X, closestEnemyToPlayer.CurrentCell.Z, false);
-                        _activeEnemyData = closestEnemyToPlayer;
                         _activeEnemyData.ChangeAggressionChannel.SendEventMessage(true);
                     }
                 }
@@ -69,14 +73,9 @@ namespace Enemy.Positioning {
                 CheckIfCellIsStillOptimal(aggressiveEnemyData);
             }
         }
+        // Note: When Calling this for reregistering an enemy to be inactive, make sure [_activeEnemyData] is null, otherwise it will be set as active enemy
         public void RegisterEnemy(GameObject enemy, OptimalPositionChanged optimalPositionChangedChannel, ChangeAggressionChannel changeAggressionChannel) {
            if (!_inactiveEnemyDatas.Exists(e => e.Enemy.name == enemy.name)) {
-               if (_activeEnemyData != null && _activeEnemyData.Enemy.name == enemy.name) {
-                   // Enemy that is trying to register is the active enemy
-                   _activeEnemyData.ChangeAggressionChannel.SendEventMessage(true);
-                   return;
-               }
-
                // Create DataObject for the enemy
                 var enemyData = new EnemyData {
                     Enemy = enemy,
@@ -94,15 +93,27 @@ namespace Enemy.Positioning {
                     enemyData.ChangeAggressionChannel.SendEventMessage(true);
                 }
                 else {
+                    if (_activeEnemyData.Enemy.name == enemy.name) {
+                        // Enemy that is trying to register is the active enemy
+                        Debug.LogWarning("Enemy " + enemyData.Enemy + " is already the " + _activeEnemyData.Enemy + " active enemy");
+                        _activeEnemyData.ChangeAggressionChannel.SendEventMessage(true);
+                        return;
+                    }
+                    
                     var distanceFromActiveEnemyToPlayer = (_activeEnemyData.Enemy.transform.position - _playerTransform.position).sqrMagnitude;
                     if(IsDistanceToPlayerCloser(enemyData.Enemy, distanceFromActiveEnemyToPlayer)) {
                         // Reposition the old active enemy
                         var exActiveEnemyData = _activeEnemyData;
                         // STOP-ATTACK Event
                         exActiveEnemyData.ChangeAggressionChannel.SendEventMessage(false);
+                        
+                        // ORDER IMPORTANT:
+                        // Set active enemy with the closest enemy, if we dont do it here, the recursive call will set self to active enemy again, since _activeEnemyData is null
+                        _activeEnemyData = enemyData;
+                        
+                        // Reregister the ex-active enemy
                         RegisterEnemy(exActiveEnemyData.Enemy, exActiveEnemyData.OptimalPositionChangedChannel, exActiveEnemyData.ChangeAggressionChannel);
                         
-                        // Set active enemy with the closest enemy
                         _activeEnemyData = enemyData;
                         
                         // ATTACK Event for the new active enemy
