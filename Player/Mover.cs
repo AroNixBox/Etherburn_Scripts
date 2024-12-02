@@ -1,4 +1,5 @@
-﻿using Enemy;
+﻿using System.Linq;
+using Enemy;
 using Player.Animation.MotionWarp;
 using Player.Cam;
 using Sirenix.OdinInspector;
@@ -61,9 +62,18 @@ namespace Player {
         }
 
         void ApplyNormalMotion(Vector3 deltaPosition, Quaternion deltaRotation) {
+            // Check for potential collisions using SweepTestAll
+            RaycastHit[] hits = _rb.SweepTestAll(deltaPosition.normalized, deltaPosition.magnitude);
+            if (hits.Length > 0) {
+                // Find the closest hit
+                RaycastHit closestHit = hits.OrderBy(hit => hit.distance).First();
+                // Project the deltaPosition onto the plane defined by the wall's normal
+                deltaPosition = Vector3.ProjectOnPlane(deltaPosition, closestHit.normal);
+            }
+
             // Apply root motion position change to this transform
-            // No DeltaTime here, as it's already applied in the Animator
-            _rb.MovePosition(_transform.position += deltaPosition);
+            _rb.MovePosition(_rb.position + deltaPosition);
+
             // Apply root motion rotation change to this transform
             RotateModelRoot(deltaRotation);
         }

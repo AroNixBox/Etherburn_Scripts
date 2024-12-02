@@ -15,11 +15,9 @@ namespace Attribute {
         }
 
         public void InitializeEnergyChannel(EnergyValueChanged energyValueChannel, ref Action allChannelsInitialized) {
-            
             _energyValueChanged = energyValueChannel;
             
-            Vector3? effectDirection = null;
-            allChannelsInitialized += () => _energyValueChanged.SendEventMessage(CurrentEnergy, effectDirection);
+            allChannelsInitialized += () => _energyValueChanged.SendEventMessage(CurrentEnergy, null);
         }
         public virtual void Increase(float amount) {
             CurrentEnergy += amount;
