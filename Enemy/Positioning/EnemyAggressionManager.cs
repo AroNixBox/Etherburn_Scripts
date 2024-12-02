@@ -71,7 +71,13 @@ namespace Enemy.Positioning {
         }
         public void RegisterEnemy(GameObject enemy, OptimalPositionChanged optimalPositionChangedChannel, ChangeAggressionChannel changeAggressionChannel) {
            if (!_inactiveEnemyDatas.Exists(e => e.Enemy.name == enemy.name)) {
-                // Create DataObject for the enemy
+               if (_activeEnemyData != null && _activeEnemyData.Enemy.name == enemy.name) {
+                   // Enemy that is trying to register is the active enemy
+                   _activeEnemyData.ChangeAggressionChannel.SendEventMessage(true);
+                   return;
+               }
+
+               // Create DataObject for the enemy
                 var enemyData = new EnemyData {
                     Enemy = enemy,
                     CurrentCell = null,
