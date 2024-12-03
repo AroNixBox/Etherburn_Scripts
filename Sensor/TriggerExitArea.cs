@@ -57,8 +57,6 @@ namespace Sensor {
                 return;
             }
             // Doublecheck if is really outside of the collider
-
-            Debug.LogError("TriggerExit");
             _entityColliderInteractionChannel.SendEventMessage();
         }
     

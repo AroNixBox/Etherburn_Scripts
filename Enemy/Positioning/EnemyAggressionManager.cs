@@ -166,7 +166,7 @@ namespace Enemy.Positioning {
             }
         }
         void CheckIfCellIsStillOptimal(EnemyData enemyData) {
-            var optimalCell = positioningGrid.GetClosestGridObjectWithinMinMaxRange(enemyData.Enemy);
+            var optimalCell = positioningGrid.GetClosestGridObjectWithinMinMaxRange(enemyData.Enemy, enemyData.CurrentCell);
             // First Call
             if (enemyData.CurrentCell == null) {
                 enemyData.CurrentCell = optimalCell;

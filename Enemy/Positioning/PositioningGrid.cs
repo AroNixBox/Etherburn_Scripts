@@ -114,11 +114,26 @@ namespace Enemy.Positioning {
             // Needs to be called after the lastGridObject is set.
             OnPlayerGridPositionChanged?.Invoke(); // Inform all listeners
         }
-        public PositioningGridObject GetClosestGridObjectWithinMinMaxRange(GameObject target) {
+        public PositioningGridObject GetClosestGridObjectWithinMinMaxRange(GameObject target, PositioningGridObject currentGridCell) {
             if(target == null) {
                 Debug.LogError("Test Target is null.");
                 return null;
             }
+            // Check if the current grid cell is in the query range
+if (currentGridCell != null) {
+    var currentGridObject = _grid.GetGridObject(currentGridCell.X, currentGridCell.Z);
+    var dx = currentGridCell.X - _lastGridObject.X;
+    var dz = currentGridCell.Z - _lastGridObject.Z;
+    var gridDistanceSqr = dx * _grid.CellSize * dx * _grid.CellSize + dz * _grid.CellSize * dz * _grid.CellSize;
+    var minRangeSqr = minQueryRange * minQueryRange;
+    var maxRangeSqr = maxQueryRange * maxQueryRange;
+
+    // Check if the current grid cell is within the min and max range
+    if (gridDistanceSqr >= minRangeSqr && gridDistanceSqr <= maxRangeSqr) {
+        return currentGridObject;
+    }
+}
+            
             if(_lastGridObject == null) {
                 Debug.LogError("Method called before lastGridObject was set.");
                 return null;
@@ -152,7 +167,7 @@ namespace Enemy.Positioning {
                     var gridObject = _grid.GetGridObject(x, z);
 
                     if (gridObject == null) {
-                        Debug.LogWarning("Grid Object of Cell with X: " + x + " Z: " + z + " is null.");
+                        Debug.LogError("Grid Object of Cell with X: " + x + " Z: " + z + " is null.");
                         continue;
                     }
                     
@@ -178,13 +193,13 @@ namespace Enemy.Positioning {
                     }
                 }
             }
+            
             // Draw the closest Cell red
             if (closestGridObject == null) {
                 // TODO: Implement Fallback
                 Debug.LogError("No reachable position found.");
                 return null;
             }
-                
             return closestGridObject;
         }
         
