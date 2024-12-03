@@ -95,7 +95,6 @@ namespace Enemy.Positioning {
                 else {
                     if (_activeEnemyData.Enemy.name == enemy.name) {
                         // Enemy that is trying to register is the active enemy
-                        Debug.LogWarning("Enemy " + enemyData.Enemy + " is already the " + _activeEnemyData.Enemy + " active enemy");
                         _activeEnemyData.ChangeAggressionChannel.SendEventMessage(true);
                         return;
                     }
@@ -129,7 +128,10 @@ namespace Enemy.Positioning {
                 }
            }
            else {
-                // Debug.LogError("Enemy already registered");
+                // If the entry exists, send a signal to the enemy in case he missed the signal, while being in another state.
+                var enemyData = _inactiveEnemyDatas.Find(e => e.Enemy.name == enemy.name);
+                enemyData.ChangeAggressionChannel.SendEventMessage(false);
+                enemyData.OptimalPositionChangedChannel.SendEventMessage(enemyData.CurrentCell.NavMeshSamplePosition);
            }
         }
         public void UnregisterEnemy(GameObject enemy) {
