@@ -63,7 +63,7 @@ namespace Player {
 
         void ApplyNormalMotion(Vector3 deltaPosition, Quaternion deltaRotation) {
             // Check for potential collisions using SweepTestAll
-            RaycastHit[] hits = _rb.SweepTestAll(deltaPosition.normalized, deltaPosition.magnitude);
+            RaycastHit[] hits = _rb.SweepTestAll(deltaPosition.normalized, deltaPosition.magnitude, QueryTriggerInteraction.Ignore);
             if (hits.Length > 0) {
                 // Find the closest hit
                 RaycastHit closestHit = hits.OrderBy(hit => hit.distance).First();
