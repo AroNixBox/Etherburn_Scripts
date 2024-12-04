@@ -32,8 +32,6 @@ public partial class SetColliderAction : Action
         return Status.Success;
     }
 
-    protected override void OnEnd()
-    {
-    }
+    protected override void OnEnd() { }
 }
 

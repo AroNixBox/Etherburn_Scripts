@@ -1,5 +1,6 @@
 ﻿using System;
 using Behavior;
+using Behavior.Events.Interfaces;
 using UnityEngine;
 using UnityEngine.UI;
 

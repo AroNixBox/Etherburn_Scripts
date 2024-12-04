@@ -1,4 +1,5 @@
 using System.Linq;
+using Behavior.Events.Interfaces;
 using UnityEngine;
 
 namespace Sensor {

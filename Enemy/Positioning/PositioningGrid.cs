@@ -301,8 +301,21 @@ namespace Enemy.Positioning {
 #endif
         }
 
+        void OnDrawGizmosSelected() {
+#if UNITY_EDITOR
+            if(positioningAnker == null) { return; }
+            // Draw range spheres for the query
+            UnityEditor.Handles.color = new Color(1f, 0f, 0f); // Semi-transparent green
+            UnityEditor.Handles.DrawWireDisc(positioningAnker.transform.position, Vector3.up, maxQueryRange);
+            UnityEditor.Handles.DrawWireDisc(positioningAnker.transform.position, Vector3.up, minQueryRange);
+#endif
+        }
+
         void OnDrawGizmos() {
             if (!drawDebug) { return; }
+            
+            
+            // Grid
             if (boundsTransforms is not { Length: 4 }) {
                 // Bounds are not set correctly
                 return;

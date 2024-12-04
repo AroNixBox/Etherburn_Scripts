@@ -77,5 +77,4 @@ public partial class UpdateAnimatorSpeedFromAgentVelocity : Action {
             Animator.Value.SetFloat(AnimatorSpeedParam.Value, 0);
         }
     }
-    
 }

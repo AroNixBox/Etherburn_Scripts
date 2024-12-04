@@ -1,4 +1,4 @@
-﻿using Behavior.Events;
+﻿using Behavior.Events.Interfaces;
 using UnityEngine;
 
 namespace Enemy {

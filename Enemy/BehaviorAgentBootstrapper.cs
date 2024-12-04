@@ -1,10 +1,10 @@
-using Behavior.Events;
+using Behavior.Events.Interfaces;
 using Sirenix.OdinInspector;
 using Unity.Behavior;
 using UnityEngine;
 using Action = System.Action;
 
-namespace Behavior {
+namespace Enemy {
     public class BehaviorAgentBootstrapper : MonoBehaviour {
         [SerializeField] BehaviorGraphAgent behaviorGraphAgent;
         [Title("Attributes")]
