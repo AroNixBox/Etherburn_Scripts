@@ -30,6 +30,7 @@ namespace Player {
         Rigidbody _rb;
         OrbitalController _orbitalController;
         Transform _transform;
+        CapsuleCollider _collider;
         
         bool _isGrounded;
         float _currentYRotation;
@@ -41,6 +42,7 @@ namespace Player {
             _references = GetComponent<References>();
             _rb = GetComponent<Rigidbody>();
             _transform = transform;
+            _collider = GetComponent<CapsuleCollider>();
             
             RootMotionWarpingControllerController = new RootMotionWarpingController(rootAnimatedGameObject, modelRoot, _references);
         }
@@ -62,21 +64,39 @@ namespace Player {
         }
 
         void ApplyNormalMotion(Vector3 deltaPosition, Quaternion deltaRotation) {
-            // Check for potential collisions using SweepTestAll
-            RaycastHit[] hits = _rb.SweepTestAll(deltaPosition.normalized, deltaPosition.magnitude, QueryTriggerInteraction.Ignore);
-            if (hits.Length > 0) {
-                // Find the closest hit
-                RaycastHit closestHit = hits.OrderBy(hit => hit.distance).First();
-                // Project the deltaPosition onto the plane defined by the wall's normal
-                deltaPosition = Vector3.ProjectOnPlane(deltaPosition, closestHit.normal);
+            const int maxIterations = 3; // Limit the number of collision adjustments
+            var iteration = 0;
+
+            while (iteration < maxIterations) {
+                // Perform a SweepTest to detect potential collisions
+                if (_rb.SweepTest(deltaPosition.normalized, out RaycastHit hit, deltaPosition.magnitude, QueryTriggerInteraction.Ignore)) {
+                    // Adjust the deltaPosition to prevent penetration
+                    deltaPosition = Vector3.ProjectOnPlane(deltaPosition, hit.normal);
+
+                    // Reduce the magnitude of deltaPosition slightly to avoid edge-case clipping
+                    deltaPosition *= 0.95f;
+                } else {
+                    // No collision detected, break out of the loop
+                    break;
+                }
+
+                iteration++;
             }
 
-            // Apply root motion position change to this transform
+            // If the iterations exceeded the maximum, block the movement entirely
+            if (iteration >= maxIterations) {
+                deltaPosition = Vector3.zero;
+            }
+
+            // Move the Rigidbody using the adjusted delta position
             _rb.MovePosition(_rb.position + deltaPosition);
 
             // Apply root motion rotation change to this transform
             RotateModelRoot(deltaRotation);
         }
+
+
+
 
         void ApplyWarpedMotion(Vector3 deltaPosition) {
             // Warping
