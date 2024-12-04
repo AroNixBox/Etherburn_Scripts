@@ -79,7 +79,3 @@ public partial class UpdateAnimatorSpeedFromAgentVelocity : Action {
     }
     
 }
-public enum MoveDirection {
-    Forward,
-    Backward
-}
