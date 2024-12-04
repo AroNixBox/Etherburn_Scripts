@@ -11,6 +11,7 @@ namespace Player.Ability
         [Header("References")]
         [SerializeField] References references;
         [SerializeField, Required] Transform headHeight;
+        [SerializeField] bool debug;
         
         OrbitalController _orbitalController;
         Transform[] _rayCheckOrigins;
@@ -28,7 +29,7 @@ namespace Player.Ability
             var detectionRadius = references.detectionRadius;
             var visionConeAngle = references.visionConeAngle;
             
-            _visionEnemyWarpTargetQuery = new VisionTargetQuery<Entity>(headHeight, _rayCheckOrigins, _maxTargets, detectionRadius, visionConeAngle);
+            _visionEnemyWarpTargetQuery = new VisionTargetQuery<Entity>(headHeight, _rayCheckOrigins, _maxTargets, detectionRadius, visionConeAngle, debug);
         }
 
         public Entity GetWarpTargetProvider(EntityType entityType) {

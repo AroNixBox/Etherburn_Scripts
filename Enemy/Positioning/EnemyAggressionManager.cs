@@ -70,7 +70,7 @@ namespace Enemy.Positioning {
             }
 
             foreach (var aggressiveEnemyData in _inactiveEnemyDatas) {
-                CheckIfCellIsStillOptimal(aggressiveEnemyData);
+                FindBestFittingCell(aggressiveEnemyData);
             }
         }
         // Note: When Calling this for reregistering an enemy to be inactive, make sure [_activeEnemyData] is null, otherwise it will be set as active enemy
@@ -99,7 +99,11 @@ namespace Enemy.Positioning {
                         return;
                     }
                     
+                    // Enemy that is trying to register is not the active enemy
+                    
                     var distanceFromActiveEnemyToPlayer = (_activeEnemyData.Enemy.transform.position - _playerTransform.position).sqrMagnitude;
+                    
+                    // Should the new Enemy get Agressive?
                     if(IsDistanceToPlayerCloser(enemyData.Enemy, distanceFromActiveEnemyToPlayer)) {
                         // Reposition the old active enemy
                         var exActiveEnemyData = _activeEnemyData;
@@ -119,11 +123,18 @@ namespace Enemy.Positioning {
                         _activeEnemyData.ChangeAggressionChannel.SendEventMessage(true);
                     }
                     else {
-                        // Add it to the List of inactive enemies
-                        _inactiveEnemyDatas.Add(enemyData);
                         // Give it a cell
-                        CheckIfCellIsStillOptimal(enemyData);
-                        enemyData.ChangeAggressionChannel.SendEventMessage(false);
+                        
+                        if (FindBestFittingCell(enemyData)) {
+                            // Add it to the List of inactive enemies
+                            _inactiveEnemyDatas.Add(enemyData);
+                            enemyData.ChangeAggressionChannel.SendEventMessage(false);
+                        }
+                        else {
+                            // Fallback, can't find a cell for the Enemy, just go into Attack Mode...
+                            _inactiveEnemyDatas.Remove(enemyData);
+                            enemyData.ChangeAggressionChannel.SendEventMessage(true);
+                        }
                     }
                 }
            }
@@ -167,19 +178,23 @@ namespace Enemy.Positioning {
                 }
             }
         }
-        void CheckIfCellIsStillOptimal(EnemyData enemyData) {
+        bool FindBestFittingCell(EnemyData enemyData) {
             var optimalCell = positioningGrid.GetClosestGridObjectWithinMinMaxRange(enemyData.Enemy, enemyData.CurrentCell);
+            if(optimalCell == null) {
+                Debug.LogWarning("No optimal cell found for " + enemyData.Enemy.name);
+                return false;
+            }
             // First Call
             if (enemyData.CurrentCell == null) {
                 enemyData.CurrentCell = optimalCell;
                 positioningGrid.OccupyCell(enemyData.CurrentCell.X, enemyData.CurrentCell.Z, true);
                 enemyData.OptimalPositionChangedChannel.SendEventMessage(enemyData.CurrentCell.NavMeshSamplePosition);
-                return;
+                return true;
             }
             
             // Enemy is already in the optimal cell
             if (optimalCell == enemyData.CurrentCell) {
-                return;
+                return true;
             } 
 
             // Unoccupy the old cell
@@ -193,6 +208,7 @@ namespace Enemy.Positioning {
 
             // Inform the enemy about the new optimal position
             enemyData.OptimalPositionChangedChannel.SendEventMessage(enemyData.CurrentCell.NavMeshSamplePosition);
+            return true;
         }
         
         EnemyData GetClosestInactiveEnemyToPlayer() {

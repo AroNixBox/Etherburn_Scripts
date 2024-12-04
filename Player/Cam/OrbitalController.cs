@@ -20,6 +20,7 @@ namespace Player.Cam {
         public float cameraSpeed = 50f;
         public bool smoothCameraRotation;
         [Range(1f, 50f)] public float cameraSmoothingFactor = 25f;
+        [SerializeField] bool debug;
         
         public Entity LockedOnEnemyTarget { get; private set; }
 
@@ -58,7 +59,7 @@ namespace Player.Cam {
             var maxTargets = references.maxTargetToCheckAround;
             var visionConeAngle = references.visionConeAngle;
             
-            _visionEnemyWarpTargetQuery = new (headHeight, rayCheckOrigins, maxTargets, _detectionRadius, visionConeAngle);
+            _visionEnemyWarpTargetQuery = new (headHeight, rayCheckOrigins, maxTargets, _detectionRadius, visionConeAngle, debug);
         }
 
         void ToggleLockOnTarget() {

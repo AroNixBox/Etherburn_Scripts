@@ -10,11 +10,12 @@ namespace Extensions {
         readonly Transform[] _rayCheckOrigins;
         readonly float _detectionRadius;
         readonly float _visionConeAngle;
+        readonly bool _debug;
 
         readonly Collider[] _colliders;
         
         RedrawScope _redrawScope;
-        public VisionTargetQuery(Transform head, Transform[] rayCheckOrigins, int maxTargets, float detectionRadius, float visionConeAngle) {
+        public VisionTargetQuery(Transform head, Transform[] rayCheckOrigins, int maxTargets, float detectionRadius, float visionConeAngle, bool debug) {
             _head = head;
             _rayCheckOrigins = rayCheckOrigins;
             _detectionRadius = detectionRadius;
@@ -23,6 +24,7 @@ namespace Extensions {
             _colliders = new Collider[maxTargets];
             
 #if UNITY_EDITOR
+            _debug = debug;
             _redrawScope = new RedrawScope();
 #endif
         }
@@ -51,12 +53,14 @@ namespace Extensions {
                 .ToList();
             
 #if UNITY_EDITOR
-            _redrawScope.Rewind();
+            if (_debug) {
+                _redrawScope.Rewind();
             
-            DrawDetectionRadius();
-            DrawVisionCone();
-            if (validTargets.Count > 0) {
-                DrawLineToTarget(validTargets.First().transform);
+                DrawDetectionRadius();
+                DrawVisionCone();
+                if (validTargets.Count > 0) {
+                    DrawLineToTarget(validTargets.First().transform);
+                }
             }
 #endif
             
@@ -70,8 +74,8 @@ namespace Extensions {
             return angle <= _visionConeAngle / 2f;
         }
         
-        #if UNITY_EDITOR
-        #region Gizmos
+#if UNITY_EDITOR
+#region Gizmos
         void DrawDetectionRadius() {
             using var builder = DrawingManager.GetBuilder(_redrawScope);
             builder.WireSphere(_head.position, _detectionRadius, new Color(1f, 0.55f, 0f));
@@ -130,14 +134,16 @@ namespace Extensions {
             builder.SolidBox(_head.position, 0.2f, Color.green);
         }
 
-        #endregion
-        #endif
+#endregion
+#endif
         public void Dispose() {
 #if UNITY_EDITOR
-            bool isDefault = _redrawScope.Equals(default(RedrawScope));
-            if (isDefault) { return; }
+            if (_debug) {
+                bool isDefault = _redrawScope.Equals(default(RedrawScope));
+                if (isDefault) { return; }
             
-            _redrawScope.Dispose();
+                _redrawScope.Dispose();
+            }
 #endif
         }
     }

@@ -1,5 +1,6 @@
 using System;
 using System.Text;
+using Drawing;
 using Extensions;
 using TMPro;
 using UnityEngine;
@@ -22,7 +23,6 @@ namespace Enemy.Positioning {
     
         // 2D Array of the Grid
         public readonly TGridObject[,] GridArray;
-        
         public Grid(int width, int height, int cellSize, Vector3 originPosition, 
             Func<Grid<TGridObject>, int, int, TGridObject> createGridObject) {
             // X

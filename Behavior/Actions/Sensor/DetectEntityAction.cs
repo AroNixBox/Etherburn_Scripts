@@ -21,6 +21,7 @@ public partial class DetectEntityAction : Action {
     [Tooltip("Put to 360 to detect all around the agent.")] 
     [SerializeReference] public BlackboardVariable<float> VisionConeAngle = new (45f);
     [SerializeReference] public BlackboardVariable<EntityType> TargetType = new (EntityType.Player);
+    [SerializeReference] public BlackboardVariable<bool> Debug;
 
     NavMeshAgent _agent;
     VisionTargetQuery<Entity> _entityVisionTargetQuery;
@@ -38,7 +39,8 @@ public partial class DetectEntityAction : Action {
             BodyParts.Value.rayCheckOrigins, 
             MaxTargets.Value, 
             DetectionRadius.Value, 
-            VisionConeAngle.Value
+            VisionConeAngle.Value,
+            Debug.Value
         );        
         
         Application.quitting += () => _entityVisionTargetQuery.Dispose();

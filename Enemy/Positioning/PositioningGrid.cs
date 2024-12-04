@@ -9,10 +9,10 @@ namespace Enemy.Positioning {
     public class PositioningGrid : MonoBehaviour {
         [BoxGroup("Debug Grid")]
         [HorizontalGroup("Debug Grid/Split", LabelWidth = 100)] 
-        [SerializeField] bool drawDebugGrid;
+        [SerializeField] bool drawDebug;
     
         [BoxGroup("Debug Grid")]
-        [ShowIf("drawDebugGrid")]
+        [ShowIf("drawDebug")]
         [SerializeField] Color debugGridColor = Color.red;
     
         [Header("Values")]
@@ -52,6 +52,12 @@ namespace Enemy.Positioning {
 
         void Start() {
             LoadGridFromScriptableObject();
+
+#if UNITY_EDITOR
+            if (drawDebug) {
+                _redrawScope = new RedrawScope();
+            } 
+#endif
         }
 
         void LoadGridFromScriptableObject() {
@@ -114,6 +120,7 @@ namespace Enemy.Positioning {
             // Needs to be called after the lastGridObject is set.
             OnPlayerGridPositionChanged?.Invoke(); // Inform all listeners
         }
+        RedrawScope _redrawScope;
         public PositioningGridObject GetClosestGridObjectWithinMinMaxRange(GameObject target, PositioningGridObject currentGridCell) {
             if(target == null) {
                 Debug.LogError("Test Target is null.");
@@ -136,7 +143,7 @@ namespace Enemy.Positioning {
             }
                         
             if(_lastGridObject == null) {
-                Debug.LogError("Method called before lastGridObject was set.");
+                Debug.LogWarning("Method called before lastGridObject was set.");
                 return null;
             }
             // Get Grid Coordinates of the Player Cell
@@ -149,6 +156,11 @@ namespace Enemy.Positioning {
             PositioningGridObject closestGridObject = null;
             var closestDistanceSqr = float.MaxValue;
 
+#if UNITY_EDITOR
+            if (drawDebug) {
+                _redrawScope.Rewind();
+            }
+#endif
             for (var dx = -gridRadius; dx <= gridRadius; dx++) {
                 for (var dz = -gridRadius; dz <= gridRadius; dz++) {
                     var x = centerX + dx;
@@ -183,15 +195,18 @@ namespace Enemy.Positioning {
                         closestDistanceSqr = distanceSqr;
                         closestGridObject = gridObject;
                     }
-                    
-                    // Draw a Box at the Cell Position
-                    var cellPosition = gridObject.NavMeshSamplePosition;
-                    using (Draw.WithDuration(2f)) {
-                        Draw.SolidBox(
+
+#if UNITY_EDITOR
+                    if (drawDebug) {
+                        // Draw a Box at the Cell Position
+                        using var builder = DrawingManager.GetBuilder(_redrawScope);
+                        var cellPosition = gridObject.NavMeshSamplePosition;
+                        builder.SolidBox(
                             new Bounds(cellPosition, Vector3.one * (_grid.CellSize * 0.8f)),
                             Color.cyan
                         );
                     }
+#endif
                 }
             }
             
@@ -279,9 +294,15 @@ namespace Enemy.Positioning {
             gridObject.SetOccupyState(isOccupied);
             _grid.TriggerGridObjectChanged(x, z);
         }
-        
+
+        void OnDestroy() {
+#if UNITY_EDITOR
+            _redrawScope.Dispose();
+#endif
+        }
+
         void OnDrawGizmos() {
-            if (!drawDebugGrid) { return; }
+            if (!drawDebug) { return; }
             if (boundsTransforms is not { Length: 4 }) {
                 // Bounds are not set correctly
                 return;
