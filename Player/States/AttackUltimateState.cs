@@ -1,7 +1,6 @@
 ﻿using Enemy;
 using Extensions.FSM;
 using Interfaces.Attribute;
-using Player.Ability;
 using Player.Animation.MotionWarp;
 using Player.Weapon;
 using Sensor;
@@ -86,18 +85,16 @@ namespace Player.States {
         }
         void SetupWeaponCollision() {
             // If the Weapon has Collision
-            if (_weaponManager.WeaponPositionData.usesHitSensor) {
-                _weaponHitSensor = _weaponManager.WeaponPositionData.hitDetectionSensor;
-                // If its a Meele Weapon with Damage on Collision
-                if (_weaponHitSensor is PlayerMeeleWeaponSensor meeleWeaponHitSensor) {
-                    var attackDamage = _currentWeapon.finisherData.attributeData.damage;
-                    var ultAttributeGain = _currentWeapon.finisherData.attributeData.ultimate;
-                    meeleWeaponHitSensor.InitializeSensor(attackDamage, true, ultAttributeGain, _ultimate);
-                }
-                
-                _references.EnableHitDetection += EnableHitDetection;
-                _references.DisableHitDetection += DisableHitDetection;
+            _weaponHitSensor = _weaponManager.CurrentWeaponSensor;
+            // If its a Meele Weapon with Damage on Collision
+            if (_weaponHitSensor is PlayerMeeleWeaponSensor meeleWeaponHitSensor) {
+                var attackDamage = _currentWeapon.finisherData.attributeData.damage;
+                var ultAttributeGain = _currentWeapon.finisherData.attributeData.ultimate;
+                meeleWeaponHitSensor.InitializeSensor(attackDamage, true, ultAttributeGain, _ultimate);
             }
+                
+            _references.EnableHitDetection += EnableHitDetection;
+            _references.DisableHitDetection += DisableHitDetection;
         }
         
 

@@ -45,7 +45,7 @@
                     "name": "Ultimate",
                     "type": "Button",
                     "id": "0d429771-0069-4357-82b6-ee61f94fef6e",
-                    "expectedControlType": "Button",
+                    "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
@@ -818,7 +818,7 @@
                 {
                     "name": "",
                     "id": "c52c8e0b-8179-41d3-b8a1-d149033bbe86",
-                    "path": "<Mouse>/position",
+                    "path": "<Mouse>/{Point}",
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard&Mouse",

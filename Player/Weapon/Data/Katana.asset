@@ -17,6 +17,10 @@ MonoBehaviour:
     still water. Its edge, honed to perfection by master swordsmiths, cuts through
     flesh and bone with terrifying ease. '
   weaponSprite: {fileID: 21300000, guid: 798ea1bd952f7cc4591e51bdde95dd8e, type: 3}
+  weaponPrefab: {fileID: 8667649858311944823, guid: 02fc65e3ebb56934d8a4153daebd5a00,
+    type: 3}
+  weaponOffset: {x: 0, y: 0, z: 0}
+  weaponRotation: {x: 0, y: 0, z: 0}
   animatorOverrideController: {fileID: 22100000, guid: 4f44f65c8dbabd140b34d7b9ed89d95e,
     type: 2}
   lightAttack:

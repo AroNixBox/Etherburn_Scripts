@@ -17,14 +17,27 @@ MonoBehaviour:
     Ancient runes whisper of forgotten battles, and each arrow it looses hungers
     for the souls of the fallen.
   weaponSprite: {fileID: 21300000, guid: 235d988fa47b85f48ace39e5b2c9f1e5, type: 3}
+  weaponPrefab: {fileID: 7349028438845385553, guid: dcaee1c4f5aa2494d9b9b3ab982b3cb3,
+    type: 3}
+  weaponOffset: {x: 0, y: 0, z: 0}
+  weaponRotation: {x: 0, y: 0, z: 0}
   animatorOverrideController: {fileID: 22100000, guid: 21b698a84b4e27f4da0d101c93ecfb80,
     type: 2}
-  lightAttackClips: []
-  lightAttackDamage: 0
-  lightAttackStaminaCost: 0
-  heavyAttackClips: []
-  heavyAttackDamage: 0
-  heavyAttackStaminaCost: 0
-  finisherWarpAnimation: []
-  finisherDamage: 0
-  finisherStaminaCost: 0
+  lightAttack:
+    attackClips: []
+    attributeData:
+      damage: 0
+      stamina: 0
+      ultimate: 0
+  heavyAttack:
+    attackClips: []
+    attributeData:
+      damage: 0
+      stamina: 0
+      ultimate: 0
+  finisherData:
+    finisherWarpAnimation: []
+    attributeData:
+      damage: 0
+      stamina: 0
+      ultimate: 0

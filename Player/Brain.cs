@@ -75,12 +75,7 @@ namespace Player {
             var ui_weaponMenu = new States.WeaponMenuState(_references);
             
             // Weapon
-            var weaponUnEquip = new States.WeaponUnEquipState(_references);
-            var idleEquipTransition = new States.IdleTransitionState(_references, 0.5f, 
-                AnimationParameters.EquipTransition, 
-                AnimationParameters.GetAnimationDuration(AnimationParameters.EquipTransition),
-                0);            
-            var weaponEquip = new States.WeaponEquipState(_references);
+            var weaponSwitchState = new States.WeaponSwitchState(_references);
             
             // Attack
             var attackUltimate = new States.AttackUltimateState(_references);
@@ -138,14 +133,10 @@ namespace Player {
             
             At(ui_weaponMenu, groundedLocomotion, () => !_references.MiddleKeyPressed 
                                                         && !_weaponManager.HasSelectedNewWeapon(_radialSelection.GetSelectedIndex()));
-            At(ui_weaponMenu, weaponUnEquip, () => !_references.MiddleKeyPressed 
+            At(ui_weaponMenu, weaponSwitchState, () => !_references.MiddleKeyPressed 
                                                   && _weaponManager.HasSelectedNewWeapon(_radialSelection.GetSelectedIndex()));
             
-            At(weaponUnEquip, idleEquipTransition, () => _references.UnEquipEnded);
-            
-            At(idleEquipTransition, weaponEquip, () => idleEquipTransition.IsTransitionTimeOver());
-            
-            At(weaponEquip, groundedLocomotion, () => _references.EquipEnded);
+            At(weaponSwitchState, groundedLocomotion, () => weaponSwitchState.SwitchCompleted());
             
             At(attackUltimate, groundedLocomotion, () => _references.ExecutionEnded);
             
@@ -175,7 +166,7 @@ namespace Player {
                 _stateMachine.OnDebugStateChanged += UpdateDebugState;
             }
             
-            _stateMachine.SetInitialState(weaponEquip);
+            _stateMachine.SetInitialState(weaponSwitchState);
             
             return;
             

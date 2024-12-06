@@ -25,6 +25,7 @@ namespace Player {
         
         [Header("Body Parts")]
         public Transform modelRoot;
+        public Transform weaponSocket;
         [Tooltip("Position where Swash Particle FX Should be spawned")]
         public Transform vfxSpawnPointRight;
         
@@ -132,8 +133,6 @@ namespace Player {
         #region Animation Event Bools
         public bool DodgeEnded { get; set; }
         public bool LandEnded { get; set; }
-        public bool UnEquipEnded { get; set; }
-        public bool EquipEnded { get; set; }
         public bool InAnimationWarpFrames { get; set; }
         public bool ExecutionEnded { get; set; }
         public bool AttackEnded { get; set; }
@@ -143,10 +142,6 @@ namespace Player {
 
         #region Animation Event Events
         public Action SpawnParticles { get; set; } = delegate { };
-        public Action GrabHolster { get; set; } = delegate { };
-        public Action ReleaseHolster { get; set; } = delegate { };
-        public Action GrabWeapon { get; set; } = delegate { };
-        public Action ReleaseWeapon { get; set; } = delegate { };
         public Action EnableHitDetection { get; set; } = delegate { };
         public Action DisableHitDetection { get; set; } = delegate { };
 

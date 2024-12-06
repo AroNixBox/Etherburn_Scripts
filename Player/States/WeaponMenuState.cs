@@ -1,5 +1,6 @@
 ﻿using Extensions;
 using Extensions.FSM;
+using Game;
 using Player.Input;
 using UI;
 using UnityEngine;
@@ -27,7 +28,15 @@ namespace Player.States {
 
         public void OnEnter() {
             _input.PointUI += TrackPointerInputPosition;
-            
+            if (CursorManager.Instance == null) {
+                Debug.LogError("Cursor Manager not in the scene");
+            }
+            else {
+                if (!CursorManager.Instance.GetCursorVisible()) {
+                    CursorManager.Instance.SetCursorVisible(true);
+                    CursorManager.Instance.SetCursorLockMode(CursorLockMode.None);
+                }
+            }
             _input.SwitchActionMap(InputReader.ActionMapName.UI);
             _radialSelection.EnableRadialSelection(true);
             
@@ -64,7 +73,17 @@ namespace Player.States {
 
         public void OnExit() {
             // We dont need to track the input anymore
-            _input.NavigateUI -= TrackPointerInputPosition;
+            _input.PointUI -= TrackPointerInputPosition;
+            
+            if (CursorManager.Instance == null) {
+                Debug.LogError("Cursor Manager not in the scene");
+            }
+            else {
+                if (!CursorManager.Instance.GetCursorVisible()) {
+                    CursorManager.Instance.SetCursorVisible(false);
+                    CursorManager.Instance.SetCursorLockMode(CursorLockMode.Locked);
+                }
+            }
             
             _input.SwitchActionMap(InputReader.ActionMapName.Player);
             _radialSelection.EnableRadialSelection(false);

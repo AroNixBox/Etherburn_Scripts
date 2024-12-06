@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Player.Animation.MotionWarp;
+using Sensor;
+using ShaderControl;
 using Sirenix.OdinInspector;
 using UI;
 using UnityEngine;
@@ -17,16 +19,9 @@ namespace Player.Weapon {
         
         [Title("Weapons")]
         [SerializeField] List<WeaponSO> weapons; 
+        public DissolveControl CurrentSpawnedWeaponDissolver { get; private set; }
+        public PlayerMeeleWeaponSensor CurrentWeaponSensor { get; private set; }
         WeaponSO _selectedWeapon;
-        [Header("Weapon Equip")]
-        [SerializeField] List<WeaponPositionData> weaponPositions;
-        [ShowInInspector] [ReadOnly] public WeaponPositionData WeaponPositionData { get; private set; }
-        
-        public void SetWeaponPositionData(WeaponSO associatedWeapon) {
-            WeaponPositionData = weaponPositions.FirstOrDefault(
-                weaponPosition => weaponPosition.associatedWeapon == associatedWeapon);
-        }
-        public void ResetWeaponPositionData() => WeaponPositionData = null;
 
         [SerializeField] int startSelectedIndex = 1;
         int _selectedIndex;
@@ -120,6 +115,10 @@ namespace Player.Weapon {
         /// <summary> Identify the selected weapon by name</summary>
         public string GetSelectedWeaponName() {
             return GetSelectedWeapon().weaponName;
+        }
+        public void SetSpawnedWeaponData(DissolveControl spawnedWeaponDissolver, PlayerMeeleWeaponSensor weaponHitSensor) {
+            CurrentSpawnedWeaponDissolver = spawnedWeaponDissolver;
+            CurrentWeaponSensor = weaponHitSensor;
         }
     }
 }

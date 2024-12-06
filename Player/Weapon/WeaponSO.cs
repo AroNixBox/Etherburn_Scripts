@@ -9,6 +9,9 @@ namespace Player.Weapon {
         public string weaponName;
         [TextArea(2, 4)] public string weaponDescription;
         public Sprite weaponSprite;
+        public GameObject weaponPrefab;
+        public Vector3 weaponOffset;
+        public Vector3 weaponRotation;
         
         [Title("Animation")]
         [InfoBox("Don't forget to set the WeaponPositionData in the References" +

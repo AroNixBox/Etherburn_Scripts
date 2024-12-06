@@ -25,7 +25,7 @@ namespace Player.States {
         #region Dynamic References
 
         WeaponSO _currentWeapon;
-        FirstTriggerHitSensor _weaponHitSensor;
+        PlayerMeeleWeaponSensor _weaponHitSensor;
         AttackData _currentAttackData;
         AnimationEffect _attackAnimationEffect;
 
@@ -67,18 +67,14 @@ namespace Player.States {
         }
         void SetupWeaponCollision() {
             // If the Weapon has Collision
-            if (_weaponManager.WeaponPositionData.usesHitSensor) {
-                _weaponHitSensor = _weaponManager.WeaponPositionData.hitDetectionSensor;
-                // If its a Meele Weapon with Damage on Collision
-                if (_weaponHitSensor is PlayerMeeleWeaponSensor meeleWeaponHitSensor) {
-                    ConfigureDamageSensor(meeleWeaponHitSensor);
-                }
+            _weaponHitSensor = _weaponManager.CurrentWeaponSensor;
+            
+            ConfigureDamageSensor(_weaponHitSensor);
                 
-                _references.EnableHitDetection += EnableHitDetection;
-                _references.EnableHitDetection += SpawnParticles;
-                _references.EnableHitDetection += PlaySound;
-                _references.DisableHitDetection += DisableHitDetection;
-            }
+            _references.EnableHitDetection += EnableHitDetection;
+            _references.EnableHitDetection += SpawnParticles;
+            _references.EnableHitDetection += PlaySound;
+            _references.DisableHitDetection += DisableHitDetection;
         }
         void SpawnParticles() {
             // Spawn Particle Swash FX:
@@ -138,13 +134,11 @@ namespace Player.States {
         public void FixedTick() { }
 
         public void OnExit() {
-            // Dont listen to the Events when we are not in the Attack State
-            if (_weaponManager.WeaponPositionData.usesHitSensor) {
-                _references.EnableHitDetection -= EnableHitDetection;
-                _references.EnableHitDetection -= SpawnParticles;
-                _references.DisableHitDetection -= DisableHitDetection;
-                _references.EnableHitDetection -= PlaySound;
-            }
+            // Dont listen to the Events when we are not in the Attack State anymore
+            _references.EnableHitDetection -= EnableHitDetection;
+            _references.EnableHitDetection -= SpawnParticles;
+            _references.DisableHitDetection -= DisableHitDetection;
+            _references.EnableHitDetection -= PlaySound;
             
             // In case Any Transition is triggered before the Hit Detection is disabled
             DisableHitDetection();

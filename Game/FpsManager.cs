@@ -9,12 +9,14 @@ public class FpsManager : MonoBehaviour {
     [SerializeField] TMP_Text fpsText;
 
     void Awake() {
-        if(vSync) {
-            QualitySettings.vSyncCount = 1;
-        } else {
-            Application.targetFrameRate = targetFps;
-        }
+    if (vSync) {
+        QualitySettings.vSyncCount = 1;
+        Application.targetFrameRate = Screen.currentResolution.refreshRate;
+    } else {
+        QualitySettings.vSyncCount = 0;
+        Application.targetFrameRate = targetFps;
     }
+}
     
     void Update() {
         if(fpsText != null && fpsText.isActiveAndEnabled) {

@@ -76,7 +76,7 @@ namespace UI {
 
         public void SelectRadialPart(Vector2 inputPosition, bool isMouseInput) {
             Vector2 localPosition;
-            
+
             if (isMouseInput) {
                 // Mouse: InverseTransformPoint to get the local position
                 localPosition = radialSelectionsParent.InverseTransformPoint(inputPosition);
@@ -88,31 +88,28 @@ namespace UI {
             // Angle in degrees from the position input of the player
             var angle = Mathf.Atan2(localPosition.y, localPosition.x) * Mathf.Rad2Deg;
             if (angle < 0) angle += 360f; // Don't want negative angles
-            
+
             // Determine the selected index
             if (_numberOfOptions == 2) {
                 // Edge Case if 2 Options
-                _selectedIndex = angle is > 90 and < 270 
-                    ? 1 
-                    : 0;
+                _selectedIndex = angle is > 90 and < 270 ? 1 : 0;
             } else {
                 // More than 2 Options
                 // FloorToInt because we want to select the closest option
                 _selectedIndex = Mathf.FloorToInt(angle / (360f / _numberOfOptions));
             }
-            
+
+            // Ensure _selectedIndex is within the valid range
+            _selectedIndex = Mathf.Clamp(_selectedIndex, 0, _radialParts.Count - 1);
+
             // Color the selected part
             for (int i = 0; i < _radialParts.Count; i++) {
-                _radialParts[i].RadialImage.color = i == _selectedIndex 
-                    ? Color.yellow 
-                    : Color.white;
+                _radialParts[i].RadialImage.color = i == _selectedIndex ? Color.yellow : Color.white;
             }
 
             // Display the weapon information
-            {
-                weaponHeaderText.text = _radialParts[_selectedIndex].WeaponName;
-                weaponDescriptionText.text = _radialParts[_selectedIndex].WeaponDescription;
-            }
+            weaponHeaderText.text = _radialParts[_selectedIndex].WeaponName;
+            weaponDescriptionText.text = _radialParts[_selectedIndex].WeaponDescription;
         }
         
         

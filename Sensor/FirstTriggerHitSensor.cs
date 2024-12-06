@@ -1,3 +1,4 @@
+using Drawing;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Serialization;
@@ -36,11 +37,14 @@ namespace Sensor {
 
             // Trigger the event and pass the collision normal and the world space position of the collision
             collisionEvent?.Invoke(other.transform, other.sharedMaterial, collisionPoint, collisionNormal);
+            using (Draw.WithDuration(2f)) {
+                Draw.Arrow(collisionPoint, collisionPoint + collisionNormal, Color.red); 
+            }
         }
         
         protected Vector3 GetClosestPoint(Collider other) {
             Vector3 closestPoint = transformsAlongObject[0].position;
-            float closestDistance = Vector3.Distance(other.ClosestPoint(closestPoint), closestPoint);
+            float closestDistance = (other.ClosestPoint(closestPoint) - closestPoint).sqrMagnitude;
 
             foreach (var transformAlongWeapon in transformsAlongObject) {
                 Vector3 point = transformAlongWeapon.position;
