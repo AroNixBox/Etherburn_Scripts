@@ -22,6 +22,8 @@ namespace Player {
         public Animation.AnimationController animationController;
         public OrbitalController orbitalController;
         [FormerlySerializedAs("abilityTargetProvider")] public AbilityTargetQuery abilityTargetQuery;
+        public CapsuleCollider collider;
+
         
         [Header("Body Parts")]
         public Transform modelRoot;
@@ -39,7 +41,7 @@ namespace Player {
         [ValidateInput("@Extensions.ClassExtensions.IsClass<IEnergy, MonoBehaviour>(ultimate)", "The assigned object must implement IEnergy.")]
         [SerializeField] MonoBehaviour ultimate;
         public IEnergy UltimateAttribute { get; private set; }
-        
+
         [Header("UI")]
         [Tooltip("WeaponWheel UI")] 
         public RadialSelection radialSelection;

@@ -1,5 +1,5 @@
 ﻿namespace Behavior.Events.Interfaces {
     public interface IRequireEntityColliderInteractionChannel {
-        void AssignEventChannel(EntityColliderInteractionChannel entityColliderInteractionChannel); 
+        EntityColliderInteractionChannel AssignEventChannel(EntityColliderInteractionChannel newEntityColliderInteractionChannel); 
     }
 }

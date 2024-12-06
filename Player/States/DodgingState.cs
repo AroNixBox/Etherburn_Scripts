@@ -14,6 +14,7 @@ namespace Player.States {
         readonly AnimationController _animationController;
         readonly Mover _mover;
         readonly IEnergy _stamina;
+        readonly CapsuleCollider _collider;
 
         readonly Vector2[] _dodgeDirections =  {
             new (0, 1),       // Dodge Front
@@ -35,6 +36,9 @@ namespace Player.States {
             _animationController = references.animationController;
             _mover = references.mover;
             _stamina = references.StaminaAttribute;
+            _collider = references.collider;
+            
+            // Timers
             
             // Values
             _dodgeStaminaCost = references.dodgeStaminaCost;
@@ -46,6 +50,17 @@ namespace Player.States {
             PlayAnimation();
 
             _stamina.Decrease(_dodgeStaminaCost);
+            ReduceColliderSize();
+        }
+        
+        void ReduceColliderSize() {
+            _collider.height /= 2;
+            _collider.center = new Vector3(_collider.center.x, _collider.height / 2, _collider.center.z);
+        }
+        
+        void ResetColliderSize() {
+            _collider.height *= 2;
+            _collider.center = new Vector3(_collider.center.x, _collider.height / 2, _collider.center.z);
         }
 
         void PlayAnimation() {
@@ -79,6 +94,8 @@ namespace Player.States {
             
             // Physics
             _mover.SetGravity(false);
+            
+            ResetColliderSize();
         }
     }
 }
