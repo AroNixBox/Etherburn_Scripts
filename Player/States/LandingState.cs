@@ -18,7 +18,7 @@ namespace Player.States {
 
         void PlayAnimation() {
             _animatorController.ChangeAnimationState(Animation.AnimationParameters.Land, 
-                Animation.AnimationParameters.GetAnimationDuration(Animation.AnimationParameters.UnEquip), 
+                Animation.AnimationParameters.GetAnimationDuration(Animation.AnimationParameters.Land), 
                 0);
         }
 

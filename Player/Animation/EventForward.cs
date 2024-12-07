@@ -55,11 +55,14 @@ namespace Player.Animation {
                 references.GetHitEnded = true;
             }
         }
+        void ChangeWeaponEnd(AnimationEvent evt) => references.ChangeWeaponEnded = true;
         
         // In Animation Trigger Events
         void SpawnParticle(AnimationEvent evt) => references.SpawnParticles.Invoke();
         void EnableHitDetection(AnimationEvent evt) => references.EnableHitDetection.Invoke();
         void DisableHitDetection(AnimationEvent evt) => references.DisableHitDetection.Invoke();
+        void MaterializeWeapon(AnimationEvent evt) => references.OnMaterializeWeapon.Invoke();
+        void DissolveWeapon(AnimationEvent evt) => references.OnDissolveWeapon.Invoke();
         
         // Specific to the Warp Animation
         void OnWarpStart(AnimationEvent evt) => references.InAnimationWarpFrames = true;

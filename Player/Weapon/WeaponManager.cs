@@ -19,8 +19,8 @@ namespace Player.Weapon {
         
         [Title("Weapons")]
         [SerializeField] List<WeaponSO> weapons; 
-        public DissolveControl CurrentSpawnedWeaponDissolver { get; private set; }
-        public PlayerMeeleWeaponSensor CurrentWeaponSensor { get; private set; }
+        public DissolveControl CurrentSpawnedWeaponDissolver { get; set; }
+        public PlayerMeeleWeaponSensor CurrentWeaponSensor { get; set; }
         WeaponSO _selectedWeapon;
 
         [SerializeField] int startSelectedIndex = 1;
@@ -115,10 +115,6 @@ namespace Player.Weapon {
         /// <summary> Identify the selected weapon by name</summary>
         public string GetSelectedWeaponName() {
             return GetSelectedWeapon().weaponName;
-        }
-        public void SetSpawnedWeaponData(DissolveControl spawnedWeaponDissolver, PlayerMeeleWeaponSensor weaponHitSensor) {
-            CurrentSpawnedWeaponDissolver = spawnedWeaponDissolver;
-            CurrentWeaponSensor = weaponHitSensor;
         }
     }
 }

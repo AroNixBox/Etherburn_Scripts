@@ -139,6 +139,7 @@ namespace Player {
         public bool ExecutionEnded { get; set; }
         public bool AttackEnded { get; set; }
         public bool GetHitEnded { get; set; }
+        public bool ChangeWeaponEnded { get; set; }
 
         #endregion
 
@@ -146,6 +147,8 @@ namespace Player {
         public Action SpawnParticles { get; set; } = delegate { };
         public Action EnableHitDetection { get; set; } = delegate { };
         public Action DisableHitDetection { get; set; } = delegate { };
+        public Action OnMaterializeWeapon { get; set; } = delegate { };
+        public Action OnDissolveWeapon { get; set; } = delegate { };
 
         #endregion
     }

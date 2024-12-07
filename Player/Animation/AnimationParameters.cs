@@ -16,9 +16,7 @@ namespace Player.Animation {
         public static readonly int Fall = Animator.StringToHash("Fall");
         public static readonly int Land = Animator.StringToHash("Land");
         public static readonly int Dodge = Animator.StringToHash("Dodge");
-        public static readonly int EquipWeapon = Animator.StringToHash("EquipWeapon");
-        public static readonly int UnEquip = Animator.StringToHash("UnequipWeapon");
-        public static readonly int EquipTransition = Animator.StringToHash("EquipTransition");
+        public static readonly int ChangeWeapon = Animator.StringToHash("ChangeWeapon");
         public static readonly int AttackFinisher = Animator.StringToHash("AttackFinisher");
         public static readonly int Attack = Animator.StringToHash("Attack");
         public static readonly int Attack2 = Animator.StringToHash("Attack2");
@@ -33,9 +31,7 @@ namespace Player.Animation {
             {Fall, 0.25f},
             {Land, 0.25f},
             {Dodge, 0.25f},
-            {EquipWeapon, 0.25f},
-            {UnEquip, 0.25f},
-            {EquipTransition, 0.1f},
+            {ChangeWeapon, 0.05f},
             {AttackFinisher, 0.1f},
             {Attack, 0.15f},
             {Attack2, 0.15f},

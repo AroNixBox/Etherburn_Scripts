@@ -6,6 +6,7 @@ using Player.Ability;
 using Player.Animation;
 using Player.Animation.MotionWarp;
 using Player.Input;
+using Player.States;
 using Player.Weapon;
 using TMPro;
 using UI;
@@ -136,7 +137,7 @@ namespace Player {
             At(ui_weaponMenu, weaponSwitchState, () => !_references.MiddleKeyPressed 
                                                   && _weaponManager.HasSelectedNewWeapon(_radialSelection.GetSelectedIndex()));
             
-            At(weaponSwitchState, groundedLocomotion, () => weaponSwitchState.SwitchCompleted());
+            At(weaponSwitchState, groundedLocomotion, () => _references.ChangeWeaponEnded);
             
             At(attackUltimate, groundedLocomotion, () => _references.ExecutionEnded);
             

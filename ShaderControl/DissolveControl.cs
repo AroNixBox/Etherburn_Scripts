@@ -54,12 +54,12 @@ namespace ShaderControl {
             _ = LerpDissolve(dissolveMode);
         }
 
-        public async Task<bool> ChangeDissolveMode(DissolveMode dissolveMode) {
-            if (_currentMode == dissolveMode) { return false; }
-            return await LerpDissolve(dissolveMode);
+        public async Task ChangeDissolveMode(DissolveMode dissolveMode) {
+            if (_currentMode == dissolveMode) { return; }
+            await LerpDissolve(dissolveMode);
         }
 
-        async Task<bool> LerpDissolve(DissolveMode dissolveMode) {
+        async Task LerpDissolve(DissolveMode dissolveMode) {
             var startAmount = GetDissolveMode(_currentMode);
             var endAmount = GetDissolveMode(dissolveMode);
             var elapsedTime = 0f;
@@ -76,7 +76,6 @@ namespace ShaderControl {
                 await Task.Yield();
             }
             SetDissolveMode(dissolveMode);
-            return true;
         }
 
         int GetDissolveMode(DissolveMode dissolveMode) {

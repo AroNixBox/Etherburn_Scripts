@@ -1,4 +1,5 @@
-﻿using Extensions.FSM;
+﻿using System.Threading.Tasks;
+using Extensions.FSM;
 using Player.Weapon;
 using UnityEngine;
 
@@ -9,7 +10,6 @@ namespace Player.States {
         readonly WeaponManager _weaponManager;
         readonly UI.RadialSelection _radialSelection;
         readonly Animation.AnimationController _animationController;
-        bool _switchCompleted;
 
         public WeaponSwitchState(References references) {
             _references = references;
@@ -18,25 +18,13 @@ namespace Player.States {
             _animationController = _references.animationController;
         }
        public void OnEnter() {
-            SwitchWeapon();
+           _references.OnMaterializeWeapon += MaterializeNewWeapon;
+           _references.OnDissolveWeapon += DissolveOldWeapon;
+           
+            PlayAnimation();
        }
-       async void SwitchWeapon() {
-           PlayAnimation();
-            
-           // Trigger dissolve on old weapon
-           if (_weaponManager.CurrentSpawnedWeaponDissolver != null) {
-               bool dissolveCompleted = await _weaponManager.CurrentSpawnedWeaponDissolver.ChangeDissolveMode(ShaderControl.DissolveControl.DissolveMode.Dissolve);
-               if (!dissolveCompleted) {
-                   Debug.LogError("Failed to dissolve the old weapon.");
-                   return;
-               }
-               // Destroy the old weapon
-               if (_weaponManager.CurrentSpawnedWeaponDissolver != null &&
-                   _weaponManager.CurrentSpawnedWeaponDissolver.gameObject != null) {
-                   Object.Destroy(_weaponManager.CurrentSpawnedWeaponDissolver.gameObject);
-               }
-           }
-            
+
+       void MaterializeNewWeapon() {
            // Read the Radial Selection selected Weapon Index
            var selectedWeaponIndex = _radialSelection.GetSelectedIndex();
            // Pass it to the Weapon Manager, it will set the Weapon
@@ -44,30 +32,54 @@ namespace Player.States {
             
            // Get the new selected Weapon
            var selectedWeapon = _weaponManager.GetSelectedWeapon();
+           // Replace the Animator Controller
+           _animationController.OverrideAnimatorController(selectedWeapon.animatorOverrideController);
+
            // Spawn the new weapon
            var spawnedWeapon = Object.Instantiate(selectedWeapon.weaponPrefab, _references.weaponSocket);
            spawnedWeapon.transform.localPosition = selectedWeapon.weaponOffset;
            spawnedWeapon.transform.localRotation = Quaternion.Euler(selectedWeapon.weaponRotation);
-           _weaponManager.SetSpawnedWeaponData(
-               spawnedWeapon.GetComponent<ShaderControl.DissolveControl>(), 
-               spawnedWeapon.GetComponent<Sensor.PlayerMeeleWeaponSensor>());
-           // Set the Anim Controller
-           _animationController.OverrideAnimatorController(selectedWeapon.animatorOverrideController);
-           await _weaponManager.CurrentSpawnedWeaponDissolver.ChangeDissolveMode(ShaderControl.DissolveControl.DissolveMode.Materialize);
+
+           _weaponManager.CurrentSpawnedWeaponDissolver = spawnedWeapon.GetComponent<ShaderControl.DissolveControl>();
+           _weaponManager.CurrentWeaponSensor = spawnedWeapon.GetComponent<Sensor.PlayerMeeleWeaponSensor>();
            
-           _switchCompleted = true;
+           _ = _weaponManager.CurrentSpawnedWeaponDissolver.ChangeDissolveMode(ShaderControl.DissolveControl.DissolveMode.Materialize);
        }
-       public bool SwitchCompleted() {
-           return _switchCompleted;
+
+       async void DissolveOldWeapon() {
+           if (_weaponManager.CurrentSpawnedWeaponDissolver != null) {
+               var oldWeapon = _weaponManager.CurrentSpawnedWeaponDissolver;
+               
+               // Null in References
+               _weaponManager.CurrentSpawnedWeaponDissolver = null;
+               _weaponManager.CurrentWeaponSensor = null;
+               
+               
+               await oldWeapon.ChangeDissolveMode(ShaderControl.DissolveControl.DissolveMode.Dissolve);
+               // Destroy the old weapon
+               if (oldWeapon != null && oldWeapon.gameObject != null) {
+                   Object.Destroy(oldWeapon.gameObject);
+               }
+           }
        }
        void PlayAnimation() {
-            // TODO:
+           _animationController.ChangeAnimationState(Animation.AnimationParameters.ChangeWeapon, 
+               Animation.AnimationParameters.GetAnimationDuration(Animation.AnimationParameters.ChangeWeapon), 
+               0);
        } 
        public void Tick() { } 
        public void FixedTick() { }
 
        public void OnExit() {
-           _switchCompleted = false;
+           // Fallback, Materialize wasnt triggered:
+           if(_weaponManager.CurrentSpawnedWeaponDissolver == null || _weaponManager.CurrentWeaponSensor == null) {
+               MaterializeNewWeapon();
+           }
+           
+           _references.OnMaterializeWeapon -= MaterializeNewWeapon;
+           _references.OnDissolveWeapon -= DissolveOldWeapon;
+           
+           _references.ChangeWeaponEnded = false;
        }
     }
 }
