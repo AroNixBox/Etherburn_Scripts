@@ -1,0 +1,58 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d164168c70144434918e5e1214bd1cac, type: 3}
+  m_Name: Great Sword
+  m_EditorClassIdentifier: 
+  weaponName: Great Sword
+  weaponDescription: XOXOXO
+  weaponSprite: {fileID: 21300000, guid: d3e03fee1fd37c149bb5203b490f0baa, type: 3}
+  weaponPrefab: {fileID: 8064088334943480021, guid: 58af5e46913913e43bdbfb21a928193f,
+    type: 3}
+  weaponOffset: {x: 0, y: 0, z: 0}
+  weaponRotation: {x: 0, y: 180, z: 20}
+  animatorOverrideController: {fileID: 22100000, guid: 4a1d35e4503d19b4486234e797f82d40,
+    type: 2}
+  lightAttack:
+    attackClips:
+    - animationClip: {fileID: 1827226128182048838, guid: d3ad7cfe17545ae409a9bc9ce926d6c1,
+        type: 3}
+      effect:
+        particleSystem: {fileID: 5275736863541973407, guid: fc424d8197b2dbd478aa8d4e59142e2c,
+          type: 3}
+        spawnPosition: {x: 0, y: 0, z: 0}
+        spawnRotation: {x: 82.7, y: 106, z: -104}
+        spawnSound: {fileID: 8300000, guid: 761c6f1207edb8240b828b81b76a4a73, type: 3}
+    attributeData:
+      damage: 40
+      stamina: 40
+      ultimate: 40
+  heavyAttack:
+    attackClips:
+    - animationClip: {fileID: 1827226128182048838, guid: e2faec2e6436c0b4ab5249e096cb6a81,
+        type: 3}
+      effect:
+        particleSystem: {fileID: 5275736863541973407, guid: fc424d8197b2dbd478aa8d4e59142e2c,
+          type: 3}
+        spawnPosition: {x: -0.13, y: 0.06, z: -0.24}
+        spawnRotation: {x: 123.577, y: -187.474, z: -309}
+        spawnSound: {fileID: 8300000, guid: 5fac730eeb998a1458a0929a8e34d1d8, type: 3}
+    attributeData:
+      damage: 80
+      stamina: 80
+      ultimate: 80
+  finisherData:
+    finisherWarpAnimation:
+    - {fileID: 11400000, guid: f89ca1438f90cac42909c9eb424d6639, type: 2}
+    attributeData:
+      damage: 100
+      stamina: 100
+      ultimate: 100

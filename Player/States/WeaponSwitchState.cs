@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks;
-using Extensions.FSM;
+﻿using Extensions.FSM;
 using Player.Weapon;
 using UnityEngine;
 

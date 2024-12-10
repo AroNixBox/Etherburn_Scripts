@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 033e19db86c34473ae49dbaaf3beeeda, type: 3}
+  m_Name: Player Great Sword
+  m_EditorClassIdentifier: 
+  effectData:
+  - material: {fileID: 13400000, guid: d85c7e236a4579d468c4f15c2143393c, type: 2}
+    associatedEffects:
+    - {fileID: 8300000, guid: 2e0623c0dacfc0547ae5af02bd8bb1fb, type: 3}
+    - {fileID: 8300000, guid: 37893f77db5abed4683523abadb6bc55, type: 3}
+    - {fileID: 8300000, guid: fbda2f9854be5b546a67c84a0b2ddd82, type: 3}
+  - material: {fileID: 13400000, guid: b5a5fd16f633acc4aa69da3b650b7b42, type: 2}
+    associatedEffects:
+    - {fileID: 8300000, guid: 05a505d5aa3e35f4999e63fe615497cf, type: 3}
+    - {fileID: 8300000, guid: 0cee4bbc2f6b79d4faee9bc9dfbf2446, type: 3}
+    - {fileID: 8300000, guid: f2c46a81698618840963ad859cf6c4c8, type: 3}
+  - material: {fileID: 13400000, guid: a19b3d256fec6294d9f9f6e4f7e91ddf, type: 2}
+    associatedEffects:
+    - {fileID: 8300000, guid: 4bdd40a8c197db24393e9924d86e9bc7, type: 3}
+    - {fileID: 8300000, guid: daa9a026565ca08478fbcfebdb51a76a, type: 3}
+    - {fileID: 8300000, guid: a4eadbea6885d624982150b3aa729ec5, type: 3}
+  - material: {fileID: 13400000, guid: d8d5ce28f7c3cd84cad91f9525e29912, type: 2}
+    associatedEffects:
+    - {fileID: 8300000, guid: 83a7782614ca5ec4b804c36777327d52, type: 3}
+    - {fileID: 8300000, guid: 359b70cedb13f66449f0be6e272eea88, type: 3}
+    - {fileID: 8300000, guid: 4baf10fb46788cf47b2819fbe1bc84ee, type: 3}
+    - {fileID: 8300000, guid: 87b4722d88d5b43448d2e865b95a5501, type: 3}
