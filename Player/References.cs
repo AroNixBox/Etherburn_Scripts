@@ -28,6 +28,9 @@ namespace Player {
         [Header("Body Parts")]
         public Transform modelRoot;
         public Transform weaponSocket;
+        public Vector3 InitialWeaponSocketPosition { get; private set; }
+        public Quaternion InitialWeaponSocketRotation { get; private set; }
+        
         [Tooltip("Position where Swash Particle FX Should be spawned")]
         public Transform vfxSpawnPointRight;
         
@@ -92,6 +95,10 @@ namespace Player {
         }
 
         void Start() {
+            // Set Needed References
+            InitialWeaponSocketPosition = weaponSocket.localPosition;
+            InitialWeaponSocketRotation = weaponSocket.localRotation;
+            
             // Player Input Events
             input.Move += OnMove;
             input.Run += OnRun;

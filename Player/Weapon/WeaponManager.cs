@@ -41,6 +41,10 @@ namespace Player.Weapon {
             radialSelection.InitializeRadialParts(weapons, _selectedIndex);
         }
         
+        public void ResetAttackIndex() {
+            _attackIndex = 0;
+        }
+        
         public bool HasSelectedNewWeapon(int selectedIndex) {
             return _selectedIndex != selectedIndex;
         }

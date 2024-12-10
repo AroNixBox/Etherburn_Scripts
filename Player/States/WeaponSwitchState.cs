@@ -28,11 +28,18 @@ namespace Player.States {
            var selectedWeaponIndex = _radialSelection.GetSelectedIndex();
            // Pass it to the Weapon Manager, it will set the Weapon
            _weaponManager.SetSelectedWeapon(selectedWeaponIndex);
-            
+           
            // Get the new selected Weapon
            var selectedWeapon = _weaponManager.GetSelectedWeapon();
+           
+           // Reset the Attack Index for the new Weapon
+           _weaponManager.ResetAttackIndex();
            // Replace the Animator Controller
            _animationController.OverrideAnimatorController(selectedWeapon.animatorOverrideController);
+           
+           // Reset the Weapon Parents Position and Rotation if there was any
+           _references.weaponSocket.localPosition = _references.InitialWeaponSocketPosition;
+           _references.weaponSocket.localRotation = _references.InitialWeaponSocketRotation;
 
            // Spawn the new weapon
            var spawnedWeapon = Object.Instantiate(selectedWeapon.weaponPrefab, _references.weaponSocket);
