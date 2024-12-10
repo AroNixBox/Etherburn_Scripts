@@ -17,7 +17,7 @@ namespace Sensor {
         bool _isInitialized;
         
         [ShowIf("@!useEventChannel")]
-        [SerializeField] UnityEvent onCollisionEvent;
+        public UnityEvent onCollisionEvent;
         void Start() {
             _collider = GetComponent<Collider>();
             
