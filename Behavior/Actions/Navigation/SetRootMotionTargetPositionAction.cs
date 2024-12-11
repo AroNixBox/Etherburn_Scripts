@@ -30,8 +30,7 @@ public partial class SetRootMotionTargetPositionAction : Action
 
     protected override Status OnStart()
     {
-        if (AreReferencesMissing())
-        {
+        if (AreReferencesMissing()) {
             Debug.LogError("RootMotionEndPosition, RootMotionDataWrapper, Target, AnimatorController or Self is missing.");
             return Status.Failure;
         }
@@ -70,7 +69,6 @@ public partial class SetRootMotionTargetPositionAction : Action
         foreach (var rmData in rmDataList) {
             var rmWorldRootMotion = Self.Value.transform.TransformDirection(rmData.totalRootMotion);
             rmWorldRootMotion.y = 0;
-
 
             // Is the target position reachable?
             if (!NavMesh.SamplePosition(selfPosition + rmWorldRootMotion, out NavMeshHit hit, 0.1f, NavMesh.AllAreas)) {

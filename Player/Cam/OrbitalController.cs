@@ -20,6 +20,7 @@ namespace Player.Cam {
         public float cameraSpeed = 50f;
         public bool smoothCameraRotation;
         [Range(1f, 50f)] public float cameraSmoothingFactor = 25f;
+        [SerializeField] float controllerSpeedMultiplier = 25f;
         [SerializeField] bool debug;
         
         public Entity LockedOnEnemyTarget { get; private set; }
@@ -115,33 +116,35 @@ namespace Player.Cam {
             _currentXAngle = _transform.eulerAngles.x;
             _currentYAngle = _transform.eulerAngles.y;
         }
-
+        
         void RotateCameraWithLookInput(Vector2 lookDirection, bool isDeviceMouse) {
             // Only Rotate when we are not locked on a target
-            if (LockedOnEnemyTarget != null) { return;}
-            
-            // TODO: Maybe use the isDeviceMouse to control the rotation speed
-            
+            if (LockedOnEnemyTarget != null) { return; }
+
+            // Adjust look direction based on input device
+            float adjustedCameraSpeed = isDeviceMouse ? cameraSpeed : cameraSpeed * controllerSpeedMultiplier;
+
             // Usual Camera Rotation based on input
             lookDirection.y = invertVerticalAxis ? -lookDirection.y : lookDirection.y;
             lookDirection.x = invertHorizontalAxis ? -lookDirection.x : lookDirection.x;
-        
+
             // Smoothing
             if (smoothCameraRotation) {
                 lookDirection.x = Mathf.Lerp(0, lookDirection.x, Time.deltaTime * cameraSmoothingFactor);
                 lookDirection.y = Mathf.Lerp(0, lookDirection.y, Time.deltaTime * cameraSmoothingFactor);
             }
-        
+
             // Adjust the Angles scaled by speed and time
-            _currentXAngle += lookDirection.y * cameraSpeed * Time.deltaTime;
-            _currentYAngle += lookDirection.x * cameraSpeed * Time.deltaTime;
-        
+            _currentXAngle += lookDirection.y * adjustedCameraSpeed * Time.deltaTime;
+            _currentYAngle += lookDirection.x * adjustedCameraSpeed * Time.deltaTime;
+
             // Ensure we stay in the vertical limits
             _currentXAngle = Mathf.Clamp(_currentXAngle, -upperVerticalLimit, lowerVerticalLimit);
-        
+
             // Apply the rotation to this game object
             _transform.rotation = Quaternion.Euler(_currentXAngle, _currentYAngle, 0);
         }
+
         
         bool IsTooFarAwayFromTarget() {
             // Compare Squared Distances to avoid the square root calculation
