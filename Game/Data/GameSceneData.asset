@@ -1,0 +1,57 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fdd4bb26a2db45d7a66bc14d89e3b25e, type: 3}
+  m_Name: GameSceneData
+  m_EditorClassIdentifier: 
+  playerScene:
+    asset: {fileID: 102900000, guid: a1fd04929a4c2714d9e3cafad9d8d85b, type: 3}
+    guid: a1fd04929a4c2714d9e3cafad9d8d85b
+  levels:
+  - levelScenes:
+    - asset: {fileID: 102900000, guid: d4aa7495715ef894f89ff4f2525e5bc1, type: 3}
+      guid: d4aa7495715ef894f89ff4f2525e5bc1
+    - asset: {fileID: 102900000, guid: 556f19a72a0a31740989941856c25dea, type: 3}
+      guid: 556f19a72a0a31740989941856c25dea
+    - asset: {fileID: 102900000, guid: 3f04de9d4e4768f429a271380a09191a, type: 3}
+      guid: 3f04de9d4e4768f429a271380a09191a
+    - asset: {fileID: 102900000, guid: 3684277e852d9694a98351911db3d366, type: 3}
+      guid: 3684277e852d9694a98351911db3d366
+    - asset: {fileID: 102900000, guid: d6c089f6c7365eb448c230bcb542f6df, type: 3}
+      guid: d6c089f6c7365eb448c230bcb542f6df
+    - asset: {fileID: 102900000, guid: 7dd9d9827c2fe084bb831146c3204387, type: 3}
+      guid: 7dd9d9827c2fe084bb831146c3204387
+    - asset: {fileID: 102900000, guid: 4bee68af6e8463a47a13111a9714f2dd, type: 3}
+      guid: 4bee68af6e8463a47a13111a9714f2dd
+    - asset: {fileID: 102900000, guid: ae0fcd53894f88e41a207d094456fe48, type: 3}
+      guid: ae0fcd53894f88e41a207d094456fe48
+    - asset: {fileID: 102900000, guid: c03140b6fd695ba4baad844428f642dd, type: 3}
+      guid: c03140b6fd695ba4baad844428f642dd
+    - asset: {fileID: 102900000, guid: 61441f02b31f64d49b68a02e45ca5b1a, type: 3}
+      guid: 61441f02b31f64d49b68a02e45ca5b1a
+    - asset: {fileID: 102900000, guid: 32995a7dbc0b17b40978a1c4c390701c, type: 3}
+      guid: 32995a7dbc0b17b40978a1c4c390701c
+    levelType: 2
+  - levelScenes:
+    - asset: {fileID: 102900000, guid: 83b209a7a26fdf245abab18804986e46, type: 3}
+      guid: 83b209a7a26fdf245abab18804986e46
+    - asset: {fileID: 102900000, guid: 41d01994c387d5544b681eea26270df6, type: 3}
+      guid: 41d01994c387d5544b681eea26270df6
+    - asset: {fileID: 102900000, guid: ef74cfc14e142da4d8acab453c0c3197, type: 3}
+      guid: ef74cfc14e142da4d8acab453c0c3197
+    - asset: {fileID: 102900000, guid: aa7a759bf33b10a4498d7c478b22f450, type: 3}
+      guid: aa7a759bf33b10a4498d7c478b22f450
+    levelType: 2
+  navMeshes:
+  - navMeshScene:
+      asset: {fileID: 102900000, guid: 440c63deb1734e94d814b826966382ee, type: 3}
+      guid: 440c63deb1734e94d814b826966382ee
+    levelType: 2

@@ -85,4 +85,4 @@ MonoBehaviour:
     attributeData:
       damage: 100
       stamina: 100
-      ultimate: 0
+      ultimate: 100
