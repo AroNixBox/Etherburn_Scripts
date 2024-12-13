@@ -12,13 +12,15 @@ namespace Player.Weapon {
         }
 
         void ApplyForceToAllCloseObjects(Transform collisionTransform, PhysicsMaterial physicMaterial,Vector3 hitPosition, Vector3 hitNormal) {
-            Collider[] collidersInRange = Physics.OverlapSphere(transform.position, range);
-            foreach (Collider col in collidersInRange) {
-                Rigidbody rb = col.attachedRigidbody;
-                if (rb != null) {
-                    Vector3 direction = (col.transform.position - transform.position).normalized;
-                    rb.AddForceAtPosition(direction * force, hitPosition, ForceMode.Impulse);
-                }
+            var collidersInRange = Physics.OverlapSphere(transform.position, range);
+            foreach (var col in collidersInRange) {
+                var rb = col.attachedRigidbody;
+                if (rb == null) { continue; }
+                // Dont apply force to entities
+                if (rb.GetComponent<Entity>()) { continue; }
+                    
+                Vector3 direction = (col.transform.position - transform.position).normalized;
+                rb.AddForceAtPosition(direction * force, hitPosition, ForceMode.Impulse);
             }
         }
         

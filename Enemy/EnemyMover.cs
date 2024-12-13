@@ -6,7 +6,6 @@ namespace Enemy {
         [SerializeField] NavMeshAgent agent;
         void Awake() {
             agent.updatePosition = false;
-            // TODO: If wanna control rotation, set this to true
             agent.updateRotation = false;
         }
         public void AnimatorMove(Vector3 rootPosition) {

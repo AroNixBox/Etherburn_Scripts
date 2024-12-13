@@ -15,7 +15,8 @@ public partial class DeathCleanupAction : Action
         SeperateAnimatorFromSelf();
         DestructAllComponentsNextToAnimator();
         UnityEngine.Object.Destroy(Self.Value);
-        return Status.Running;
+        
+        return Status.Success;
     }
 
     void SeperateAnimatorFromSelf() {
@@ -27,18 +28,16 @@ public partial class DeathCleanupAction : Action
         foreach (var component in componentsOnAnimatorGo) {
             if(component is Animator) { continue; }
             if(component is Transform) { continue; }
+            if(component is Enemy.EnemyEventForward) { continue; }
             
             UnityEngine.Object.Destroy(component);
         }
     }
 
-    protected override Status OnUpdate()
-    {
+    protected override Status OnUpdate() {
         return Status.Success;
     }
 
-    protected override void OnEnd()
-    {
-    }
+    protected override void OnEnd() { }
 }
 

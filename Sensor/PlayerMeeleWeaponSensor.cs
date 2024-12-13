@@ -1,5 +1,4 @@
-﻿using Attribute;
-using Interfaces.Attribute;
+﻿using Interfaces.Attribute;
 using UnityEngine;
 
 namespace Sensor {

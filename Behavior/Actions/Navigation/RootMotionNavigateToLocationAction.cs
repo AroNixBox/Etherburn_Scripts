@@ -37,7 +37,6 @@ public partial class RootMotionNavigateToLocationAction : Action
     protected override Status OnUpdate() {
         // If the Location has changed, update the destination
         if (Agent.Value.destination != Location.Value) {
-            Debug.Log("Destination changed");
             Agent.Value.SetDestination(Location.Value);
         }
 

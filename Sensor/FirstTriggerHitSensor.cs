@@ -25,9 +25,8 @@ namespace Sensor {
         
         // Base Call starts here, should identify collision before calling base.OnTriggerEnter(other)
         protected virtual void OnTriggerEnter(Collider other) {
-            if (((1 << other.gameObject.layer) & excludedLayers) != 0) {
-                return;
-            }
+            if (IsLayerExcluded(other.gameObject)) { return; }
+            if(IsColliderTrigger(other)) { return; }
             
             // Get the closest point of the collision (approximate contact point in world space)
             Vector3 collisionPoint = GetClosestPoint(other);
@@ -41,7 +40,8 @@ namespace Sensor {
                 Draw.Arrow(collisionPoint, collisionPoint + collisionNormal, Color.red); 
             }
         }
-        
+        protected bool IsLayerExcluded(GameObject obj) => ((1 << obj.layer) & excludedLayers) != 0;
+        public bool IsColliderTrigger(Collider col) => col.isTrigger;
         protected Vector3 GetClosestPoint(Collider other) {
             Vector3 closestPoint = transformsAlongObject[0].position;
             float closestDistance = (other.ClosestPoint(closestPoint) - closestPoint).sqrMagnitude;
