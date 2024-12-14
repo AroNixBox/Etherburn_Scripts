@@ -41,7 +41,7 @@ namespace Player.Cam {
         Transform _transform;
 
         InputReader _input;
-        Extensions.VisionTargetQuery<Entity> _visionEnemyWarpTargetQuery;
+        VisionTargetQuery<Entity> _visionEnemyWarpTargetQuery;
 
 
         #endregion

@@ -35,6 +35,8 @@ namespace ShaderControl {
         }
 
         void OnValidate() {
+            if(Application.isPlaying) { return; }
+            
             SetDissolveMode(startMode);
         }
 
