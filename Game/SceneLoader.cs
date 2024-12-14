@@ -11,18 +11,14 @@ namespace Game {
         [SerializeField] SceneData sceneData;
         [SerializeField] Canvas loadingCanvas;
         [SerializeField] Slider loadingSlider;
-
         readonly List<AsyncOperation> _asyncOperations = new ();
-
         void Start() {
             if(sceneData == null) {
                 Debug.LogError("SceneData is not set in the inspector", transform);
-                return;
             }
-            
-            //StartCoroutine(LoadScenesAsync(SceneData.ELevelType.Level_One));
         }
         
+        // TODO: Call from Button
         [Button]
         void StartLevelOne() {
             StartCoroutine(LoadScenesAsync(SceneData.ELevelType.Level_One));
@@ -45,6 +41,14 @@ namespace Game {
                 var navSceneOperation = SceneManager.LoadSceneAsync(navMeshPackage.navMeshScene.BuildIndex, LoadSceneMode.Additive);
                 navSceneOperation.allowSceneActivation = false;
                 _asyncOperations.Add(navSceneOperation);
+            }
+            
+            // Load Agression Manager Scene
+            SceneData.GridManagerPackage[] agressionManagerPackages = sceneData.aggressionManagers.Where(agressionManager => agressionManager.levelType == levelType).ToArray();
+            foreach (var agressionManagerPackage in agressionManagerPackages) {
+                var agressionManagerOperation = SceneManager.LoadSceneAsync(agressionManagerPackage.gridManagerScene.BuildIndex, LoadSceneMode.Additive);
+                agressionManagerOperation.allowSceneActivation = false;
+                _asyncOperations.Add(agressionManagerOperation);
             }
             
             SceneData.ScenePackage[] levelPackages = sceneData.levels.Where(level => level.levelType == levelType).ToArray();

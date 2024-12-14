@@ -55,3 +55,8 @@ MonoBehaviour:
       asset: {fileID: 102900000, guid: 440c63deb1734e94d814b826966382ee, type: 3}
       guid: 440c63deb1734e94d814b826966382ee
     levelType: 2
+  agressionManagers:
+  - gridManagerScene:
+      asset: {fileID: 102900000, guid: c0ac2b4ac017da94b9711b835aedc281, type: 3}
+      guid: c0ac2b4ac017da94b9711b835aedc281
+    levelType: 2

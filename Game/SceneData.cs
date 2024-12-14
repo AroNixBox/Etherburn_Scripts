@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using Eflatun.SceneReference;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Game {
     [CreateAssetMenu(menuName = "Game/SceneData")]
@@ -8,6 +9,7 @@ namespace Game {
         public SceneReference playerScene;
         public ScenePackage[] levels;
         public NavMeshScenePackage[] navMeshes;
+        [FormerlySerializedAs("agressionManagers")] public GridManagerPackage[] aggressionManagers;
         
         [System.Serializable]
         public class ScenePackage {
@@ -21,9 +23,15 @@ namespace Game {
             public ELevelType levelType;
         }
         
+        [System.Serializable]
+        public class GridManagerPackage {
+            public SceneReference gridManagerScene;
+            public ELevelType levelType;
+        }
+        
         public enum ELevelType {
             None,
-            Menu,
+            Nixon_Testing,
             Level_One
         }
     }

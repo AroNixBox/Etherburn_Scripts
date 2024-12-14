@@ -96,7 +96,9 @@ namespace Game.Editor {
             var filteredScenes = _sceneData.levels
                 .Where(pkg => pkg.levelType == levelType)
                 .SelectMany(pkg => pkg.levelScenes)
-                .Concat(_sceneData.navMeshes.Where(nav => nav.levelType == levelType).Select(nav => nav.navMeshScene));
+                .Concat(_sceneData.navMeshes.Where(nav => nav.levelType == levelType).Select(nav => nav.navMeshScene))
+                .Concat(_sceneData.aggressionManagers.Where(aggression => aggression.levelType == levelType)
+                    .Select(aggression => aggression.gridManagerScene));
 
             foreach (var sceneRef in filteredScenes) {
                 if (sceneRef.BuildIndex >= 0) { // Ensure BuildIndex is valid

@@ -4,6 +4,7 @@ using Drawing;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.SceneManagement;
 
 namespace Enemy.Positioning {
     public class PositioningGrid : MonoBehaviour {
@@ -28,11 +29,11 @@ namespace Enemy.Positioning {
         [SerializeField] Transform navMeshReachabilityChecker;
         
         // Query
+        [ReadOnly]
         [BoxGroup("Query Settings")]
-        [HorizontalGroup("Query Settings/Split", LabelWidth = 100)]
-        [PreviewField(Alignment = ObjectFieldAlignment.Left)]
         public GameObject positioningAnker;
         
+        [HorizontalGroup("Query Settings/Split", LabelWidth = 100)]
         [VerticalGroup("Query Settings/Split/Range")]
         [SerializeField] float minQueryRange;
 
@@ -51,6 +52,9 @@ namespace Enemy.Positioning {
         #region Grid Creation
 
         void Start() {
+            positioningAnker = FindObjectsByType<Entity>(FindObjectsInactive.Include, FindObjectsSortMode.None)
+                .FirstOrDefault(entity => entity.EntityType is EntityType.Player)?.gameObject;
+            
             LoadGridFromScriptableObject();
 
 #if UNITY_EDITOR
@@ -61,7 +65,7 @@ namespace Enemy.Positioning {
         }
 
         void LoadGridFromScriptableObject() {
-            var savedGridData = Resources.Load<GridWrapper>(FileName);
+            var savedGridData = Resources.Load<GridWrapper>(FileName + "_" + gameObject.scene.name);
             if (savedGridData != null) {
                 _grid = savedGridData.ToGrid();
                 Debug.Log("Grid successfully loaded from Resources!"); 
@@ -84,7 +88,7 @@ namespace Enemy.Positioning {
 
             // Save the ScriptableObject with the GridWrapperData
 #if UNITY_EDITOR
-            const string fullAssetPath = ResourcesPath + FileName + ".asset";
+            string fullAssetPath = ResourcesPath + FileName + "_" + gameObject.scene.name + ".asset";
             UnityEditor.AssetDatabase.CreateAsset(gridWrapper, fullAssetPath);
             UnityEditor.AssetDatabase.SaveAssets();
             Debug.Log($"Grid data saved to {ResourcesPath}");
