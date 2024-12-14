@@ -25,6 +25,7 @@ namespace Player.Input {
         // Events for different input actions. Subscribe to these in game logic
         public event UnityAction<Vector2> Move = delegate { };
         public event UnityAction<Vector2, bool> Look = delegate { };
+        public event UnityAction<bool> IsLooking = delegate { };
         public event UnityAction EnableMouseControlCamera = delegate { };
         public event UnityAction DisableMouseControlCamera = delegate { };
         public event UnityAction<bool> Dodge = delegate { };
@@ -80,7 +81,17 @@ namespace Player.Input {
 
         // Called when the player looks around
         public void OnLook(InputAction.CallbackContext context) {
-            Look.Invoke(context.ReadValue<Vector2>(), IsDeviceMouse(context));
+            switch (context) {
+                case {phase: InputActionPhase.Started}:
+                    IsLooking.Invoke(true);
+                    break;
+                case {phase: InputActionPhase.Canceled}:
+                    IsLooking.Invoke(false);
+                    break;
+                case {phase: InputActionPhase.Performed}:
+                    Look.Invoke(context.ReadValue<Vector2>(), IsDeviceMouse(context));
+                    break;
+            }
         }
 
         // Helper method to check if the input device is a mouse

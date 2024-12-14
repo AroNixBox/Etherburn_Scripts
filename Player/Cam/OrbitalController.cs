@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using Extensions;
 using Player.Input;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -32,6 +33,11 @@ namespace Player.Cam {
         // Cached
         float _detectionRadius;
         
+        // Directly Calling the Look Method from the Event doesn't work - InputAsset is broken, performed isnt called when value stays the same on controller but still isn't cancelled
+        Vector2 _lookDirection;
+        bool _isDeviceMouse;
+        bool _isLooking;
+        
         Transform _transform;
 
         InputReader _input;
@@ -53,14 +59,28 @@ namespace Player.Cam {
             _input = references.input;
             
             _input.LockOnTarget += ToggleLockOnTarget;
-            _input.Look += RotateCameraWithLookInput;
+            _input.Look += ChangeLookValues;
+            _input.IsLooking += ToggleLook;
             
             _detectionRadius = references.detectionRadius;
             var rayCheckOrigins = references.rayCheckOrigins;
             var maxTargets = references.maxTargetToCheckAround;
             var visionConeAngle = references.visionConeAngle;
             
-            _visionEnemyWarpTargetQuery = new (headHeight, rayCheckOrigins, maxTargets, _detectionRadius, visionConeAngle, debug);
+            _visionEnemyWarpTargetQuery = new VisionTargetQuery<Entity>(headHeight, rayCheckOrigins, maxTargets, _detectionRadius, visionConeAngle, debug);
+        }
+
+        void ChangeLookValues(Vector2 lookDirection, bool isDeviceMouse) {
+            _lookDirection = lookDirection;
+            _isDeviceMouse = isDeviceMouse;
+        }
+
+        void ToggleLook(bool arg0) {
+            _isLooking = arg0;
+            if (_isLooking) { return; }
+            // Reset on Cancel
+            _lookDirection = Vector2.zero;
+            _isDeviceMouse = false;
         }
 
         void ToggleLockOnTarget() {
@@ -90,6 +110,10 @@ namespace Player.Cam {
         public bool IsLockedOnTarget() => LockedOnEnemyTarget != null;
 
         void Update() {
+            if(_isLooking) {
+                RotateCameraWithLookInput(_lookDirection, _isDeviceMouse);
+            }
+            
             if (LockedOnEnemyTarget != null) {
                 if (IsTooFarAwayFromTarget()) {
                     ToggleLockOnTarget();
