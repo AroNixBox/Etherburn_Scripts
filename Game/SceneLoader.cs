@@ -16,7 +16,7 @@ namespace Game {
 
         void Start() {
             if(sceneData == null) {
-                Debug.LogError("SceneData is not set in the inspector");
+                Debug.LogError("SceneData is not set in the inspector", transform);
                 return;
             }
             

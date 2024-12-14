@@ -98,12 +98,17 @@ namespace Enemy.Positioning {
         }
 
         void TrackPlayerOnGrid() {
-            if (positioningAnker == null) return;
+            if (positioningAnker == null) { return; }
 
             _grid.GetXZ(positioningAnker.transform.position, out var currentX, out var currentZ);
             var currentGridObject = _grid.GetGridObject(currentX, currentZ);
 
             if (_lastGridObject == currentGridObject) {
+                return;
+            }
+            
+            if(currentGridObject == null) {
+                Debug.LogError("Player is not on the grid, please check the bounds.");
                 return;
             }
 
