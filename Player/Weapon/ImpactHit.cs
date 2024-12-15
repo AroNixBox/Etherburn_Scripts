@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Player.Weapon {
     public class ImpactHit : MonoBehaviour {
-        [SerializeField] FirstTriggerHitSensor sensor;
+        [SerializeField] RaycastInBetweenTransformsSensor sensor;
         [SerializeField] float range = 1f;
         [SerializeField] float force = 1f;
 

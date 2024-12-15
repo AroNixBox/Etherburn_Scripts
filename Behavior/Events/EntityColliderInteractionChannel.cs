@@ -4,10 +4,10 @@ using UnityEngine;
 using Unity.Properties;
 
 #if UNITY_EDITOR
-[CreateAssetMenu(menuName = "Behavior/Event Channels/Entity Collider Interaction")]
+[CreateAssetMenu(menuName = "Behavior/Event Channels/Entity Weapon Interaction")]
 #endif
 [Serializable, GeneratePropertyBag]
-[EventChannelDescription(name: "Entity Collider Interaction", message: "Entity Collider Interaction", category: "Events", id: "e39b95991deebf767479b54eb9720c98")]
+[EventChannelDescription(name: "Entity Weapon Interaction", message: "Entity Weapon Interaction", category: "Events", id: "e39b95991deebf767479b54eb9720c98")]
 public partial class EntityColliderInteractionChannel : EventChannelBase
 {
     public delegate void EntityColliderInteractionEventHandler();

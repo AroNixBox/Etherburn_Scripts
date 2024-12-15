@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Effects {
     public class MeshSlicer : MonoBehaviour {
-        [SerializeField] FirstTriggerHitSensor sensor;
+        [SerializeField] RaycastInBetweenTransformsSensor sensor;
     
         void Start() {
             sensor.collisionEvent.AddListener(SliceMesh);

@@ -4,7 +4,7 @@ using UnityEngine;
 namespace Effects.VFX {
     // TODO: Rework for Pooling.
     public class SpawnParticleAt : MonoBehaviour {
-        [SerializeField] FirstTriggerHitSensor sensor;
+        [SerializeField] RaycastInBetweenTransformsSensor sensor;
         [SerializeField] ParticleEffect particleData;
 
         void OnEnable() {

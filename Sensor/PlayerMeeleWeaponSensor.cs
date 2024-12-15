@@ -7,10 +7,6 @@ namespace Sensor {
         bool _isUltimate;
         float _ultAttributeAmount;
         
-        protected override void Awake() {
-            base.Awake();
-            SetColliderEnabled(false);
-        }
         // Overload for InitializeSensor() to include Ultimate Attribute for Player
         public void InitializeSensor(float damageAmount, bool isUltimate, float ultAttributeAmount, IEnergy ultimateAttribute) {
             base.InitializeSensor(damageAmount);
@@ -20,9 +16,8 @@ namespace Sensor {
             _ultimateAttribute = ultimateAttribute;
         }
         
-        protected override void ApplyHit(Collider other, IHealth health) {
-            base.ApplyHit(other, health);
-            
+        protected override void ApplyHit(Vector3 hitPoint, IHealth health) {
+            base.ApplyHit(hitPoint, health);
 
             if (_ultimateAttribute == null) {
                 Debug.LogError("InitializeSensor() was not called, will not gain Ultimate Attribute");

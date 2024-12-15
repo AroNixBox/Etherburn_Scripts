@@ -5,7 +5,7 @@ using UnityEngine;
 namespace Effects.Audio {
     [RequireComponent(typeof(AudioSource))]
     public class PlayAudio : MonoBehaviour {
-        [SerializeField, Required] FirstTriggerHitSensor sensor;
+        [SerializeField, Required] RaycastInBetweenTransformsSensor sensor;
         [SerializeField, Required] AudioEffect audioEffect;
         AudioSource _audioSource;
 

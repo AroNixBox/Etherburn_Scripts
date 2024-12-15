@@ -123,10 +123,10 @@ namespace Player.States {
         #region Anim Event Method Calls
         // Called from the Animation Evnent on each Light Attack to enable/disable the Hit Detection
         void EnableHitDetection() {
-            _weaponHitSensor.SetColliderEnabled(true);
+            _weaponHitSensor.CastForObjects(true);
         }
         void DisableHitDetection() {
-            _weaponHitSensor.SetColliderEnabled(false);
+            _weaponHitSensor.CastForObjects(false);
         }
         #endregion
         

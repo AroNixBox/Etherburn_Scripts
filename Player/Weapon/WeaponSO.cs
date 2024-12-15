@@ -15,7 +15,7 @@ namespace Player.Weapon {
         
         [Title("Animation")]
         [InfoBox("Don't forget to set the WeaponPositionData in the References" +
-                 "for Equip, UnEquip and Hit Detection, also add e.g. Collider & Scripts to the Equipped Weapon for Input tracking")]
+                 "for Equip, UnEquip and Hit Detection, also add e.g. Weapon & Scripts to the Equipped Weapon for Input tracking")]
         public AnimatorOverrideController animatorOverrideController;
 
         [Title("Attack Data")]

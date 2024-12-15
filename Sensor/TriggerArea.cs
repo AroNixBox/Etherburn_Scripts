@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using Behavior.Events.Interfaces;
 using Sirenix.OdinInspector;
@@ -10,7 +11,7 @@ namespace Sensor {
         [SerializeField] EntityType targetEntityType;
         [SerializeField] EMessageType messageType;
         Collider _collider;
-        Transform _target;
+        List<Entity> _targetEntities;
         
         [SerializeField] bool useEventChannel = true;
         EntityColliderInteractionChannel _entityColliderInteractionChannel;
@@ -23,14 +24,12 @@ namespace Sensor {
             
             // TODO: Find a way to get the target entity without using FindObjectsByType
             var entities = FindObjectsByType<Entity>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
-            var targetEntities = entities.Where(entity => entity.EntityType == targetEntityType).ToList();
+            _targetEntities = entities.Where(entity => entity.EntityType == targetEntityType).ToList();
 
-            if(targetEntities.Count == 0) {
+            if(_targetEntities.Count == 0) {
                 Debug.LogError($"No entity of type {targetEntityType} found.");
                 return;
             }
-            // TODO: Find a way to get the target entity without using First(), very weird
-            _target = targetEntities.First().transform;
 
             if (!useEventChannel) {
                 _isInitialized = true;
@@ -55,12 +54,14 @@ namespace Sensor {
         void OnTriggerEnter(Collider other) {
             if(!_isInitialized) { return; }
             if (messageType != EMessageType.Enter) { return; }
-            if(other.transform != _target) { return; }
+            if(!other.TryGetComponent(out Entity entity)) { return; }
+            if(!_targetEntities.Contains(entity)) { return; }
             if(other.TryGetComponent(out Rigidbody rigidbody)) {
                 if (rigidbody.isKinematic) {
                     // If the other Object is Kinematic, check for intersection first
                     if (IsColliderIntersecting(other)) {
                         FireEvent();
+                        FireSpecificAction(entity);
                     }
                     return;
                 }
@@ -68,6 +69,7 @@ namespace Sensor {
             
             if (IsColliderIntersecting(other)) {
                 FireEvent();
+                FireSpecificAction(entity);
             }
         }
         
@@ -83,15 +85,18 @@ namespace Sensor {
                 onCollisionEvent?.Invoke();
             }
         }
+        protected virtual void FireSpecificAction(Entity entity) { }
         void OnTriggerExit(Collider other) {
             if(!_isInitialized) { return; }
             if (messageType != EMessageType.Exit) { return; }
-            if(other.transform != _target) { return; }
+            if(!other.TryGetComponent(out Entity entity)) { return; }
+            if(!_targetEntities.Contains(entity)) { return; }
             
             if(other.TryGetComponent(out Rigidbody rigidbody)) {
                 if (rigidbody.isKinematic) {
                     if (!IsColliderIntersecting(other)) {
                         FireEvent();
+                        FireSpecificAction(entity);
                     }
                     return;
                 }
@@ -99,6 +104,7 @@ namespace Sensor {
             // Doublecheck if is really outside of the collider
             if (!IsColliderIntersecting(other)) {
                 FireEvent();
+                FireSpecificAction(entity);
             }
         }
     

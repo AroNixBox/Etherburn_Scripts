@@ -4,8 +4,7 @@ namespace Sensor {
     public class DamageDealingObject : BaseMeeleWeaponHitSensor {
         [SerializeField] float damageAmount;
         
-        protected override void Awake() {
-            base.Awake();
+        protected void Awake() {
             InitializeSensor(damageAmount);
         }
     }

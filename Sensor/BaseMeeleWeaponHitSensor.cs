@@ -1,33 +1,34 @@
-﻿using Extensions;
+﻿using System.Collections.Generic;
+using Extensions;
 using Interfaces.Attribute;
 using UnityEngine;
 
 namespace Sensor {
-    public class BaseMeeleWeaponHitSensor : FirstTriggerHitSensor {
-        protected float DamageAmount;
+    public class BaseMeeleWeaponHitSensor : RaycastInBetweenTransformsSensor {
+        float _damageAmount;
 
         // Initialize Damage Amount only, since this is common
-        public virtual void InitializeSensor(float damageAmount) {
-            DamageAmount = damageAmount;
+        protected void InitializeSensor(float damageAmount) {
+            _damageAmount = damageAmount;
         }
 
-        protected override void OnTriggerEnter(Collider other) {
-            if (IsLayerExcluded(other.gameObject)) { return; }
-            if (IsColliderTrigger(other)) { return; }
+        protected override List<RaycastHit> DetectHitsInSensor() {
+            if (_damageAmount == 0) { Debug.LogError("InitializeSensor() was not called, will deal no damage"); }
             
-            if (DamageAmount == 0) { Debug.LogError("InitializeSensor() was not called, will deal no damage"); } 
-            
-            // Base Call is for VFX, SFX, etc.
-            base.OnTriggerEnter(other);
-            
-            if (other.TryGetComponentInParent(out IHealth health)) {
-                ApplyHit(other, health);
+            var hitList = base.DetectHitsInSensor();
+
+            foreach (var hit in hitList) {
+                var hitPoint = hit.point;
+                if (hit.collider.TryGetComponentInParent(out IHealth health)) {
+                    ApplyHit(hitPoint, health);
+                }
             }
+            
+            return hitList;
         }
 
-        protected virtual void ApplyHit(Collider other, IHealth health) {
-            var hitPosition = GetClosestPoint(other);
-            health.Decrease(DamageAmount, hitPosition);
+        protected virtual void ApplyHit(Vector3 hitPoint, IHealth health) {
+            health.Decrease(_damageAmount, hitPoint);
         }
     }
 }

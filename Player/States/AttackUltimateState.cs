@@ -29,7 +29,7 @@ namespace Player.States {
 
         WeaponSO _currentWeapon;
         WarpAnimation _weaponExecution;
-        FirstTriggerHitSensor _weaponHitSensor;
+        RaycastInBetweenTransformsSensor _weaponHitSensor;
 
         #endregion
         public AttackUltimateState(References references) {
@@ -114,10 +114,10 @@ namespace Player.States {
         }
         // Called from the Clip (From - To) contact reading
         void EnableHitDetection() {
-            _weaponHitSensor.SetColliderEnabled(true);
+            _weaponHitSensor.CastForObjects(true);
         }
         void DisableHitDetection() {
-            _weaponHitSensor.SetColliderEnabled(false);
+            _weaponHitSensor.CastForObjects(false);
         }
 
         #endregion

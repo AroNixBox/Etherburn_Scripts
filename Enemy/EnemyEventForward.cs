@@ -1,3 +1,4 @@
+using Sensor;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -5,7 +6,7 @@ namespace Enemy {
     [RequireComponent(typeof(Animator))]
     public class EnemyEventForward : MonoBehaviour {
         [SerializeField, Required] EnemyMover enemyMover;
-        [SerializeField, Required] EnemyWeaponController weaponController;
+        [SerializeField, Required] DamageDealingObject weapon;
         Animator _animator;
 
         void Awake() {
@@ -25,14 +26,14 @@ namespace Enemy {
         // Animation Events
         void EnableHitDetection(AnimationEvent evt) {
             if (IsInAnimationTransition(evt)) { return; }
-            if(weaponController == null) { return; } // [WeaponController.cs] will be null when Enemy dies, all Components get destroyed except [EnemyEventForward.cs] and [Animator]
-            weaponController.SetWeaponColliderState(true);
+            if(weapon == null) { return; } // [WeaponController.cs] will be null when Enemy dies, all Components get destroyed except [EnemyEventForward.cs] and [Animator]
+            weapon.CastForObjects(true);
         }
         
         void DisableHitDetection(AnimationEvent evt) {
             if (IsInAnimationTransition(evt)) { return; }
-            if(weaponController == null) { return; } // [WeaponController.cs] will be null when Enemy dies, all Components get destroyed except [EnemyEventForward.cs] and [Animator]
-            weaponController.SetWeaponColliderState(false);
+            if(weapon == null) { return; } // [WeaponController.cs] will be null when Enemy dies, all Components get destroyed except [EnemyEventForward.cs] and [Animator]
+            weapon.CastForObjects(false);
         }
         
         bool IsInAnimationTransition(AnimationEvent evt) {
