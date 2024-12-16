@@ -12,11 +12,8 @@ namespace Effects.VFX {
         }
 
         void SpawnParticle(Transform collisionTransform, PhysicsMaterial physicMaterial, Vector3 collisionPoint, Vector3 collisionNormal) {
-            Quaternion rotation = collisionNormal == Vector3.zero 
-                ? Quaternion.identity 
-                : Quaternion.LookRotation(collisionNormal);
+            Quaternion rotation = collisionNormal == Vector3.zero ? Quaternion.identity : Quaternion.LookRotation(collisionNormal);
             var particleGameObject = particleData.GetEffectData(physicMaterial);
-            
             var particleInstance = Instantiate(particleGameObject, collisionPoint, rotation);
             
             // If our GameObject that we spawn has a ParticleSystem On It Play it.

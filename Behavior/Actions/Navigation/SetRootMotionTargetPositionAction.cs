@@ -88,6 +88,16 @@ public partial class SetRootMotionTargetPositionAction : Action
             bestRootMotionData = rmData;
             break;
         }
+        
+        if(bestRootMotionData == null) {
+            // Fallback, check if we have an AttackClip with 0,0,0 RootMotion
+            foreach (var rmData in rmDataList) {
+                if (rmData.totalRootMotion == Vector3.zero) {
+                    bestRootMotionData = rmData;
+                    break;
+                }
+            }
+        }
 
         return bestRootMotionData;
     }

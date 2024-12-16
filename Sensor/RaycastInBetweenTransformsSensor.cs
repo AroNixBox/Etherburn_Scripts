@@ -1,6 +1,9 @@
+using System;
 using System.Collections.Generic;
+using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.Serialization;
 
 namespace Sensor {
     public class RaycastInBetweenTransformsSensor : MonoBehaviour {
@@ -17,6 +20,43 @@ namespace Sensor {
 
         readonly HashSet<Collider> _hitObjects = new();
         bool _cast;
+
+        void Start() {
+            if(fallbackPositionsBetweenStartAndEnd.Count == 0) {
+                GenerateFallbackCollisionTrackingPositions();
+                Debug.LogError($"Fallback Positions for {gameObject.name} are not generated, please generate them in the Editor", transform);
+            }
+        }
+
+        [FoldoutGroup("Fallback Positions")]
+        [SerializeField] [ReadOnly] List<Transform> fallbackPositionsBetweenStartAndEnd = new();
+
+        [FoldoutGroup("Fallback Positions")]
+        [Button, GUIColor(0.4f, 0.8f, 1f)]
+        void GenerateFallbackCollisionTrackingPositions() {
+            var direction = rayEnd.position - rayStart.position;
+            var distance = direction.magnitude;
+            var normalizedDirection = direction.normalized;
+            var stepSize = 0.15f;
+
+            int totalSteps = Mathf.FloorToInt(distance / stepSize);
+
+            // Create a parent GameObject for fallback positions
+            var fallbackParent = new GameObject("FallbackCollisionDetectionPositions").transform;
+            fallbackParent.SetParent(transform);
+
+            for (int i = 1; i <= totalSteps; i++) {
+                var fallbackPosition = rayStart.position + normalizedDirection * (i * stepSize);
+
+                var fallbackTransform = new GameObject($"FallbackPosition_{i}").transform;
+                fallbackTransform.position = fallbackPosition;
+
+                // Set the fallback position as a child of the fallback parent
+                fallbackTransform.SetParent(fallbackParent);
+
+                fallbackPositionsBetweenStartAndEnd.Add(fallbackTransform);
+            }
+        }
 
         void FixedUpdate() {
             if (_cast) {
@@ -70,7 +110,7 @@ namespace Sensor {
                 var orientation = direction.sqrMagnitude > 0 ? Quaternion.LookRotation(direction) : Quaternion.identity;
 
                 // Perform BoxCast
-                var hitResults = new RaycastHit[10];
+                var hitResults = new RaycastHit[100];
                 var hitCount = Physics.BoxCastNonAlloc(
                     lerpStart,
                     castSize,
@@ -85,11 +125,32 @@ namespace Sensor {
                 // Process hits
                 for (var j = 0; j < hitCount; j++) {
                     var hitInfo = hitResults[j];
+
+                    if (hitInfo.point == Vector3.zero) {
+                        // Calculate the closest point from fallback positions, rayStart, and rayEnd
+                        var closestPoint = rayStart.position;
+                        var closestDistance = (hitInfo.collider.ClosestPoint(rayStart.position) - rayStart.position).sqrMagnitude;
+
+                        foreach (var fallbackPosition in fallbackPositionsBetweenStartAndEnd) {
+                            var distance = (hitInfo.collider.ClosestPoint(fallbackPosition.position) - fallbackPosition.position).sqrMagnitude;
+                            if (distance < closestDistance) {
+                                closestPoint = fallbackPosition.position;
+                                closestDistance = distance;
+                            }
+                        }
+
+                        var endPointDistance = (hitInfo.collider.ClosestPoint(rayEnd.position) - rayEnd.position).sqrMagnitude;
+                        if (endPointDistance < closestDistance) {
+                            closestPoint = rayEnd.position;
+                        }
+
+                        hitInfo.point = closestPoint;
+                    }
+                    
                     if (CollisionWithSelfOrParent(hitInfo.collider)) continue;
                     if (!_hitObjects.Add(hitInfo.collider)) continue;
 
                     hitList.Add(hitInfo);
-
                     // Debug and collision events
                     collisionEvent?.Invoke(hitInfo.transform, hitInfo.collider.sharedMaterial, hitInfo.point, hitInfo.normal);
                 }
