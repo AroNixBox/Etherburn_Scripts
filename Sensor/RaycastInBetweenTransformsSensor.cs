@@ -1,6 +1,4 @@
-using System;
 using System.Collections.Generic;
-using Drawing;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -8,7 +6,7 @@ namespace Sensor {
     public class RaycastInBetweenTransformsSensor : MonoBehaviour {
         // Material, Collision Point, Collision Normal
         public UnityEvent<Transform, PhysicsMaterial, Vector3, Vector3> collisionEvent = new();
-        [SerializeField] Vector3 castSize = new Vector3(0.05f, 0.05f, 0.05f);
+        [SerializeField] Vector3 castSize = new (0.05f, 0.05f, 0.05f);
         [SerializeField] protected LayerMask excludedLayers = 1 << 2; // Default to Ignore Raycast layer
         [SerializeField] Transform rayStart;
         [SerializeField] Transform rayEnd;
@@ -20,7 +18,6 @@ namespace Sensor {
         readonly HashSet<Collider> _hitObjects = new();
         bool _cast;
 
-        // FixedUpdate is not precise enough for this sensor
         void FixedUpdate() {
             if (_cast) {
                 DetectHitsInSensor();
@@ -43,59 +40,68 @@ namespace Sensor {
             var currentRayStart = rayStart.position;
             var currentRayEnd = rayEnd.position;
 
-            // Wenn es der erste Cast ist, speichere die Startpositionen
+            // Initialize the first cast
             if (_isFirstCast) {
                 _lastRayStartPosition = currentRayStart;
                 _lastRayEndPosition = currentRayEnd;
                 _isFirstCast = false;
             }
 
+            // Calculate movement delta
             var deltaStart = currentRayStart - _lastRayStartPosition;
-            
-            var totalCasts = Mathf.CeilToInt(deltaStart.magnitude / 0.1f);
+            var deltaEnd = currentRayEnd - _lastRayEndPosition;
+
+            // Adjust step size based on cast size to avoid gaps
+            var stepSize = Mathf.Max(castSize.x, castSize.y, castSize.z) * 0.9f; // Ensures overlap
+            var totalCastsStart = Mathf.CeilToInt(deltaStart.magnitude / stepSize);
+            var totalCastsEnd = Mathf.CeilToInt(deltaEnd.magnitude / stepSize);
+            var totalCasts = Mathf.Max(totalCastsStart, totalCastsEnd);
 
             var hitList = new List<RaycastHit>();
 
             for (int i = 0; i <= totalCasts; i++) {
-                // Interpolate positions
+                // Interpolate start and end points for the current cast
                 var lerpStart = Vector3.Lerp(_lastRayStartPosition, currentRayStart, (float)i / totalCasts);
                 var lerpEnd = Vector3.Lerp(_lastRayEndPosition, currentRayEnd, (float)i / totalCasts);
 
-                // BoxCast the interpolated positions
+                // Calculate direction and distance
                 var direction = lerpEnd - lerpStart;
                 var maxDistance = direction.magnitude;
-                var halfExtents = new Vector3(0.05f, 0.05f, 0.05f);
-                var orientation = Quaternion.LookRotation(direction.normalized);
-                
+                var orientation = direction.sqrMagnitude > 0 ? Quaternion.LookRotation(direction) : Quaternion.identity;
 
-                RaycastHit[] hitResults = new RaycastHit[10];
-                int hitCount = Physics.BoxCastNonAlloc(lerpStart, halfExtents, direction.normalized, hitResults, orientation, maxDistance, ~excludedLayers, QueryTriggerInteraction.Ignore);
+                // Perform BoxCast
+                var hitResults = new RaycastHit[10];
+                var hitCount = Physics.BoxCastNonAlloc(
+                    lerpStart,
+                    castSize,
+                    direction.normalized,
+                    hitResults,
+                    orientation,
+                    maxDistance,
+                    ~excludedLayers,
+                    QueryTriggerInteraction.Ignore
+                );
 
+                // Process hits
                 for (var j = 0; j < hitCount; j++) {
                     var hitInfo = hitResults[j];
                     if (CollisionWithSelfOrParent(hitInfo.collider)) continue;
-
                     if (!_hitObjects.Add(hitInfo.collider)) continue;
 
                     hitList.Add(hitInfo);
 
-                    // Debug und Events
+                    // Debug and collision events
                     collisionEvent?.Invoke(hitInfo.transform, hitInfo.collider.sharedMaterial, hitInfo.point, hitInfo.normal);
-
-                    #if UNITY_EDITOR
-                    using (Draw.WithDuration(2f)) {
-                        Draw.Arrow(hitInfo.point, hitInfo.point + hitInfo.normal, Color.red);
-                    }
-                    #endif
                 }
             }
 
-            // Aktualisiere die letzten Positionen
+            // Update last positions
             _lastRayStartPosition = currentRayStart;
             _lastRayEndPosition = currentRayEnd;
 
             return hitList;
         }
+
         
         void OnDrawGizmosSelected() {
             if (rayStart == null || rayEnd == null) return;
