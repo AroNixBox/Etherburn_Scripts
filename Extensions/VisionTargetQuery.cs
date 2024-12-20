@@ -15,7 +15,7 @@ namespace Extensions {
         readonly Collider[] _colliders;
         
         RedrawScope _redrawScope;
-        public VisionTargetQuery(Transform head, Transform[] rayCheckOrigins, int maxTargets, float detectionRadius, float visionConeAngle, bool debug) {
+         VisionTargetQuery(Transform head, Transform[] rayCheckOrigins, int maxTargets, float detectionRadius, float visionConeAngle, bool debug) {
             _head = head;
             _rayCheckOrigins = rayCheckOrigins;
             _detectionRadius = detectionRadius;
@@ -30,7 +30,12 @@ namespace Extensions {
         }
         
         public List<T> GetAllTargetsInVisionConeSorted() {
-            int targetsFound = Physics.OverlapSphereNonAlloc(_head.position, _detectionRadius, _colliders);
+            if(_head == null || _rayCheckOrigins.Length == 0 || _colliders.Length == 0 || _detectionRadius == 0f || _visionConeAngle == 0f) {
+                Debug.LogError("VisionTargetQuery was not built for GetAllTargetsInVisionConeSorted().");
+                return null;
+            }
+            
+            var targetsFound = Physics.OverlapSphereNonAlloc(_head.position, _detectionRadius, _colliders);
 
             if (targetsFound == 0) {
                 return new List<T>();
@@ -66,12 +71,136 @@ namespace Extensions {
             
             return validTargets;
         }
+        
+        public List<T> GetAllTargetsInVisionConeSorted(List<T> targetsToQuery) {
+            if(_head == null || _rayCheckOrigins.Length == 0 || _detectionRadius == 0f || _visionConeAngle == 0f) {
+                Debug.LogError("VisionTargetQuery was not built for GetAllTargetsInVisionConeSorted(List<T> targetsToQuery).");
+                return null;
+            }
+            
+            var validTargets = targetsToQuery
+                .Where(item => 
+                    item.TryGetComponent(out Collider collider) &&
+                               IsInDetectionRadius(collider.transform.position) &&
+                               IsInVisionCone(collider.ClosestPoint(_head.position)) &&
+                               _rayCheckOrigins.Any(origin => {
+                                   Vector3 direction = collider.ClosestPoint(origin.position) - origin.position;
+                                   return Physics.Raycast(origin.position, direction, out var hit, _detectionRadius) 
+                                          && hit.collider == item.GetComponent<Collider>();
+                               })
+                )
+                .OrderBy(item => (_head.position - item.transform.position).sqrMagnitude)
+                .Select(item => item)
+                .ToList();
+            
+#if UNITY_EDITOR
+            if (_debug) {
+                _redrawScope.Rewind();
+            
+                DrawDetectionRadius();
+                DrawVisionCone();
+                if (validTargets.Count > 0) {
+                    DrawLineToTarget(validTargets.First().transform);
+                }
+            }
+#endif
+            
+            return validTargets;
+        }
+        
+        public List<T> GetAllTargetsInRangeWithOutLineOfSightSorted(List<T> targetsToQuery) {
+            if(_head == null || _detectionRadius == 0f) {
+                Debug.LogError("VisionTargetQuery was not built for GetAllTargetsInRangeWithOutLineOfSight(List<T> targetsToQuery).");
+                return null;
+            }
+            
+            var validTargets = targetsToQuery
+                .Where(item => IsInDetectionRadius(item.transform.position))
+                .OrderBy(item => (_head.position - item.transform.position).sqrMagnitude)
+                .Select(item => item)
+                .ToList();
+            
+#if UNITY_EDITOR
+            if (_debug) {
+                _redrawScope.Rewind();
+            
+                DrawDetectionRadius();
+                if (validTargets.Count > 0) {
+                    DrawLineToTarget(validTargets.First().transform);
+                }
+            }
+#endif
+            
+            return validTargets;
+        }
+        
+        public T GetTargetInVisionCone(T targetToQuery) {
+            if(_head == null || _visionConeAngle == 0f || _detectionRadius == 0f || _rayCheckOrigins.Length == 0) {
+                Debug.LogError("VisionTargetQuery was not built for GetTargetInVisionCone(T targetToQuery).");
+                return null;
+            }
+            
+            var isValidTarget = false;
+            
+            if (targetToQuery.TryGetComponent(out Collider collider)) {
+                if (IsInDetectionRadius(collider.transform.position) &&
+                    IsInVisionCone(collider.ClosestPoint(_head.position))) {
+                    isValidTarget = _rayCheckOrigins.Any(origin => {
+                        Vector3 direction = collider.ClosestPoint(origin.position) - origin.position;
+                        return Physics.Raycast(origin.position, direction, out var hit, _detectionRadius)
+                                        && hit.collider == collider;
+                    });
+                }
+            }
 
-        // TODO: Make Vision Cone also check horizontal angle and let it start from the head position, currently it is drawn from the head, but fired from the root.
+        #if UNITY_EDITOR
+            if (_debug) {
+                _redrawScope.Rewind();
+                DrawDetectionRadius();
+                DrawVisionCone();
+                if (isValidTarget) {
+                    DrawLineToTarget(targetToQuery.transform);
+                }
+            }
+        #endif
+
+            return isValidTarget ? targetToQuery : null;
+        }
+        
+        public T GetTargetInRangeWithOutVisionCone(T targetToQuery) {
+            if(_head == null || _detectionRadius == 0f) {
+                Debug.LogError("VisionTargetQuery was not built for  GetTargetInRange(T targetToQuery).");
+                return null;
+            }
+            
+            var isValidTarget = false;
+            
+            if (targetToQuery.TryGetComponent(out Collider collider)) {
+                if (IsInDetectionRadius(collider.transform.position)) {
+                    isValidTarget = true;
+                }
+            }
+
+#if UNITY_EDITOR
+            if (_debug) {
+                _redrawScope.Rewind();
+                DrawDetectionRadius();
+                DrawVisionCone();
+                if (isValidTarget) {
+                    DrawLineToTarget(targetToQuery.transform);
+                }
+            }
+#endif
+            return isValidTarget ? targetToQuery : null;
+        }
         bool IsInVisionCone(Vector3 targetPosition) {
             Vector3 directionToTarget = (targetPosition - _head.position).normalized;
             float angle = Vector3.Angle(_head.forward, directionToTarget);
             return angle <= _visionConeAngle / 2f;
+        }
+        
+        bool IsInDetectionRadius(Vector3 targetPosition) {
+            return (_head.position - targetPosition).sqrMagnitude <= _detectionRadius * _detectionRadius;
         }
         
 #if UNITY_EDITOR
@@ -145,6 +274,48 @@ namespace Extensions {
                 _redrawScope.Dispose();
             }
 #endif
+        }
+        public class Builder {
+            Transform _head;
+            Transform[] _rayCheckOrigins;
+            int _maxTargets;
+            float _detectionRadius;
+            float _visionConeAngle;
+            bool _debug;
+
+            public Builder SetHead(Transform head) {
+                _head = head;
+                return this;
+            }
+
+            public Builder SetRayCheckOrigins(Transform[] rayCheckOrigins) {
+                _rayCheckOrigins = rayCheckOrigins;
+                return this;
+            }
+
+            public Builder SetMaxTargets(int maxTargets) {
+                _maxTargets = maxTargets;
+                return this;
+            }
+
+            public Builder SetDetectionRadius(float detectionRadius) {
+                _detectionRadius = detectionRadius;
+                return this;
+            }
+
+            public Builder SetVisionConeAngle(float visionConeAngle) {
+                _visionConeAngle = visionConeAngle;
+                return this;
+            }
+
+            public Builder SetDebug(bool debug) {
+                _debug = debug;
+                return this;
+            }
+
+            public VisionTargetQuery<U> Build<U>() where U : MonoBehaviour {
+                return new VisionTargetQuery<U>(_head, _rayCheckOrigins, _maxTargets, _detectionRadius, _visionConeAngle, _debug);
+            }
         }
     }
 }

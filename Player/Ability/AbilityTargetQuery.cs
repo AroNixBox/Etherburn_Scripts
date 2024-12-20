@@ -29,7 +29,14 @@ namespace Player.Ability
             var detectionRadius = references.detectionRadius;
             var visionConeAngle = references.visionConeAngle;
             
-            _visionEnemyWarpTargetQuery = new VisionTargetQuery<Entity>(headHeight, _rayCheckOrigins, _maxTargets, detectionRadius, visionConeAngle, debug);
+            _visionEnemyWarpTargetQuery = new VisionTargetQuery<Entity>.Builder()
+                .SetHead(headHeight)
+                .SetRayCheckOrigins(_rayCheckOrigins)
+                .SetMaxTargets(_maxTargets)
+                .SetDetectionRadius(detectionRadius)
+                .SetVisionConeAngle(visionConeAngle)
+                .SetDebug(debug)
+                .Build<Entity>();
         }
 
         public Entity GetWarpTargetProvider(EntityType entityType) {
@@ -40,10 +47,16 @@ namespace Player.Ability
                 return lockedOnTarget;
             }
             
-            var entities = _visionEnemyWarpTargetQuery.GetAllTargetsInVisionConeSorted();
-            if(entities.Count == 0) { return null; }
+            var entityManager = EntityManager.Instance;
+            if (entityManager == null) {
+                Debug.LogError("Entity Manager ist not in the Scene!", transform);
+                return null;
+            }
             
-            return entities.FirstOrDefault(entity => entity.EntityType == entityType);
+            var allEnemies = entityManager.GetEntitiesOfType(EntityType.Enemy);
+            var allEntitiesInVisionCone = _visionEnemyWarpTargetQuery.GetAllTargetsInVisionConeSorted(allEnemies);
+            if(allEntitiesInVisionCone.Count == 0) { return null; }
+            return allEntitiesInVisionCone.FirstOrDefault(entity => entity.EntityType == entityType);
         }
 
         void OnDestroy() {

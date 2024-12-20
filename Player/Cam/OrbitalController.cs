@@ -67,7 +67,14 @@ namespace Player.Cam {
             var maxTargets = references.maxTargetToCheckAround;
             var visionConeAngle = references.visionConeAngle;
             
-            _visionEnemyWarpTargetQuery = new VisionTargetQuery<Entity>(headHeight, rayCheckOrigins, maxTargets, _detectionRadius, visionConeAngle, debug);
+            _visionEnemyWarpTargetQuery = new VisionTargetQuery<Entity>.Builder()
+                .SetHead(headHeight)
+                .SetRayCheckOrigins(rayCheckOrigins)
+                .SetMaxTargets(maxTargets)
+                .SetDetectionRadius(_detectionRadius)
+                .SetVisionConeAngle(visionConeAngle)
+                .SetDebug(debug)
+                .Build<Entity>();
         }
 
         void ChangeLookValues(Vector2 lookDirection, bool isDeviceMouse) {
@@ -101,7 +108,14 @@ namespace Player.Cam {
                 _currentXAngle = Mathf.Clamp(_currentXAngle, -upperVerticalLimit, lowerVerticalLimit);
             } else {
                 // Lock on target
-                var allEntitiesInVisionCone = _visionEnemyWarpTargetQuery.GetAllTargetsInVisionConeSorted();
+                var entityManager = EntityManager.Instance;
+                if (entityManager == null) {
+                    Debug.LogError("Entity Manager ist not in the Scene!", transform);
+                    return;
+                }
+            
+                var allEnemies = entityManager.GetEntitiesOfType(lockOnEntityType);                
+                var allEntitiesInVisionCone = _visionEnemyWarpTargetQuery.GetAllTargetsInVisionConeSorted(allEnemies);
                 if(allEntitiesInVisionCone.Count == 0) { return; }
 
                 LockedOnEnemyTarget = allEntitiesInVisionCone.FirstOrDefault(entity => entity.EntityType == lockOnEntityType);
