@@ -12,6 +12,19 @@ namespace Game {
         [SerializeField] Canvas loadingCanvas;
         [SerializeField] Slider loadingSlider;
         readonly List<AsyncOperation> _asyncOperations = new ();
+        
+        public SceneData.ELevelType CurrentLevelType { get; private set; }
+        
+        public static SceneLoader Instance { get; private set; }
+
+        void Awake() {
+            if(Instance == null) {
+                Instance = this;
+            } else {
+                Destroy(gameObject);
+            }
+        }
+
         void Start() {
             if(sceneData == null) {
                 Debug.LogError("SceneData is not set in the inspector", transform);
@@ -25,8 +38,16 @@ namespace Game {
         }
         
         IEnumerator LoadScenesAsync(SceneData.ELevelType levelType) {
+            // Set Current Level Type
+            CurrentLevelType = levelType;
+            
             // Save Bootstrapper Scene Build Index
             var currentBuildIndex = SceneManager.GetActiveScene().buildIndex;
+            
+            // Load Systems Scene
+            var systemsSceneOperation = SceneManager.LoadSceneAsync(sceneData.systemsScene.BuildIndex, LoadSceneMode.Additive);
+            systemsSceneOperation.allowSceneActivation = false;
+            _asyncOperations.Add(systemsSceneOperation);
             
             // Load Player Scene
             var playerSceneOperation = SceneManager.LoadSceneAsync(sceneData.playerScene.BuildIndex, LoadSceneMode.Additive);
@@ -41,14 +62,6 @@ namespace Game {
                 var navSceneOperation = SceneManager.LoadSceneAsync(navMeshPackage.navMeshScene.BuildIndex, LoadSceneMode.Additive);
                 navSceneOperation.allowSceneActivation = false;
                 _asyncOperations.Add(navSceneOperation);
-            }
-            
-            // Load Agression Manager Scene
-            SceneData.GridManagerPackage[] agressionManagerPackages = sceneData.aggressionManagers.Where(agressionManager => agressionManager.levelType == levelType).ToArray();
-            foreach (var agressionManagerPackage in agressionManagerPackages) {
-                var agressionManagerOperation = SceneManager.LoadSceneAsync(agressionManagerPackage.gridManagerScene.BuildIndex, LoadSceneMode.Additive);
-                agressionManagerOperation.allowSceneActivation = false;
-                _asyncOperations.Add(agressionManagerOperation);
             }
             
             SceneData.ScenePackage[] levelPackages = sceneData.levels.Where(level => level.levelType == levelType).ToArray();

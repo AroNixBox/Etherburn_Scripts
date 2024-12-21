@@ -1,15 +1,14 @@
 ﻿using System.Collections.Generic;
 using Eflatun.SceneReference;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Game {
     [CreateAssetMenu(menuName = "Game/SceneData")]
     public class SceneData : ScriptableObject {
         public SceneReference playerScene;
+        public SceneReference systemsScene;
         public ScenePackage[] levels;
         public NavMeshScenePackage[] navMeshes;
-        [FormerlySerializedAs("agressionManagers")] public GridManagerPackage[] aggressionManagers;
         
         [System.Serializable]
         public class ScenePackage {

@@ -15,6 +15,9 @@ MonoBehaviour:
   playerScene:
     asset: {fileID: 102900000, guid: a1fd04929a4c2714d9e3cafad9d8d85b, type: 3}
     guid: a1fd04929a4c2714d9e3cafad9d8d85b
+  systemsScene:
+    asset: {fileID: 102900000, guid: 26750a569b292e348a5ddde890ad0d4b, type: 3}
+    guid: 26750a569b292e348a5ddde890ad0d4b
   levels:
   - levelScenes:
     - asset: {fileID: 102900000, guid: d4aa7495715ef894f89ff4f2525e5bc1, type: 3}
@@ -54,9 +57,4 @@ MonoBehaviour:
   - navMeshScene:
       asset: {fileID: 102900000, guid: 440c63deb1734e94d814b826966382ee, type: 3}
       guid: 440c63deb1734e94d814b826966382ee
-    levelType: 2
-  agressionManagers:
-  - gridManagerScene:
-      asset: {fileID: 102900000, guid: c0ac2b4ac017da94b9711b835aedc281, type: 3}
-      guid: c0ac2b4ac017da94b9711b835aedc281
     levelType: 2
