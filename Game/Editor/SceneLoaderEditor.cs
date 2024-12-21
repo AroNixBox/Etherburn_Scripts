@@ -93,13 +93,16 @@ namespace Game.Editor {
             }
 
             // Filter scenes by level type
-            var filteredScenes = _sceneData.levels
-                .Where(pkg => pkg.levelType == levelType)
-                .SelectMany(pkg => pkg.levelScenes)
-                .Concat(_sceneData.navMeshes.Where(nav => nav.levelType == levelType).Select(nav => nav.navMeshScene))
-                .Concat(_sceneData.aggressionManagers.Where(aggression => aggression.levelType == levelType)
-                    .Select(aggression => aggression.gridManagerScene));
-
+            var filteredScenes = new[] {
+                    // Add Player and Systems scenes to the list first
+                    _sceneData.systemsScene,
+                    _sceneData.playerScene
+                }
+                .Concat(_sceneData.levels
+                    .Where(pkg => pkg.levelType == levelType)
+                    .SelectMany(pkg => pkg.levelScenes)
+                    .Concat(_sceneData.navMeshes.Where(nav => nav.levelType == levelType).Select(nav => nav.navMeshScene)));
+            
             foreach (var sceneRef in filteredScenes) {
                 if (sceneRef.BuildIndex >= 0) { // Ensure BuildIndex is valid
                     EditorSceneManager.OpenScene(SceneUtility.GetScenePathByBuildIndex(sceneRef.BuildIndex), OpenSceneMode.Additive);
