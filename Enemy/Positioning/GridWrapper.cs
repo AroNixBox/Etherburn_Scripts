@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 
 namespace Enemy.Positioning {
+    [PreferBinarySerialization]
     public class GridWrapper : ScriptableObject {
         public int gridWidth;
         public int gridHeight;
