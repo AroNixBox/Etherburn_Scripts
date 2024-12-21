@@ -39,6 +39,7 @@ public partial class DetectEntityInRangeAction : Action {
         
         _agent ??= Agent.Value.GetComponent<NavMeshAgent>();
         _entityVisionTargetQuery ??= new VisionTargetQuery<Entity>.Builder()
+                .SetHead(Agent.Value.transform)
                 .SetDetectionRadius(DetectionRadius.Value)
                 .SetDebug(ShowDebug.Value)
                 .Build<Entity>();
