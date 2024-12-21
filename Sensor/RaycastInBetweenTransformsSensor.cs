@@ -55,6 +55,11 @@ namespace Sensor {
                 fallbackPositionsBetweenStartAndEnd.Add(fallbackTransform);
             }
         }
+        [FoldoutGroup("Fallback Positions")]
+        [Button, GUIColor(1f, 0.03f, 0.05f)]
+        void ClearFallbackCollisionTrackingPositions() {
+            fallbackPositionsBetweenStartAndEnd.Clear();
+        }
 
         void FixedUpdate() {
             if (_cast) {
