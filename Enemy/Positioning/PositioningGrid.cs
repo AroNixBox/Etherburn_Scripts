@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Linq;
 using Drawing;
+using Game;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.AI;
-using UnityEngine.SceneManagement;
 
 namespace Enemy.Positioning {
     public class PositioningGrid : MonoBehaviour {
@@ -49,14 +49,14 @@ namespace Enemy.Positioning {
         const string ResourcesPath = "Assets/Resources/";
         const string FileName = "PositioningData/GridPositioningWrapper";
 
-        #region Grid Creation
+#region Grid Creation
 
-        void Start() {
-            positioningAnker = FindObjectsByType<Entity>(FindObjectsInactive.Include, FindObjectsSortMode.None)
-                .FirstOrDefault(entity => entity.EntityType is EntityType.Player)?.gameObject;
-            
+        async void Start() {
             LoadGridFromScriptableObject();
-
+            
+            await EntityManager.Instance.WaitTillInitialized();
+            positioningAnker = EntityManager.Instance.GetEntitiesOfType(EntityType.Player).First().gameObject;
+            
 #if UNITY_EDITOR
             if (drawDebug) {
                 _redrawScope = new RedrawScope();
@@ -65,7 +65,23 @@ namespace Enemy.Positioning {
         }
 
         void LoadGridFromScriptableObject() {
-            var savedGridData = Resources.Load<GridWrapper>(FileName + "_" + gameObject.scene.name);
+            if(SceneLoader.Instance == null) {
+#if UNITY_EDITOR
+                // Sceneloader will be null when in the Editor and started not from the Bootstrapper Scene
+                
+                // Pause the Editor
+                UnityEditor.EditorApplication.isPaused = true;
+                // Create Popup and ask for the LevelType
+                LevelTypeSelectionWindow.OnSelectionMade += SelectLevelType;
+                LevelTypeSelectionWindow.ShowWindow();
+                return;
+#endif
+                
+                Debug.LogError("SceneLoader is not set in the scene.");
+                return;
+            }
+            
+            var savedGridData = Resources.Load<GridWrapper>(FileName + "_" + SceneLoader.Instance.CurrentLevelType.ToString());
             if (savedGridData != null) {
                 _grid = savedGridData.ToGrid();
                 Debug.Log("Grid successfully loaded from Resources!"); 
@@ -74,10 +90,43 @@ namespace Enemy.Positioning {
             }
         }
 
+#if UNITY_EDITOR
         [BoxGroup("SaveLoadGroup")]
         [GUIColor(0.4f, 0.8f, 1.0f)]
         [Button(ButtonSizes.Large)]
         void SaveGridToScriptableObject() {
+            LevelTypeSelectionWindow.OnSelectionMade += SaveGridAfterSelection;
+            LevelTypeSelectionWindow.ShowWindow();
+        }
+        
+        // Select Level from Dropdown if initialized without bootstrapper
+        void SelectLevelType(SceneData.ELevelType selectedLevelType, bool isCancelled) {
+            UnityEditor.EditorApplication.isPaused = false;
+            LevelTypeSelectionWindow.OnSelectionMade -= SaveGridAfterSelection;
+            
+            if (isCancelled) {
+                Debug.Log("Save operation cancelled.");
+                // Go out of Playmode
+                UnityEditor.EditorApplication.isPlaying = false;
+                return;
+            }
+            var savedGridData = Resources.Load<GridWrapper>(FileName + "_" + selectedLevelType.ToString());
+            if (savedGridData != null) {
+                _grid = savedGridData.ToGrid();
+                Debug.Log("Grid successfully loaded from Resources!"); 
+            }else {
+                Debug.LogError("No saved grid data found in Resources.");
+            }
+        }
+
+        void SaveGridAfterSelection(SceneData.ELevelType selectedLevelType, bool isCancelled) {
+            LevelTypeSelectionWindow.OnSelectionMade -= SaveGridAfterSelection;
+
+            if (isCancelled) {
+                Debug.Log("Save operation cancelled.");
+                return;
+            }
+
             var grid = SaveGridPosition();
 
             // New ScriptableObject
@@ -87,15 +136,14 @@ namespace Enemy.Positioning {
             gridWrapper.InitializeFromGrid(grid);
 
             // Save the ScriptableObject with the GridWrapperData
-#if UNITY_EDITOR
-            string fullAssetPath = ResourcesPath + FileName + "_" + gameObject.scene.name + ".asset";
+            string fullAssetPath = ResourcesPath + FileName + "_" + selectedLevelType.ToString() + ".asset";
             UnityEditor.AssetDatabase.CreateAsset(gridWrapper, fullAssetPath);
             UnityEditor.AssetDatabase.SaveAssets();
-            Debug.Log($"Grid data saved to {ResourcesPath}");
-#endif
+            Debug.Log($"Grid data saved to {fullAssetPath}");
         }
 
-        #endregion
+#endif
+#endregion
 
         void Update() {
             TrackPlayerOnGrid();
@@ -103,6 +151,11 @@ namespace Enemy.Positioning {
 
         void TrackPlayerOnGrid() {
             if (positioningAnker == null) { return; }
+
+            if (_grid == null) {
+                Debug.LogWarning("Grid is not initialized.");
+                return;
+            }
 
             _grid.GetXZ(positioningAnker.transform.position, out var currentX, out var currentZ);
             var currentGridObject = _grid.GetGridObject(currentX, currentZ);

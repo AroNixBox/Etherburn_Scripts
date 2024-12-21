@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Enemy.Positioning {
@@ -20,8 +21,9 @@ namespace Enemy.Positioning {
             }
         }
 
-        void Start() {
-            _playerTransform = positioningGrid.positioningAnker.transform;
+        async void Start() {
+            await EntityManager.Instance.WaitTillInitialized();
+            _playerTransform = EntityManager.Instance.GetEntitiesOfType(EntityType.Player).First().transform;
             positioningGrid.OnPlayerGridPositionChanged += ReevaluateEnemyBehavior;
         }
         
