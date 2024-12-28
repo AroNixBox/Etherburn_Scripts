@@ -26,9 +26,7 @@ namespace Game {
         }
 
         void Start() {
-            if(sceneData == null) {
-                Debug.LogError("SceneData is not set in the inspector", transform);
-            }
+            StartLevelOne();
         }
         
         // TODO: Call from Button
@@ -38,6 +36,10 @@ namespace Game {
         }
         
         IEnumerator LoadScenesAsync(SceneData.ELevelType levelType) {
+            if(sceneData == null) {
+                Debug.LogError("SceneData is not set in the inspector", transform);
+            }
+            
             // Set Current Level Type
             CurrentLevelType = levelType;
             

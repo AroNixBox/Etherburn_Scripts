@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Drawing;
 using Game;
@@ -52,8 +53,10 @@ namespace Enemy.Positioning {
 #region Grid Creation
 
         async void Start() {
+            // Load the Grid from the Resources
             LoadGridFromScriptableObject();
             
+            // Wait till the EntityManager is initialized
             await EntityManager.Instance.WaitTillInitialized();
             positioningAnker = EntityManager.Instance.GetEntitiesOfType(EntityType.Player).First().gameObject;
             
@@ -66,8 +69,7 @@ namespace Enemy.Positioning {
 
         void LoadGridFromScriptableObject() {
             if(SceneLoader.Instance == null) {
-#if UNITY_EDITOR
-                // Sceneloader will be null when in the Editor and started not from the Bootstrapper Scene
+#if UNITY_EDITOR // Sceneloader will be null when in the Editor and started not from the Bootstrapper Scene
                 
                 // Pause the Editor
                 UnityEditor.EditorApplication.isPaused = true;
@@ -75,12 +77,13 @@ namespace Enemy.Positioning {
                 LevelTypeSelectionWindow.OnSelectionMade += SelectLevelType;
                 LevelTypeSelectionWindow.ShowWindow();
                 return;
-#endif
-                
+#else // We are NOT in the Editor and Sce
                 Debug.LogError("SceneLoader is not set in the scene.");
                 return;
+#endif
             }
             
+            // Load the Grid from the Resources
             var savedGridData = Resources.Load<GridWrapper>(FileName + "_" + SceneLoader.Instance.CurrentLevelType.ToString());
             if (savedGridData != null) {
                 _grid = savedGridData.ToGrid();
@@ -91,25 +94,21 @@ namespace Enemy.Positioning {
         }
 
 #if UNITY_EDITOR
-        [BoxGroup("SaveLoadGroup")]
-        [GUIColor(0.4f, 0.8f, 1.0f)]
-        [Button(ButtonSizes.Large)]
-        void SaveGridToScriptableObject() {
-            LevelTypeSelectionWindow.OnSelectionMade += SaveGridAfterSelection;
-            LevelTypeSelectionWindow.ShowWindow();
-        }
-        
         // Select Level from Dropdown if initialized without bootstrapper
         void SelectLevelType(SceneData.ELevelType selectedLevelType, bool isCancelled) {
+            // Pause the Game
             UnityEditor.EditorApplication.isPaused = false;
             LevelTypeSelectionWindow.OnSelectionMade -= SaveGridAfterSelection;
             
+            // Did the dev click the cancel button?
             if (isCancelled) {
                 Debug.Log("Save operation cancelled.");
                 // Go out of Playmode
                 UnityEditor.EditorApplication.isPlaying = false;
                 return;
             }
+            
+            // Try loading the Grid from the Resources
             var savedGridData = Resources.Load<GridWrapper>(FileName + "_" + selectedLevelType.ToString());
             if (savedGridData != null) {
                 _grid = savedGridData.ToGrid();
@@ -118,7 +117,13 @@ namespace Enemy.Positioning {
                 Debug.LogError("No saved grid data found in Resources.");
             }
         }
-
+        [BoxGroup("SaveLoadGroup")]
+        [GUIColor(0.4f, 0.8f, 1.0f)]
+        [Button(ButtonSizes.Large)]
+        void SaveGridToScriptableObject() {
+            LevelTypeSelectionWindow.OnSelectionMade += SaveGridAfterSelection;
+            LevelTypeSelectionWindow.ShowWindow();
+        }
         void SaveGridAfterSelection(SceneData.ELevelType selectedLevelType, bool isCancelled) {
             LevelTypeSelectionWindow.OnSelectionMade -= SaveGridAfterSelection;
 
@@ -127,23 +132,47 @@ namespace Enemy.Positioning {
                 return;
             }
 
-            var grid = SaveGridPosition();
+            var originalGrid = SaveGridPosition();
+            var walkableCells = FilterPositioningGridObjects(originalGrid, go => go.IsWalkable);
 
+            // Neues Grid mit nur den begehbaren Zellen erstellen
+            var walkableGrid = new Grid<PositioningGridObject>(
+                originalGrid.Width,
+                originalGrid.Height,
+                originalGrid.CellSize,
+                originalGrid.OriginPosition,
+                (g, x, z) => originalGrid.GetGridObject(x, z),
+                walkableCells.Select(cell => new Vector2Int(cell.X, cell.Z)).ToList()
+            );
+            
             // New ScriptableObject
-            GridWrapper gridWrapper = ScriptableObject.CreateInstance<GridWrapper>();
+            var gridWrapper = ScriptableObject.CreateInstance<GridWrapper>();
 
             // Convert Grid to GridWrapper
-            gridWrapper.InitializeFromGrid(grid);
+            gridWrapper.InitializeFromGrid(walkableGrid);
 
             // Save the ScriptableObject with the GridWrapperData
-            string fullAssetPath = ResourcesPath + FileName + "_" + selectedLevelType.ToString() + ".asset";
+            var fullAssetPath = ResourcesPath + FileName + "_" + selectedLevelType.ToString() + ".asset";
             UnityEditor.AssetDatabase.CreateAsset(gridWrapper, fullAssetPath);
             UnityEditor.AssetDatabase.SaveAssets();
             Debug.Log($"Grid data saved to {fullAssetPath}");
         }
-
 #endif
 #endregion
+
+        List<PositioningGridObject> FilterPositioningGridObjects(Grid<PositioningGridObject> grid, Func<PositioningGridObject, bool> filter) {
+            var result = new List<PositioningGridObject>();
+            for (var x = 0; x < grid.Width; x++) {
+                for (var z = 0; z < grid.Height; z++) {
+                    var gridObject = grid.GetGridObject(x, z);
+                    if (filter(gridObject)) {
+                        result.Add(gridObject);
+                    }
+                }
+            }
+
+            return result;
+        }
 
         void Update() {
             TrackPlayerOnGrid();
@@ -165,8 +194,14 @@ namespace Enemy.Positioning {
             }
             
             if(currentGridObject == null) {
-                Debug.LogError("Player is not on the grid, please check the bounds.");
-                return;
+                // Fallback, player is not on grid, get the closest grid cell
+                _grid.GetClosestXZ(positioningAnker.transform.position, out currentX, out currentZ);
+                currentGridObject = _grid.GetGridObject(currentX, currentZ);
+
+                if (currentGridObject == null) {
+                    Debug.LogError("Player is not on the grid, please check the bounds.");
+                    return;
+                }
             }
 
             if (_lastGridObject != null) {
