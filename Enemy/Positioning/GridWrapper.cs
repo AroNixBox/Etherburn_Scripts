@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -45,23 +46,17 @@ namespace Enemy.Positioning {
         }
 
 
-        // Load the grid from the ScriptableObject
         public Grid<PositioningGridObject> ToGrid() {
             var includedCells = new List<Vector2Int>();
 
-            for (var i = 0; i < gridData.Length; i++) {
-                if (gridData[i] == null) {
-                    // The Grid Data is null, even though we filtered it out before on loading [BAD]
-                    Debug.LogWarning("GridWrapper: GridData is null at index " + i + " - <b>Skipping</b>");
+            foreach (var cellData in gridData) {
+                if (cellData == null) {
+                    Debug.LogWarning("GridWrapper: GridData is null - <b>Skipping</b>");
                     continue;
                 }
-                
-                // determine the x and z position of the cell
-                var x = i / gridHeight;
-                var z = i % gridHeight;
-                
-                // Add the cell to the included cells
-                includedCells.Add(new Vector2Int(x, z));
+
+                // Add the cell position to the included cells
+                includedCells.Add(new Vector2Int(cellData.x, cellData.z));
             }
 
             // Create the grid and return it
@@ -71,7 +66,8 @@ namespace Enemy.Positioning {
                 cellSize,
                 originPosition + new Vector3(gridOffset.x, 0, gridOffset.y),
                 (g, x, z) => {
-                    var cellData = gridData[x * gridHeight + z];
+                    var cellData = gridData.FirstOrDefault(data => data.x == x && data.z == z);
+                    if (cellData == null) return null;
                     return new PositioningGridObject(
                         cellData.x,
                         cellData.z,

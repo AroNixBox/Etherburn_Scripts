@@ -135,7 +135,7 @@ namespace Enemy.Positioning {
             var originalGrid = SaveGridPosition();
             var walkableCells = FilterPositioningGridObjects(originalGrid, go => go.IsWalkable);
 
-            // Neues Grid mit nur den begehbaren Zellen erstellen
+            // New grid with only walkable cells
             var walkableGrid = new Grid<PositioningGridObject>(
                 originalGrid.Width,
                 originalGrid.Height,
