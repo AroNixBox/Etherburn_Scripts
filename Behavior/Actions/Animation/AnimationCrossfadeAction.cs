@@ -14,11 +14,23 @@ public partial class AnimationCrossfadeAction : Action {
     CountdownTimer _countdownTimer;
 
     protected override Status OnStart() {
+        var missingType = MissingType();
+        if(missingType != null) {
+            Debug.LogError($"{missingType} is missing.");
+            return Status.Failure;
+        }
+        
         var animationDetails = AnimationsParams.GetAnimationDetails(AnimationState.Value);
         AnimationController.Value.CrossfadeToState(animationDetails);
         
         _countdownTimer ??= new CountdownTimer(animationDetails.BlendDuration);
         return Status.Running;
+    }
+    
+    Type MissingType() {
+        if(ReferenceEquals(AnimationController.Value, null)) { return typeof(AnimationController); }
+        
+        return null; // If all checks passed, no type is missing
     }
     protected override Status OnUpdate() {
         if (_countdownTimer.IsFinished) {

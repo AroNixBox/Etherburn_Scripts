@@ -17,12 +17,9 @@ public partial class SetLocationAroundTargetRelativeToSelfAction : Action
     Target _targetProvider;
 
     protected override Status OnStart() {
-        if(ReferenceEquals(Target?.Value, null)) {
-            Debug.LogError("Target is missing.");
-            return Status.Failure;
-        }
-        if(ReferenceEquals(Self?.Value, null)) {
-            Debug.LogError("Self is missing.");
+        var missingType = MissingType();
+        if(missingType != null) {
+            LogFailure($"Missing {missingType.Name}.");
             return Status.Failure;
         }
         
@@ -40,12 +37,15 @@ public partial class SetLocationAroundTargetRelativeToSelfAction : Action
         return Status.Success;
     }
 
+    Type MissingType() {
+        if(ReferenceEquals(Self.Value, null)) { return typeof(GameObject); }
+
+        return null;
+    }
     protected override Status OnUpdate() {
         return Status.Running;
     }
 
-    protected override void OnEnd()
-    {
-    }
+    protected override void OnEnd() { }
 }
 

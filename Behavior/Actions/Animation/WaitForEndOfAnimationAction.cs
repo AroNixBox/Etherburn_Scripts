@@ -11,8 +11,9 @@ public partial class WaitForEndOfAnimationAction : Action {
     [SerializeReference] public BlackboardVariable<int> LayerIndex;
     CountdownTimer _countdownTimer;
     protected override Status OnStart() {
-        if(ReferenceEquals(Animator.Value, null)) {
-            LogFailure("No Animator assigned.");
+        var missingType = MissingType();
+        if(missingType != null) {
+            Debug.LogError($"{missingType} is missing.");
             return Status.Failure;
         }
         
@@ -20,6 +21,11 @@ public partial class WaitForEndOfAnimationAction : Action {
         _countdownTimer = new CountdownTimer(waitTime);
         _countdownTimer.Start();
         return Status.Running;
+    }
+    Type MissingType() {
+        if(ReferenceEquals(Animator.Value, null)) { return typeof(Animator); }
+        
+        return null; // If all checks passed, no type is missing
     }
 
     float GetCurrentOrNextClipLength(int layerIndex) {

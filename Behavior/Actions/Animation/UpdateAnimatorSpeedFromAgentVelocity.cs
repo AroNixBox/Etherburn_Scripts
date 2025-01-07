@@ -23,8 +23,9 @@ public partial class UpdateAnimatorSpeedFromAgentVelocity : Action {
     Vector3 _velocity;
 
     protected override Status OnStart() {
-        if (ReferenceEquals(Agent.Value, null) || ReferenceEquals(Animator.Value, null)) {
-            LogFailure("No Agent or Animator assigned.");
+        var missingType = MissingType();
+        if(missingType != null) {
+            LogFailure($"Missing {missingType.Name} reference.");
             return Status.Failure;
         }
         if(string.IsNullOrEmpty(AnimatorSpeedParam.Value)) {
@@ -36,6 +37,12 @@ public partial class UpdateAnimatorSpeedFromAgentVelocity : Action {
         return Status.Running;
     }
 
+    Type MissingType() {
+        if(ReferenceEquals(Agent.Value, null)) { return typeof(NavMeshAgent); }
+        if(ReferenceEquals(Animator.Value, null)) { return typeof(Animator); }
+        
+        return null; // If all checks passed, no type is missing
+    }
     protected override Status OnUpdate() {
         if (!Agent.Value.hasPath) {
             HandleNoPath();

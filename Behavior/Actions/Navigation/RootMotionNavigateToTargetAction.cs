@@ -19,10 +19,12 @@ public partial class RootMotionNavigateToTargetAction : Action
     Vector3 _colliderAdjustedTargetPosition;
 
     protected override Status OnStart() {
-        if (ReferenceEquals(Agent.Value, null) || ReferenceEquals(Target.Value, null)) {
-            Debug.LogError("Agent or Target is missing.");
+        var missingType = MissingType();
+        if(missingType != null) {
+            Debug.LogError($"{missingType} is missing.");
             return Status.Failure;
         }
+        
         Agent.Value.SetDestination(Target.Value.transform.position);
 
         if (SignalOnArrival.Value) {
@@ -33,6 +35,13 @@ public partial class RootMotionNavigateToTargetAction : Action
         }
         
         return Status.Running;
+    }
+    
+    Type MissingType() {
+        if(ReferenceEquals(Agent.Value, null)) { return typeof(NavMeshAgent); }
+        if(ReferenceEquals(Target.Value, null)) { return typeof(GameObject); }
+        
+        return null;
     }
 
     protected override Status OnUpdate() {

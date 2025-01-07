@@ -13,13 +13,19 @@ public partial class SetColliderAction : Action
     [SerializeReference] public BlackboardVariable<bool> Active;
 
     protected override Status OnStart() {
-        if(ReferenceEquals(Weapon.Value, null)) {
-            LogFailure("No Weapon assigned.");
+        var missingType = MissingType();
+        if(missingType != null) {
+            Debug.LogError($"{missingType} is missing.");
             return Status.Failure;
         }
         
         Weapon.Value.CastForObjects(Active.Value);
         return Status.Success;
+    }
+    
+    Type MissingType() {
+        if(ReferenceEquals(Weapon.Value, null)) { return typeof(DamageDealingObject); }
+        return null;
     }
 
     protected override Status OnUpdate() {

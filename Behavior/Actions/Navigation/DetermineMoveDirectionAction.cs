@@ -14,17 +14,15 @@ public partial class DetermineMoveDirectionAction : Action
     [SerializeReference] public BlackboardVariable<GameObject> target;
 
     protected override Status OnStart() {
-        if (ReferenceEquals(self.Value, null) || ReferenceEquals(target.Value, null)) {
-            Debug.LogError("No Self or Target assigned.");
+        var missingType = MissingType();
+        if(missingType != null) {
+            Debug.LogError($"{missingType} is missing.");
             return Status.Failure;
         }
         
         // Calculate the direction to the target
         var directionToTarget = target.Value.transform.position - self.Value.transform.position;
         directionToTarget.y = 0; // Ignore vertical difference
-    
-        // Debugging: Log the direction to the target
-        Debug.Log($"Direction to Target: {directionToTarget}");
 
         // Calculate the forward direction of the self object
         var forward = self.Value.transform.forward;
@@ -34,12 +32,16 @@ public partial class DetermineMoveDirectionAction : Action
         // Determine if the target is in front or behind
         var dotProduct = Vector3.Dot(forward, directionToTarget.normalized);
 
-        // Debugging: Log the dot product
-        Debug.Log($"Dot Product: {dotProduct}");
-
         moveDirection.Value = dotProduct > 0 ? MoveDirection.Forward : MoveDirection.Backward;
 
         return Status.Success;
+    }
+    
+    Type MissingType() {
+        if(ReferenceEquals(self.Value, null)) { return typeof(GameObject); }
+        if(ReferenceEquals(target.Value, null)) { return typeof(GameObject); }
+        
+        return null;
     }
 
     protected override Status OnUpdate() {

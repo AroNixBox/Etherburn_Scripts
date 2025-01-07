@@ -23,19 +23,7 @@ public partial class AttributeThresholdCondition : Condition {
         };
     }
 
-    public override void OnStart()
-    {
-    }
+    public override void OnStart() { }
 
-    public override void OnEnd()
-    {
-    }
-    
-    public enum ThresholdComparison {
-        GreaterThan,
-        LessThan,
-        Equal,
-        GreaterEqual,
-        LessEqual
-    }
+    public override void OnEnd() { }
 }

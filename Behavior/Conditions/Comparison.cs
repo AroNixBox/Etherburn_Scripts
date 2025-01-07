@@ -1,4 +1,4 @@
-﻿namespace Behavior.Flow.Conditions {
+﻿namespace Behavior.Conditions {
     public enum Comparison {
         Is,
         IsNot

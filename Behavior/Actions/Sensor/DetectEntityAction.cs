@@ -18,7 +18,6 @@ public partial class DetectEntityAction : Action {
     [SerializeReference] public BlackboardVariable<GameObject> Target;
     [Tooltip("Out Value that gets assigned with the detected target.")] 
     [SerializeReference] public BlackboardVariable<EnemyBodyParts> BodyParts;
-    [SerializeReference] public BlackboardVariable<int> MaxTargets = new (10);
     [SerializeReference] public BlackboardVariable<float> DetectionRadius = new (5f);
     [Tooltip("Put to 360 to detect all around the agent.")] 
     [SerializeReference] public BlackboardVariable<float> VisionConeAngle = new (45f);
@@ -30,6 +29,12 @@ public partial class DetectEntityAction : Action {
     List<Entity> _associatedPlayerEntities;
 
     protected override Status OnStart() {
+        var missingType = MissingType();
+        if (missingType != null) {
+            Debug.LogError($"Missing Type: {missingType}");
+            return Status.Failure;
+        }
+        
         // Get our Player
         var entityManager = EntityManager.Instance;
         if (entityManager == null) {
@@ -37,19 +42,12 @@ public partial class DetectEntityAction : Action {
             return Status.Failure;
         }
             
-        _associatedPlayerEntities ??= entityManager.GetEntitiesOfType(EntityType.Player);
-        
-        // TODO: Check if Target is assigned and not null
-        if(ReferenceEquals(Agent.Value, null) || ReferenceEquals(BodyParts.Value, null)) {
-            LogFailure("No Agent, Target or BodyParts assigned.");
-            return Status.Failure;
-        }
+        _associatedPlayerEntities ??= entityManager.GetEntitiesOfType(TargetType.Value);
         
         _agent ??= Agent.Value.GetComponent<NavMeshAgent>();
         _entityVisionTargetQuery ??= new VisionTargetQuery<Entity>.Builder()
                 .SetHead(BodyParts.Value.head)
                 .SetRayCheckOrigins(BodyParts.Value.rayCheckOrigins)
-                .SetMaxTargets(MaxTargets.Value)
                 .SetDetectionRadius(DetectionRadius.Value)
                 .SetVisionConeAngle(VisionConeAngle.Value)
                 .SetDebug(ShowDebug.Value)
@@ -58,6 +56,13 @@ public partial class DetectEntityAction : Action {
         
         Application.quitting += () => _entityVisionTargetQuery.Dispose();
         return Status.Running;
+    }
+
+    Type MissingType() {
+        if(ReferenceEquals(Agent.Value, null)) { return typeof(GameObject); }
+        if(ReferenceEquals(BodyParts.Value, null)) { return typeof(EnemyBodyParts); }
+        
+        return null;
     }
 
     protected override Status OnUpdate() {

@@ -17,8 +17,9 @@ public partial class RootMotionNavigateToLocationAction : Action
     [SerializeReference] public BlackboardVariable<bool> RotateTowardsTarget = new (true);
 
     protected override Status OnStart() {
-        if (ReferenceEquals(Agent?.Value, null)) {
-            Debug.LogError("Agent is missing.");
+        var missingType = MissingType();
+        if(missingType != null) {
+            Debug.LogError($"{missingType} is missing.");
             return Status.Failure;
         }
         
@@ -32,6 +33,12 @@ public partial class RootMotionNavigateToLocationAction : Action
         }
         
         return Status.Running;
+    }
+    
+    Type MissingType() {
+        if(ReferenceEquals(Agent.Value, null)) { return typeof(NavMeshAgent); }
+        
+        return null;
     }
 
     protected override Status OnUpdate() {

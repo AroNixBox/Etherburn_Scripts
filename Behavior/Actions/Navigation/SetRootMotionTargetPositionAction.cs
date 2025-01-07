@@ -28,10 +28,10 @@ public partial class SetRootMotionTargetPositionAction : Action
     [SerializeReference] public BlackboardVariable<float> MinAttackDistance;
     [SerializeReference] public BlackboardVariable<RootMotionDataWrapper.RootMotionType> RootMotionType;
 
-    protected override Status OnStart()
-    {
-        if (AreReferencesMissing()) {
-            Debug.LogError("RootMotionEndPosition, RootMotionDataWrapper, Target, AnimatorController or Self is missing.");
+    protected override Status OnStart() {
+        var missingType = MissingType();
+        if(missingType != null) {
+            Debug.LogError($"{missingType} is missing.");
             return Status.Failure;
         }
 
@@ -53,12 +53,13 @@ public partial class SetRootMotionTargetPositionAction : Action
         return Status.Success;
     }
 
-    bool AreReferencesMissing() => ReferenceEquals(RootMotionEndPosition, null)
-                                   || ReferenceEquals(RootMotionDataWrapper, null)
-                                   || ReferenceEquals(Self, null)
-                                   || ReferenceEquals(AnimationController, null)
-                                   || ReferenceEquals(CurrentAnimationState, null)
-                                   || ReferenceEquals(RootMotionType, null);
+    Type MissingType() {
+        if(ReferenceEquals(RootMotionDataWrapper.Value, null)) { return typeof(RootMotionDataWrapper); }
+        if(ReferenceEquals(AnimationController.Value, null)) { return typeof(AnimationController); }
+        if(ReferenceEquals(Self.Value, null)) { return typeof(GameObject); }
+        
+        return null; // If all checks passed, no type is missing
+    }
 
     RootMotionAnimationDataSO FindBestRootMotionData(Vector3 selfPosition) {
         RootMotionAnimationDataSO bestRootMotionData = null;

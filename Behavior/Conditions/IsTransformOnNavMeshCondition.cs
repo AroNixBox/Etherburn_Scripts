@@ -1,4 +1,5 @@
 using System;
+using Behavior.Conditions;
 using Unity.Behavior;
 using UnityEngine;
 using UnityEngine.AI;
@@ -9,27 +10,19 @@ public partial class IsTransformOnNavMeshCondition : Condition
 {
     [SerializeReference] public BlackboardVariable<Transform> Transform;
     [SerializeReference] public BlackboardVariable<NavMeshAgent> Agent;
-    [SerializeReference] public BlackboardVariable<Choice> Condition;
+    [SerializeReference] public BlackboardVariable<Comparison> Condition;
 
     public override bool IsTrue() {
         if (!NavMesh.SamplePosition(Transform.Value.position, out var hit, 0.1f, NavMesh.AllAreas)) {
-            return Condition.Value == Choice.IsNot;
+            return Condition.Value == Comparison.IsNot;
         }
     
         NavMeshPath path = new NavMeshPath();
         bool isPathComplete = Agent.Value.CalculatePath(hit.position, path) && path.status == NavMeshPathStatus.PathComplete;
     
-        return Condition.Value == Choice.Is ? isPathComplete : !isPathComplete;
+        return Condition.Value == Comparison.Is ? isPathComplete : !isPathComplete;
     }
-    public override void OnStart()
-    {
-    }
+    public override void OnStart() { }
 
-    public override void OnEnd()
-    {
-    }
-}
-public enum Choice {
-    Is,
-    IsNot
+    public override void OnEnd() { }
 }

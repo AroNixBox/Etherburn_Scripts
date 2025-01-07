@@ -22,6 +22,12 @@ public partial class DetectEntityInRangeAction : Action {
     List<Entity> _associatedPlayerEntities;
 
     protected override Status OnStart() {
+        var missingType = MissingType();
+        if(missingType != null) {
+            LogFailure($"Missing Type: {missingType}");
+            return Status.Failure;
+        }
+        
         // Get our Player
         var entityManager = EntityManager.Instance;
         if (entityManager == null) {
@@ -30,12 +36,6 @@ public partial class DetectEntityInRangeAction : Action {
         }
             
         _associatedPlayerEntities ??= entityManager.GetEntitiesOfType(EntityType.Player);
-        
-        // TODO: Check if Target is assigned and not null
-        if(ReferenceEquals(Agent.Value, null)) {
-            LogFailure("No Agent, Target or BodyParts assigned.");
-            return Status.Failure;
-        }
         
         _agent ??= Agent.Value.GetComponent<NavMeshAgent>();
         _entityVisionTargetQuery ??= new VisionTargetQuery<Entity>.Builder()
@@ -47,6 +47,12 @@ public partial class DetectEntityInRangeAction : Action {
         
         Application.quitting += () => _entityVisionTargetQuery.Dispose();
         return Status.Running;
+    }
+
+    Type MissingType() {
+        if(ReferenceEquals(Agent.Value, null)) { return typeof(GameObject); }
+
+        return null;
     }
 
     protected override Status OnUpdate() {

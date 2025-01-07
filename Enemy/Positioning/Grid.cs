@@ -149,9 +149,9 @@ namespace Enemy.Positioning {
             z = Mathf.FloorToInt((worldPosition - _calculatedCenterPosition).z / CellSize);
         }
         public void GetClosestXZ(Vector3 worldPosition, out int x, out int z) {
-            Vector3 relativePosition = worldPosition - _calculatedCenterPosition;
-            float rawX = relativePosition.x / CellSize;
-            float rawZ = relativePosition.z / CellSize;
+            var relativePosition = worldPosition - _calculatedCenterPosition;
+            var rawX = relativePosition.x / CellSize;
+            var rawZ = relativePosition.z / CellSize;
 
             // Round to the nearest whole number
             x = Mathf.RoundToInt(rawX);
@@ -160,6 +160,30 @@ namespace Enemy.Positioning {
             // Clamp the values to ensure they are within the grid bounds
             x = Mathf.Clamp(x, 0, Width - 1);
             z = Mathf.Clamp(z, 0, Height - 1);
+
+            // Check if the calculated grid cell exists
+            if (GetGridObject(x, z) == null) {
+                // Find the closest existing grid cell
+                float closestDistanceSqr = float.MaxValue;
+                int closestX = x, closestZ = z;
+
+                for (var dx = -1; dx <= 1; dx++) {
+                    for (var dz = -1; dz <= 1; dz++) {
+                        var newX = Mathf.Clamp(x + dx, 0, Width - 1);
+                        var newZ = Mathf.Clamp(z + dz, 0, Height - 1);
+                        if (GetGridObject(newX, newZ) == null) continue;
+                        var distanceSqr = (new Vector3(newX, 0, newZ) - new Vector3(x, 0, z)).sqrMagnitude;
+                        if (!(distanceSqr < closestDistanceSqr)) { continue; }
+                        
+                        closestDistanceSqr = distanceSqr;
+                        closestX = newX;
+                        closestZ = newZ;
+                    }
+                }
+
+                x = closestX;
+                z = closestZ;
+            }
         }
     
         // Get the Grid Object based on the XZ-Grid Position => (So World position needs to be converted before calling this)

@@ -273,11 +273,11 @@ namespace Enemy.Positioning {
                     
                     // Skip Cells smaller than Min Range or bigger than Max Range
                     if (gridDistanceSqr < minRangeSqr || gridDistanceSqr > maxRangeSqr) continue;
-                    // Get the Grid Object of all Cells in Range
+                    // Get the Grid Object of one of the Cells in range
                     var gridObject = _grid.GetGridObject(x, z);
 
                     if (gridObject == null) {
-                        Debug.LogError("Grid Object of Cell with X: " + x + " Z: " + z + " is null.");
+                        // Continue if one cell in range is not actually a grid cell (removed on creation)
                         continue;
                     }
                     

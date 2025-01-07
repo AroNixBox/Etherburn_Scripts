@@ -17,7 +17,7 @@ public partial class SmoothlyLookAtAction : Action
     [SerializeReference] public BlackboardVariable<Transform> Target;
     [SerializeReference] public BlackboardVariable<bool> SignalOnComplete;
     [SerializeReference] public BlackboardVariable<bool> LimitToYAxis;
-    [SerializeReference] public BlackboardVariable<float> RotationSpeed = new BlackboardVariable<float>(5f);
+    [SerializeReference] public BlackboardVariable<float> RotationSpeed = new(5f);
 
     protected override Status OnStart()
     {
@@ -28,6 +28,13 @@ public partial class SmoothlyLookAtAction : Action
         }
 
         return Status.Running;
+    }
+
+    Type MissingType() {
+        if(ReferenceEquals(Transform.Value, null)) { return typeof(Transform); }
+        if(ReferenceEquals(Target.Value, null)) { return typeof(Transform); }
+        
+        return null;
     }
 
     protected override Status OnUpdate() {

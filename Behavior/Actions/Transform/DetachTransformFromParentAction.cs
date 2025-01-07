@@ -10,15 +10,21 @@ public partial class DetachTransformFromParentAction : Action
 {
     [SerializeReference] public BlackboardVariable<Transform> Transform;
 
-    protected override Status OnStart()
-    {
-        if(ReferenceEquals(Transform.Value, null)) {
-            LogFailure("No Transform assigned.");
+    protected override Status OnStart() {
+        var missingType = MissingType();
+        if (missingType != null) {
+            Debug.LogError($"Missing Type: {missingType}");
             return Status.Failure;
         }
         
         Transform.Value.SetParent(null);
         return Status.Success;
+    }
+    
+    Type MissingType() {
+        if(ReferenceEquals(Transform.Value, null)) { return typeof(Transform); }
+        
+        return null;
     }
 
     protected override Status OnUpdate()
@@ -26,8 +32,6 @@ public partial class DetachTransformFromParentAction : Action
         return Status.Success;
     }
 
-    protected override void OnEnd()
-    {
-    }
+    protected override void OnEnd() { }
 }
 

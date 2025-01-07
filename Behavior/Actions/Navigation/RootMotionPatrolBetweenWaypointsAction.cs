@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Unity.Behavior;
 using UnityEngine;
 using UnityEngine.AI;
@@ -21,8 +22,14 @@ public partial class RootMotionPatrolBetweenWaypointsAction : Action
     int _currentPointIndex;
     
     protected override Status OnStart() {
-        if (Agent.Value == null || Waypoints.Value == null || Waypoints.Value.Count == 0) {
-            LogFailure("No Agent assigned or patrol points are missing.");
+        var missingType = MissingType();
+        if(missingType != null) {
+            Debug.LogError($"{missingType} is missing.");
+            return Status.Failure;
+        }
+        
+        if (Waypoints.Value.Count == 0 || Waypoints.Value.Any(waypoint => waypoint == null)) {
+            LogFailure("Too few waypoints or one of the waypoints is null.");
             return Status.Failure;
         }
 
@@ -32,6 +39,12 @@ public partial class RootMotionPatrolBetweenWaypointsAction : Action
         MoveToNextPoint();
 
         return Status.Running;
+    }
+    Type MissingType() {
+        if(ReferenceEquals(Agent.Value, null)) { return typeof(NavMeshAgent); }
+        if(ReferenceEquals(Waypoints.Value, null)) { return typeof(List<GameObject>); }
+        
+        return null;
     }
 
     protected override Status OnUpdate() {
