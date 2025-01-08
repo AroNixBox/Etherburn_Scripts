@@ -21,9 +21,9 @@ public partial class SmoothlyLookAtAction : Action
 
     protected override Status OnStart()
     {
-        if (Transform.Value == null || Target.Value == null)
-        {
-            LogFailure($"Missing Transform or Target.");
+        var missingType = MissingType();
+        if (missingType != null) {
+            Debug.LogError($"Missing required BlackboardVariable of type {missingType}.");
             return Status.Failure;
         }
 
@@ -38,15 +38,13 @@ public partial class SmoothlyLookAtAction : Action
     }
 
     protected override Status OnUpdate() {
-        if (ProcessSmoothLookAt())
-        {
+        if (ProcessSmoothLookAt()) { 
             return SignalOnComplete.Value ? Status.Success : Status.Running;
         }
         return Status.Running;
     }
 
-    bool ProcessSmoothLookAt()
-    {
+    bool ProcessSmoothLookAt() {
         Vector3 targetPosition = Target.Value.position;
 
         if (LimitToYAxis.Value)
