@@ -134,7 +134,7 @@ namespace Extensions {
             return validTargets;
         }
         
-        public T GetTargetInVisionCone(T targetToQuery) {
+        public T GetTargetInRangeAndVisionCone(T targetToQuery) {
             if(_head == null || _visionConeAngle == 0f || _detectionRadius == 0f || _rayCheckOrigins.Length == 0) {
                 Debug.LogError("VisionTargetQuery was not built for GetTargetInVisionCone(T targetToQuery).");
                 return null;

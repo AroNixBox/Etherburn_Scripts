@@ -6,7 +6,6 @@ using Player.Ability;
 using Player.Animation;
 using Player.Animation.MotionWarp;
 using Player.Input;
-using Player.States;
 using Player.Weapon;
 using TMPro;
 using UI;
@@ -203,10 +202,10 @@ namespace Player {
         }
 
         void Update() {
+            debugFPS.text = "FPS: " + (1.0f / Time.deltaTime).ToString("F2");
             if(_stateMachine == null) return;
             
             _stateMachine.Tick();
-            debugFPS.text = "FPS: " + (1.0f / Time.deltaTime).ToString("F2");
         }
         void FixedUpdate() {
             if(_stateMachine == null) return;

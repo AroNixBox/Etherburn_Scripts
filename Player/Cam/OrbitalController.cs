@@ -114,7 +114,7 @@ namespace Player.Cam {
                     return;
                 }
             
-                var allEnemies = entityManager.GetEntitiesOfType(lockOnEntityType);                
+                var allEnemies = entityManager.GetEntitiesOfType(lockOnEntityType, out _); // TODO: Use "_" if want to perform something when no more Enemies are alive                
                 var allEntitiesInVisionCone = _visionEnemyWarpTargetQuery.GetAllTargetsInVisionConeSorted(allEnemies);
                 if(allEntitiesInVisionCone.Count == 0) { return; }
 

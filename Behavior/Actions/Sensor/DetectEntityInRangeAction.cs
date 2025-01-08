@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using Extensions;
 using Unity.Behavior;
 using UnityEngine;
@@ -19,49 +17,70 @@ public partial class DetectEntityInRangeAction : Action {
 
     NavMeshAgent _agent;
     VisionTargetQuery<Entity> _entityVisionTargetQuery;
-    List<Entity> _associatedPlayerEntities;
+    Entity _associatedPlayerEntity;
+    
+    TargetEntitiesUnregisteredChannel _targetEntityUnregisteredBbv;
+    const string EntityUnregisteredChannelName = "TargetEntitiesUnregisteredChannel";
 
     protected override Status OnStart() {
         var missingType = MissingType();
-        if(missingType != null) {
+        if (missingType != null) {
             LogFailure($"Missing Type: {missingType}");
             return Status.Failure;
         }
-        
-        // Get our Player
+
         var entityManager = EntityManager.Instance;
         if (entityManager == null) {
-            Debug.LogError("Entity Manager ist not in the Scene!");
+            Debug.LogError("Entity Manager is not in the Scene!");
             return Status.Failure;
         }
-            
-        _associatedPlayerEntities ??= entityManager.GetEntitiesOfType(EntityType.Player);
-        
+
+        TargetEntitiesUnregisteredChannel targetEntitiesUnregisteredChannel = null;
+        _associatedPlayerEntity ??= entityManager.GetEntityOfType(TargetType.Value, out targetEntitiesUnregisteredChannel);
+
+        if (_associatedPlayerEntity == null) {
+            Debug.LogError($"{TargetType.Value} Entity not found");
+            return Status.Failure;
+        }
+
+        if (targetEntitiesUnregisteredChannel != null && _targetEntityUnregisteredBbv == null) {
+            if (!Agent.Value.TryGetComponent(out BehaviorGraphAgent behaviorGraphAgent)) {
+                Debug.LogError("BehaviorGraphAgent is not Attached to the Agent GameObject");
+                return Status.Failure;
+            }
+
+            if (!behaviorGraphAgent.BlackboardReference.GetVariableValue(EntityUnregisteredChannelName, out TargetEntitiesUnregisteredChannel assignedEntityUnregisteredChannel)) {
+                Debug.LogError($"Blackboard variable: {EntityUnregisteredChannelName} could not be set, the variable name is incorrect or the variable does not exist in the blackboard");
+                return Status.Failure;
+            }
+
+            if (assignedEntityUnregisteredChannel.name != targetEntitiesUnregisteredChannel.name) {
+                if (!behaviorGraphAgent.BlackboardReference.SetVariableValue(EntityUnregisteredChannelName, targetEntitiesUnregisteredChannel)) {
+                    Debug.LogError($"Blackboard variable: {EntityUnregisteredChannelName} could not be set, the variable name is incorrect or the variable does not exist in the blackboard");
+                    return Status.Failure;
+                }
+            }
+        }
+
         _agent ??= Agent.Value.GetComponent<NavMeshAgent>();
         _entityVisionTargetQuery ??= new VisionTargetQuery<Entity>.Builder()
-                .SetHead(Agent.Value.transform)
-                .SetDetectionRadius(DetectionRadius.Value)
-                .SetDebug(ShowDebug.Value)
-                .Build<Entity>();
-        
-        
+            .SetHead(Agent.Value.transform)
+            .SetDetectionRadius(DetectionRadius.Value)
+            .SetDebug(ShowDebug.Value)
+            .Build<Entity>();
+
         Application.quitting += () => _entityVisionTargetQuery.Dispose();
         return Status.Running;
     }
 
     Type MissingType() {
-        if(ReferenceEquals(Agent.Value, null)) { return typeof(GameObject); }
-
-        return null;
+        return ReferenceEquals(Agent.Value, null) ? typeof(GameObject) : null;
     }
 
     protected override Status OnUpdate() {
-        var targetsSorted = _entityVisionTargetQuery.GetAllTargetsInRangeWithOutLineOfSightSorted(_associatedPlayerEntities);
-        if(targetsSorted.Count == 0) {
-            return Status.Failure;
-        }
+        var targetsSorted = _entityVisionTargetQuery.GetTargetInRangeWithOutVisionCone(_associatedPlayerEntity);
         
-        Target.Value = targetsSorted.First().gameObject;
+        Target.Value = targetsSorted.gameObject;
         return Status.Success;
     }
 

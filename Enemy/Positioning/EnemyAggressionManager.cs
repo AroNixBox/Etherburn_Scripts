@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 namespace Enemy.Positioning {
@@ -7,7 +6,12 @@ namespace Enemy.Positioning {
     public class EnemyAggressionManager : MonoBehaviour {
         public static EnemyAggressionManager Instance;
         [SerializeField] PositioningGrid positioningGrid;
+        
         Transform _playerTransform;
+        TargetEntitiesUnregisteredChannel _targetEntityUnregisteredChannel;
+        TargetEntitiesUnregisteredChannel.TargetEntitiesUnregisteredChannelEventHandler _handler;
+        bool _isPlayerUnregistered;
+        
         // Enemies
         readonly List<EnemyData> _inactiveEnemyDatas = new(); // Sleeping
         EnemyData _activeEnemyData; // Active
@@ -23,10 +27,22 @@ namespace Enemy.Positioning {
 
         async void Start() {
             await EntityManager.Instance.WaitTillInitialized();
-            _playerTransform = EntityManager.Instance.GetEntitiesOfType(EntityType.Player).First().transform;
+            _playerTransform = EntityManager.Instance.GetEntityOfType(EntityType.Player, out _targetEntityUnregisteredChannel).transform;
+            
+            if (_targetEntityUnregisteredChannel != null) {
+                // Create a delegate instance and subscribe to the event
+                _handler = HandlePlayerUnregistered;
+                _targetEntityUnregisteredChannel.RegisterListener(_handler);
+            }
+            
             positioningGrid.OnPlayerGridPositionChanged += ReevaluateEnemyBehavior;
         }
-        
+
+        void HandlePlayerUnregistered() {
+            positioningGrid.OnPlayerGridPositionChanged -= ReevaluateEnemyBehavior;
+            _isPlayerUnregistered = true;
+        } 
+        void HandlePlayerUnregisteredWarning() => Debug.LogWarning("Player is unregistered, no need to register the enemy");
         void ReevaluateEnemyBehavior() {
             // Swap out the active enemy if there is a closer inactive enemy
             var closestEnemyToPlayer = GetClosestInactiveEnemyToPlayer();
@@ -77,7 +93,12 @@ namespace Enemy.Positioning {
         }
         // Note: When Calling this for reregistering an enemy to be inactive, make sure [_activeEnemyData] is null, otherwise it will be set as active enemy
         public void RegisterEnemy(GameObject enemy, OptimalPositionChanged optimalPositionChangedChannel, ChangeAggressionChannel changeAggressionChannel) {
-           if (!_inactiveEnemyDatas.Exists(e => e.Enemy.name == enemy.name)) {
+            if(_isPlayerUnregistered) {
+                HandlePlayerUnregisteredWarning();
+                return;
+            }
+            
+            if (!_inactiveEnemyDatas.Exists(e => e.Enemy.name == enemy.name)) {
                // Create DataObject for the enemy
                 var enemyData = new EnemyData {
                     Enemy = enemy,
@@ -148,6 +169,11 @@ namespace Enemy.Positioning {
            }
         }
         public void UnregisterEnemy(GameObject enemy) {
+            if(_isPlayerUnregistered) {
+                HandlePlayerUnregisteredWarning();
+                return;
+            }
+            
             // TODO: HANDLE: _activeEnemyData.Enemy
             if (_activeEnemyData != null && _activeEnemyData.Enemy != null && _activeEnemyData.Enemy.name == enemy.name) {
                 // This enemy was the active enemy
@@ -212,7 +238,6 @@ namespace Enemy.Positioning {
             enemyData.OptimalPositionChangedChannel.SendEventMessage(enemyData.CurrentCell.NavMeshSamplePosition);
             return true;
         }
-        
         EnemyData GetClosestInactiveEnemyToPlayer() {
             EnemyData closestEnemy = null;
             var closestDistance = float.MaxValue;
@@ -231,6 +256,15 @@ namespace Enemy.Positioning {
         bool IsDistanceToPlayerCloser(GameObject enemy, float distanceToCompareWith) {
             return (enemy.transform.position - _playerTransform.position).sqrMagnitude < distanceToCompareWith;
         }
+
+        void OnDestroy() {
+            if (_targetEntityUnregisteredChannel != null && _handler != null) {
+                _targetEntityUnregisteredChannel.UnregisterListener(_handler);
+            }
+            
+            positioningGrid.OnPlayerGridPositionChanged -= ReevaluateEnemyBehavior;
+        }
+
         class EnemyData {
             public GameObject Enemy;
             public PositioningGridObject CurrentCell;

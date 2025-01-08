@@ -30,9 +30,14 @@ namespace Enemy.Positioning {
         [SerializeField] Transform navMeshReachabilityChecker;
         
         // Query
+        [BoxGroup("Query Settings")]
+        public EntityType playerType = EntityType.Player;
         [ReadOnly]
         [BoxGroup("Query Settings")]
-        public GameObject positioningAnker;
+        [ShowInInspector]
+        GameObject _positioningAnker;
+        TargetEntitiesUnregisteredChannel _targetEntitiesUnregisteredChannel;
+        TargetEntitiesUnregisteredChannel.TargetEntitiesUnregisteredChannelEventHandler _handler;
         
         [HorizontalGroup("Query Settings/Split", LabelWidth = 100)]
         [VerticalGroup("Query Settings/Split/Range")]
@@ -58,13 +63,23 @@ namespace Enemy.Positioning {
             
             // Wait till the EntityManager is initialized
             await EntityManager.Instance.WaitTillInitialized();
-            positioningAnker = EntityManager.Instance.GetEntitiesOfType(EntityType.Player).First().gameObject;
+            _positioningAnker = EntityManager.Instance.GetEntityOfType(playerType, out _targetEntitiesUnregisteredChannel).gameObject;
+            
+            if (_targetEntitiesUnregisteredChannel != null) {
+                // Create a delegate instance and subscribe to the event
+                _handler = HandlePlayerUnregistered;
+                _targetEntitiesUnregisteredChannel.RegisterListener(_handler);
+            }
             
 #if UNITY_EDITOR
             if (drawDebug) {
                 _redrawScope = new RedrawScope();
             } 
 #endif
+        }
+
+        void HandlePlayerUnregistered() {
+            
         }
 
         void LoadGridFromScriptableObject() {
@@ -179,14 +194,14 @@ namespace Enemy.Positioning {
         }
 
         void TrackPlayerOnGrid() {
-            if (positioningAnker == null) { return; }
+            if (_positioningAnker == null) { return; }
 
             if (_grid == null) {
                 Debug.LogWarning("Grid is not initialized.");
                 return;
             }
 
-            _grid.GetXZ(positioningAnker.transform.position, out var currentX, out var currentZ);
+            _grid.GetXZ(_positioningAnker.transform.position, out var currentX, out var currentZ);
             var currentGridObject = _grid.GetGridObject(currentX, currentZ);
 
             if (_lastGridObject == currentGridObject) {
@@ -195,7 +210,7 @@ namespace Enemy.Positioning {
             
             if(currentGridObject == null) {
                 // Fallback, player is not on grid, get the closest grid cell
-                _grid.GetClosestXZ(positioningAnker.transform.position, out currentX, out currentZ);
+                _grid.GetClosestXZ(_positioningAnker.transform.position, out currentX, out currentZ);
                 currentGridObject = _grid.GetGridObject(currentX, currentZ);
 
                 if (currentGridObject == null) {
@@ -400,17 +415,22 @@ namespace Enemy.Positioning {
 
         void OnDrawGizmosSelected() {
 #if UNITY_EDITOR
-            if(positioningAnker == null) { return; }
+            if (_positioningAnker == null) {
+                var entities = FindObjectsByType<Entity>(FindObjectsSortMode.None);
+                if(entities.Length == 0) { return; }
+                var playerEntity = entities.FirstOrDefault(entity => entity.EntityType == playerType);
+                if(playerEntity == null) { return; }
+                _positioningAnker = playerEntity.gameObject;
+            }            
             // Draw range spheres for the query
-            UnityEditor.Handles.color = new Color(1f, 0f, 0f); // Semi-transparent green
-            UnityEditor.Handles.DrawWireDisc(positioningAnker.transform.position, Vector3.up, maxQueryRange);
-            UnityEditor.Handles.DrawWireDisc(positioningAnker.transform.position, Vector3.up, minQueryRange);
+            UnityEditor.Handles.color = new Color(1f, 0f, 0f);
+            UnityEditor.Handles.DrawWireDisc(_positioningAnker.transform.position, Vector3.up, maxQueryRange);
+            UnityEditor.Handles.DrawWireDisc(_positioningAnker.transform.position, Vector3.up, minQueryRange);
 #endif
         }
 
         void OnDrawGizmos() {
             if (!drawDebug) { return; }
-            
             
             // Grid
             if (boundsTransforms is not { Length: 4 }) {

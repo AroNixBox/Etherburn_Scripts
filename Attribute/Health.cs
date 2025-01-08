@@ -6,7 +6,7 @@ namespace Attribute {
         public Vector3 HitPosition { get; private set; }
         public bool HasTakenDamage { get; set; }
         public bool HasDied { get; set; }
-
+        
         public override void Decrease(float amount, Vector3? hitPosition = null) {
             base.Decrease(amount, hitPosition);
             
@@ -15,13 +15,16 @@ namespace Attribute {
                 // Get the direction
                 HitPosition = hitPosition.Value;
             }
+            HasTakenDamage = true;
             
             // Flags for State Machines
-            if (CurrentEnergy <= 0) {
-                HasDied = true;
-            }
+            if (!(CurrentEnergy <= 0)) return;
+            HasDied = true;
+
+            if (EntityManager.Instance == null) { return; }
+            if(!TryGetComponent(out Entity entity)) { return; }
             
-            HasTakenDamage = true;
+            EntityManager.Instance.UnregisterEntity(entity);
         }
     }
 }
