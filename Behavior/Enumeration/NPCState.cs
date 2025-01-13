@@ -3,7 +3,7 @@ using Unity.Behavior;
 [BlackboardEnum]
 public enum NPCState {
 	None,
-    Patrol,
+    BehaviorHub,
 	Agressive,
 	Hurt,
 	Die,

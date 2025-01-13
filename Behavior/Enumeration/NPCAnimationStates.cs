@@ -5,6 +5,8 @@ using Unity.Behavior;
 public enum NPCAnimationStates {
 	None,
     GroundLocomotion,
+    Hub_Idle,
+    Hub_Sit,
 	AttackA,
 	AttackB,
 	Eat,

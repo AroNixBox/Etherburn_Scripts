@@ -28,9 +28,7 @@ public partial class AnimationCrossfadeAction : Action {
     }
     
     Type MissingType() {
-        if(ReferenceEquals(AnimationController.Value, null)) { return typeof(AnimationController); }
-        
-        return null; // If all checks passed, no type is missing
+        return ReferenceEquals(AnimationController.Value, null) ? typeof(AnimationController) : null; // If all checks passed, no type is missing
     }
     protected override Status OnUpdate() {
         if (_countdownTimer.IsFinished) {

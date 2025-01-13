@@ -1,0 +1,267 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-1877092664341408046
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c02bb70996b49eba31d0c206e28da24, type: 3}
+  m_Name: BB_Hub
+  m_EditorClassIdentifier: 
+  VersionTimestamp: 638720459316030314
+  AssetID:
+    m_Value0: 7272953664744999790
+    m_Value1: 13773225359391514811
+  m_Blackboard:
+    m_Variables:
+    - rid: 1788444943808987711
+    - rid: 1788444943808987712
+    - rid: 1788444943808987713
+    - rid: 1788444943808987714
+    - rid: 1788444943808987715
+    - rid: 1788444943808987716
+    - rid: 1788444943808987717
+    - rid: 1788444943808987718
+    - rid: 1788444943808987719
+    - rid: 1788444943808987720
+  m_SharedBlackboardVariableGuids: []
+  references:
+    version: 2
+    RefIds:
+    - rid: 1788444943808987711
+      type: {class: 'BlackboardVariable`1[[System.Collections.Generic.List`1[[UnityEngine.GameObject, UnityEngine.CoreModule]], mscorlib]]',
+        ns: Unity.Behavior, asm: Unity.Behavior}
+      data:
+        GUID:
+          m_Value0: 13433469354623615924
+          m_Value1: 13889410442516146130
+        Name: Waypoints
+        m_Value: []
+    - rid: 1788444943808987712
+      type: {class: 'BlackboardVariable`1[[UnityEngine.Animator, UnityEngine.AnimationModule]]',
+        ns: Unity.Behavior, asm: Unity.Behavior}
+      data:
+        GUID:
+          m_Value0: 8154733611987522852
+          m_Value1: 14356691213306761371
+        Name: Animator
+        m_Value: {fileID: 0}
+    - rid: 1788444943808987713
+      type: {class: 'BlackboardVariable`1[[System.Single, mscorlib]]', ns: Unity.Behavior,
+        asm: Unity.Behavior}
+      data:
+        GUID:
+          m_Value0: 9409998077768283036
+          m_Value1: 13064459172168061708
+        Name: MovementSpeed
+        m_Value: 0
+    - rid: 1788444943808987714
+      type: {class: 'BlackboardVariable`1[[System.Single, mscorlib]]', ns: Unity.Behavior,
+        asm: Unity.Behavior}
+      data:
+        GUID:
+          m_Value0: 17322259304839465687
+          m_Value1: 8578517461773672973
+        Name: ForceWaitTimeAfterAgressionLoss
+        m_Value: 0
+    - rid: 1788444943808987715
+      type: {class: 'BlackboardVariable`1[[System.Single, mscorlib]]', ns: Unity.Behavior,
+        asm: Unity.Behavior}
+      data:
+        GUID:
+          m_Value0: 6642157499696650426
+          m_Value1: 4417964012185766870
+        Name: DetectionFrequency
+        m_Value: 0
+    - rid: 1788444943808987716
+      type: {class: 'BlackboardVariable`1[[UnityEngine.GameObject, UnityEngine.CoreModule]]',
+        ns: Unity.Behavior, asm: Unity.Behavior}
+      data:
+        GUID:
+          m_Value0: 897647989792338321
+          m_Value1: 15508799407188252732
+        Name: Target
+        m_Value: {fileID: 0}
+    - rid: 1788444943808987717
+      type: {class: 'BlackboardVariable`1[[System.Single, mscorlib]]', ns: Unity.Behavior,
+        asm: Unity.Behavior}
+      data:
+        GUID:
+          m_Value0: 15127828242916184397
+          m_Value1: 7088964773615760078
+        Name: DetectionRange
+        m_Value: 0
+    - rid: 1788444943808987718
+      type: {class: 'BlackboardVariable`1[[System.Single, mscorlib]]', ns: Unity.Behavior,
+        asm: Unity.Behavior}
+      data:
+        GUID:
+          m_Value0: 11929294296602619382
+          m_Value1: 16082917192767341321
+        Name: VisionConeAngle
+        m_Value: 0
+    - rid: 1788444943808987719
+      type: {class: 'BlackboardVariable`1[[System.Boolean, mscorlib]]', ns: Unity.Behavior,
+        asm: Unity.Behavior}
+      data:
+        GUID:
+          m_Value0: 3420236208760053296
+          m_Value1: 8575391977942592957
+        Name: ShowDebug
+        m_Value: 0
+    - rid: 1788444943808987720
+      type: {class: 'BlackboardVariable`1[[NpcStateChanged, Assembly-CSharp]]', ns: Unity.Behavior,
+        asm: Unity.Behavior}
+      data:
+        GUID:
+          m_Value0: 15181085963382864615
+          m_Value1: 16351030146618402708
+        Name: NPC State Channel
+        m_Value: {fileID: 0}
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2dd922ae02c94c87a66e46a10a7319b9, type: 3}
+  m_Name: BB_Hub
+  m_EditorClassIdentifier: 
+  AssetID:
+    m_Value0: 7272953664744999790
+    m_Value1: 13773225359391514811
+  m_Variables:
+  - rid: 1788444943653273882
+  - rid: 1788444943653274234
+  - rid: 1788444943653274581
+  - rid: 1788444943735063315
+  - rid: 1788444943769665895
+  - rid: 1788444943787753734
+  - rid: 1788444943787753735
+  - rid: 1788444943787753736
+  - rid: 1788444943787754054
+  - rid: 1788444943808987710
+  m_VersionTimestamp: 638720459316030314
+  m_CommandBuffer:
+    m_Commands: []
+  m_RuntimeBlackboardAsset: {fileID: -1877092664341408046}
+  references:
+    version: 2
+    RefIds:
+    - rid: 1788444943653273882
+      type: {class: 'TypedVariableModel`1[[System.Collections.Generic.List`1[[UnityEngine.GameObject, UnityEngine.CoreModule]], mscorlib]]',
+        ns: Unity.Behavior.GraphFramework, asm: Unity.Behavior.GraphFramework}
+      data:
+        ID:
+          m_Value0: 13433469354623615924
+          m_Value1: 13889410442516146130
+        Name: Waypoints
+        IsExposed: 1
+        m_IsShared: 0
+        m_Value: []
+    - rid: 1788444943653274234
+      type: {class: 'TypedVariableModel`1[[UnityEngine.Animator, UnityEngine.AnimationModule]]',
+        ns: Unity.Behavior.GraphFramework, asm: Unity.Behavior.GraphFramework}
+      data:
+        ID:
+          m_Value0: 8154733611987522852
+          m_Value1: 14356691213306761371
+        Name: Animator
+        IsExposed: 1
+        m_IsShared: 0
+        m_Value: {fileID: 0}
+    - rid: 1788444943653274581
+      type: {class: 'TypedVariableModel`1[[System.Single, mscorlib]]', ns: Unity.Behavior.GraphFramework,
+        asm: Unity.Behavior.GraphFramework}
+      data:
+        ID:
+          m_Value0: 9409998077768283036
+          m_Value1: 13064459172168061708
+        Name: MovementSpeed
+        IsExposed: 1
+        m_IsShared: 0
+        m_Value: 0
+    - rid: 1788444943735063315
+      type: {class: 'TypedVariableModel`1[[System.Single, mscorlib]]', ns: Unity.Behavior.GraphFramework,
+        asm: Unity.Behavior.GraphFramework}
+      data:
+        ID:
+          m_Value0: 17322259304839465687
+          m_Value1: 8578517461773672973
+        Name: ForceWaitTimeAfterAgressionLoss
+        IsExposed: 1
+        m_IsShared: 0
+        m_Value: 0
+    - rid: 1788444943769665895
+      type: {class: 'TypedVariableModel`1[[System.Single, mscorlib]]', ns: Unity.Behavior.GraphFramework,
+        asm: Unity.Behavior.GraphFramework}
+      data:
+        ID:
+          m_Value0: 6642157499696650426
+          m_Value1: 4417964012185766870
+        Name: DetectionFrequency
+        IsExposed: 1
+        m_IsShared: 0
+        m_Value: 0
+    - rid: 1788444943787753734
+      type: {class: 'TypedVariableModel`1[[UnityEngine.GameObject, UnityEngine.CoreModule]]',
+        ns: Unity.Behavior.GraphFramework, asm: Unity.Behavior.GraphFramework}
+      data:
+        ID:
+          m_Value0: 897647989792338321
+          m_Value1: 15508799407188252732
+        Name: Target
+        IsExposed: 1
+        m_IsShared: 0
+        m_Value: {fileID: 0}
+    - rid: 1788444943787753735
+      type: {class: 'TypedVariableModel`1[[System.Single, mscorlib]]', ns: Unity.Behavior.GraphFramework,
+        asm: Unity.Behavior.GraphFramework}
+      data:
+        ID:
+          m_Value0: 15127828242916184397
+          m_Value1: 7088964773615760078
+        Name: DetectionRange
+        IsExposed: 1
+        m_IsShared: 0
+        m_Value: 0
+    - rid: 1788444943787753736
+      type: {class: 'TypedVariableModel`1[[System.Single, mscorlib]]', ns: Unity.Behavior.GraphFramework,
+        asm: Unity.Behavior.GraphFramework}
+      data:
+        ID:
+          m_Value0: 11929294296602619382
+          m_Value1: 16082917192767341321
+        Name: VisionConeAngle
+        IsExposed: 1
+        m_IsShared: 0
+        m_Value: 0
+    - rid: 1788444943787754054
+      type: {class: 'TypedVariableModel`1[[System.Boolean, mscorlib]]', ns: Unity.Behavior.GraphFramework,
+        asm: Unity.Behavior.GraphFramework}
+      data:
+        ID:
+          m_Value0: 3420236208760053296
+          m_Value1: 8575391977942592957
+        Name: ShowDebug
+        IsExposed: 1
+        m_IsShared: 0
+        m_Value: 0
+    - rid: 1788444943808987710
+      type: {class: 'TypedVariableModel`1[[NpcStateChanged, Assembly-CSharp]]', ns: Unity.Behavior.GraphFramework,
+        asm: Unity.Behavior.GraphFramework}
+      data:
+        ID:
+          m_Value0: 15181085963382864615
+          m_Value1: 16351030146618402708
+        Name: NPC State Channel
+        IsExposed: 1
+        m_IsShared: 0
+        m_Value: {fileID: 0}
