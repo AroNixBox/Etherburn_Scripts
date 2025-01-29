@@ -24,18 +24,7 @@ namespace Game {
                 Destroy(gameObject);
             }
         }
-
-        void Start() {
-            StartLevelOne();
-        }
-        
-        // TODO: Call from Button
-        [Button]
-        void StartLevelOne() {
-            StartCoroutine(LoadScenesAsync(SceneData.ELevelType.Level_One));
-        }
-        
-        IEnumerator LoadScenesAsync(SceneData.ELevelType levelType) {
+        public IEnumerator LoadScenesAsync(SceneData.ELevelType levelType) {
             if(sceneData == null) {
                 Debug.LogError("SceneData is not set in the inspector", transform);
             }

@@ -16,9 +16,9 @@ namespace Player.Input {
     public class InputReader : ScriptableObject, PlayerInputActions.IPlayerActions, PlayerInputActions.IUIActions, PlayerInputActions.IGlobalActions, IInputReader {
         [SerializeField] ActionMapName initialActionMap = ActionMapName.Player;
         // The actual input actions asset. This will be initialized in EnablePlayerActions
-        PlayerInputActions _inputActions;
+        public PlayerInputActions InputActions { get; private set; }
         ActionMapName _currentActionMap;
-        Dictionary<ActionMapName, InputActionMap> _actionMaps = new();
+        readonly Dictionary<ActionMapName, InputActionMap> _actionMaps = new();
         
         #region Player Map Input Action Callbacks
 
@@ -26,8 +26,6 @@ namespace Player.Input {
         public event UnityAction<Vector2> Move = delegate { };
         public event UnityAction<Vector2, bool> Look = delegate { };
         public event UnityAction<bool> IsLooking = delegate { };
-        public event UnityAction EnableMouseControlCamera = delegate { };
-        public event UnityAction DisableMouseControlCamera = delegate { };
         public event UnityAction<bool> Dodge = delegate { };
         public event UnityAction<bool> Run = delegate { };
         public event UnityAction<bool> Attack = delegate { };
@@ -36,11 +34,11 @@ namespace Player.Input {
         public event UnityAction LockOnTarget = delegate { };
 
         // Helper method to check if the jump key is currently pressed
-        public bool IsJumpKeyPressed() => _inputActions.Player.Jump.IsPressed();
+        public bool IsJumpKeyPressed() => InputActions.Player.Jump.IsPressed();
         
         // Properties to get current movement and look directions
-        public Vector2 Direction => _inputActions.Player.Move.ReadValue<Vector2>();
-        public Vector2 LookDirection => _inputActions.Player.Look.ReadValue<Vector2>();
+        public Vector2 Direction => InputActions.Player.Move.ReadValue<Vector2>();
+        public Vector2 LookDirection => InputActions.Player.Look.ReadValue<Vector2>();
         
         #endregion
         
@@ -135,18 +133,6 @@ namespace Player.Input {
             }
         }
 
-        // Called when the player toggles mouse control for the camera
-        public void OnMouseControlCamera(InputAction.CallbackContext context) {
-            switch (context.phase) {
-                case InputActionPhase.Started:
-                    EnableMouseControlCamera.Invoke();
-                    break;
-                case InputActionPhase.Canceled:
-                    DisableMouseControlCamera.Invoke();
-                    break;
-            }
-        }
-
         // Called when the player starts or stops running
         public void OnRun(InputAction.CallbackContext context) {
             switch (context.phase) {
@@ -234,23 +220,29 @@ namespace Player.Input {
         }
 
         #endregion
+
+        public void InitializeInputActionAsset() {
+            InputActions = new PlayerInputActions();
+        }
+        
         // Called in IInputReader on Enable
         public void EnablePlayerActions() {
-            if (_inputActions == null) {
-                _inputActions = new PlayerInputActions();
-                _inputActions.Player.SetCallbacks(this);
-                _inputActions.UI.SetCallbacks(this);
-                _inputActions.Global.SetCallbacks(this);
-                InitializeActionMaps();
+            if(InputActions == null) {
+                InitializeInputActionAsset();
             }
+            
+            InputActions.Player.SetCallbacks(this);
+            InputActions.UI.SetCallbacks(this);
+            InputActions.Global.SetCallbacks(this);
+            InitializeActionMaps();
 
             switch (initialActionMap) {
                 case ActionMapName.Player:
-                    _inputActions.Player.Enable();
+                    InputActions.Player.Enable();
                     _currentActionMap = ActionMapName.Player;
                     break;
                 case ActionMapName.UI:
-                    _inputActions.UI.Enable();
+                    InputActions.UI.Enable();
                     _currentActionMap = ActionMapName.UI;
                     break;
                 default: 
@@ -258,13 +250,13 @@ namespace Player.Input {
                     break;
             }
             
-            _inputActions.Global.Enable();
+            InputActions.Global.Enable();
         }
-        
+        public bool IsActionMapActive(ActionMapName mapName) => _currentActionMap == mapName;
         void InitializeActionMaps() {
-            AddActionMap(ActionMapName.Player, _inputActions.Player);
-            AddActionMap(ActionMapName.UI, _inputActions.UI);
-            AddActionMap(ActionMapName.Global, _inputActions.Global);
+            AddActionMap(ActionMapName.Player, InputActions.Player);
+            AddActionMap(ActionMapName.UI, InputActions.UI);
+            AddActionMap(ActionMapName.Global, InputActions.Global);
             // TODO: Add more action maps here
         }
         void AddActionMap(ActionMapName mapName, InputActionMap actionMap) {
@@ -274,7 +266,7 @@ namespace Player.Input {
         }
 
         public void SwitchActionMap(ActionMapName newMap) {
-            if (_inputActions == null) {
+            if (InputActions == null) {
                 Debug.LogError("InputActions not initialized");
                 return;
             }
