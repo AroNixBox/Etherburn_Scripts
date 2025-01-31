@@ -1,7 +1,9 @@
+using Player.Input;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 namespace UI.Menu {
@@ -10,9 +12,6 @@ namespace UI.Menu {
         [Title("Buttons")] 
         [SerializeField, Required] Button firstSelectedOptionsButton;
         [SerializeField, Required] Button closeButton;
-
-        [Title("Panels")] 
-        [SerializeField, Required] GameObject optionsPanel;
         
         [Header("Events")]
         [SerializeField] UnityEvent onCloseButtonPressed;
@@ -28,13 +27,28 @@ namespace UI.Menu {
                 return;
             }
             
-            _sceneEventSystem.SetSelectedGameObject(firstSelectedOptionsButton.gameObject);
-        }
+            // Check if a controller is connected
+            if (InputUtils.IsUsingController()) {
+                _sceneEventSystem.SetSelectedGameObject(firstSelectedOptionsButton.gameObject);
+            }
 
+            // Subscribe to device change events
+            InputSystem.onDeviceChange += OnDeviceChange;
+        }
+        
         void Start() {
             SetupButtonNavigation();
-            
-            // Find all RebindButtons in children
+        }
+
+        /// <summary>
+        /// Handles device change events to set the selected game object when a controller is connected.
+        /// </summary>
+        void OnDeviceChange(InputDevice device, InputDeviceChange change) {
+            if (change == InputDeviceChange.Added && device is Gamepad) {
+                _sceneEventSystem.SetSelectedGameObject(firstSelectedOptionsButton.gameObject);
+            } else if (change == InputDeviceChange.Removed && device is Gamepad) {
+                _sceneEventSystem.SetSelectedGameObject(null);
+            }
         }
 
         void SetupButtonNavigation() {
@@ -44,6 +58,12 @@ namespace UI.Menu {
         void CloseMenu() {
             // Invoke the event
             onCloseButtonPressed.Invoke();
+        }
+        
+        
+        void OnDisable() {
+            // Unsubscribe from device change events
+            InputSystem.onDeviceChange -= OnDeviceChange;
         }
     }
 }

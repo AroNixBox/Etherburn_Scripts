@@ -1,28 +1,27 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Player.Input;
-using Sirenix.OdinInspector;
+using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.SceneManagement;
 
 namespace UI.Menu {
     public class RebindHandler : MonoBehaviour {
         [SerializeField] InputReader inputReader;
         [SerializeField] RectTransform rebindOverlay;
+        [SerializeField] TMP_Text rebindOverlayText;
 
         PlayerInputActions _inputActions;
         Action _rebindCanceled;
         Action _rebindCompleted;
         Action<InputAction, int> _rebindStarted;
 
-        void Start() {
+        void Awake() {
             inputReader.InitializeInputActionAsset();
+            _inputActions = inputReader.InputActions;
         }
 
-        public void StartRebind(string actionName, int bindingIndex, bool excludeMouse) {
-            _inputActions = inputReader.InputActions;
-            
-            // Find the Input Action based on its name
+        public void StartRebind(string actionName, int bindingIndex, bool excludeMouse, Action rebindCompleted) {
             InputAction action = _inputActions.FindAction(actionName);
 
             if (action == null || action.bindings.Count <= bindingIndex) {
@@ -30,85 +29,74 @@ namespace UI.Menu {
                 return;
             }
 
-            // If it is valid check if it is a composite
-            // Iterate through each each composite part and rebind it
             if (action.bindings[bindingIndex].isComposite) {
-                // TODO: Change here that we dont change all composite parts in a row but rather one by one
-                
-                var firstPartIndex = bindingIndex + 1;
-
-                if (firstPartIndex < action.bindings.Count && action.bindings[firstPartIndex].isComposite) {
-                    PerformRebind(action, bindingIndex, true, excludeMouse);
-                }
-            }
-            else {
-                PerformRebind(action, bindingIndex, false, excludeMouse);
+                PerformCompositeRebind(action, bindingIndex, excludeMouse, rebindCompleted);
+            } else {
+                PerformRebind(action, bindingIndex, excludeMouse, rebindCompleted);
             }
         }
 
-        void PerformRebind(InputAction actionToRebind, int bindingIndex, bool allCompositeParts, bool excludeMouse) {
+        void PerformRebind(InputAction actionToRebind, int bindingIndex, bool excludeMouse, Action rebindCompleted) {
             if (actionToRebind == null || bindingIndex < 0) {
                 Debug.LogError("Action or Binding not found");
                 return;
             }
 
             Debug.Log($"Rebinding action: {actionToRebind.name}, binding index: {bindingIndex}");
-            // Print the old binding
-            Debug.Log("Old binding: " + actionToRebind.GetBindingDisplayString(bindingIndex));
 
-            rebindOverlay.gameObject.SetActive(true); // enable the overlay
+            rebindOverlay.gameObject.SetActive(true);
+            // Change to text to show the current action being rebound, if it is a composite, we show the name of the composite part
+            var bindingName = actionToRebind.bindings[bindingIndex].isPartOfComposite
+                ? actionToRebind.bindings[bindingIndex].name
+                : actionToRebind.name;
+            
+            var rebindInformation = $"Rebinding: <b>{bindingName}</b>, press ANY key to rebind";
+            rebindOverlayText.text = rebindInformation;
             actionToRebind.Disable();
 
-            var rebind = actionToRebind.PerformInteractiveRebinding(bindingIndex);
-            
-            // Handle rebind completion
-            rebind.OnComplete(operation => {
-                Debug.Log("Rebind completed, Rebinded: " + actionToRebind.name + " with: " + operation.selectedControl.displayName);
-                
-                rebindOverlay.gameObject.SetActive(false);
-                actionToRebind.Enable();
-                // Print the current binding that we overrode
-                Debug.Log("Current binding: " + actionToRebind.GetBindingDisplayString(bindingIndex));
-                
-                operation.Dispose();
-                
+            var rebind = actionToRebind.PerformInteractiveRebinding(bindingIndex)
+                .WithCancelingThrough("<Keyboard>/escape")
+                .OnComplete(operation => {
+                    Debug.Log("Rebind completed, Rebinded: " + actionToRebind.name + " with: " + operation.selectedControl.displayName);
 
-                if (allCompositeParts) {
-                    var nextBindingIndex = bindingIndex + 1;
-                    if (nextBindingIndex < actionToRebind.bindings.Count &&
-                        actionToRebind.bindings[nextBindingIndex].isComposite) {
-                        Debug.Log("Rebinding next composite part");
-                        PerformRebind(actionToRebind, nextBindingIndex, true, excludeMouse);
+                    rebindOverlay.gameObject.SetActive(false);
+                    actionToRebind.Enable();
+                    Debug.Log("Current binding: " + actionToRebind.GetBindingDisplayString(bindingIndex));
+
+                    operation.Dispose();
+                    rebindCompleted?.Invoke();
+                    _rebindCompleted?.Invoke();
+                })
+                .OnCancel(operation => {
+                    Debug.Log("Rebind canceled - Checking active input devices:");
+
+                    foreach (var device in InputSystem.devices) {
+                        Debug.Log($"Device: {device.name}, enabled: {device.enabled}");
                     }
-                }
-                _rebindCompleted?.Invoke();
-            });
 
-            // Handle rebind cancel
-            rebind.OnCancel(operation => {
-                Debug.Log("Rebind canceled - Checking active input devices:");
+                    rebindOverlay.gameObject.SetActive(false);
+                    actionToRebind.Enable();
+                    operation.Dispose();
+                });
 
-                foreach (var device in InputSystem.devices) {
-                    Debug.Log($"Device: {device.name}, enabled: {device.enabled}");
-                }
-
-                rebindOverlay.gameObject.SetActive(false);
-                actionToRebind.Enable();
-                operation.Dispose();
-            });
-
-            // Cancel rebind if pressing escape
-            rebind.WithCancelingThrough("<Keyboard>/escape");
-
-            // Exclude mouse
             if (excludeMouse) {
                 rebind.WithControlsExcluding("<Mouse>/escape");
             }
 
             _rebindStarted?.Invoke(actionToRebind, bindingIndex);
-
-            // Actually start the rebind process
             rebind.Start();
+        }
+
+        void PerformCompositeRebind(InputAction actionToRebind, int bindingIndex, bool excludeMouse, Action rebindCompleted) {
+            void RebindNextPart(int partIndex) {
+                if (partIndex < actionToRebind.bindings.Count && actionToRebind.bindings[partIndex].isPartOfComposite) {
+                    PerformRebind(actionToRebind, partIndex, excludeMouse, () => RebindNextPart(partIndex + 1));
+                } else {
+                    rebindCompleted?.Invoke();
+                }
+            }
+
+            RebindNextPart(bindingIndex + 1);
         }
 
         /// <summary>
@@ -117,11 +105,13 @@ namespace UI.Menu {
         /// <param name="actionName"></param>
         /// <param name="bindingIndex"></param>
         /// <returns></returns>
-        public string GetBindingName(string actionName, int bindingIndex) {
+        public string GetBindingName(string actionName, int bindingIndex) { InputAction action = _inputActions.FindAction(actionName); return action.GetBindingDisplayString(bindingIndex); }
+        public string GetActionName(string actionName) { return _inputActions.FindAction(actionName).name; }
+        
+        public bool IsChildOfComposite(string actionName, int bindingIndex) {
             InputAction action = _inputActions.FindAction(actionName);
-            return action.GetBindingDisplayString(bindingIndex);
+            return action.bindings[bindingIndex].isPartOfComposite;
         }
-
         // Save the bindings into player prefs for each action
         static void SaveBindingOverride(InputAction action) {
             for (int i = 0; i < action.bindings.Count; i++) {

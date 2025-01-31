@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -9,7 +8,7 @@ using UnityEngine.UI;
 namespace Game {
     public class SceneLoader : MonoBehaviour {
         [SerializeField] SceneData sceneData;
-        [SerializeField] Canvas loadingCanvas;
+        [SerializeField] RectTransform loadingElement;
         [SerializeField] Slider loadingSlider;
         readonly List<AsyncOperation> _asyncOperations = new ();
         
@@ -88,14 +87,14 @@ namespace Game {
             SceneManager.UnloadSceneAsync(currentBuildIndex);
         }
         IEnumerator UpdateLoadingSlider() {
-            loadingCanvas.gameObject.SetActive(true);
+            loadingElement.gameObject.SetActive(true);
             
             while(_asyncOperations.Count > 0) {
                 loadingSlider.value = _asyncOperations.Average(op => op.progress);
                 yield return null;
             }
             
-            loadingCanvas.gameObject.SetActive(false);
+            loadingElement.gameObject.SetActive(false);
         }
     }
 }
