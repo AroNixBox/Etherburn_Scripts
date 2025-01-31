@@ -28,7 +28,7 @@ namespace UI.Menu {
             }
             
             // Check if the menu was opened with a controller
-            if (InputUtils.IsUsingController()) {
+            if (InputUtils.WasLastInputController()) {
                 _sceneEventSystem.SetSelectedGameObject(firstSelectedButton.gameObject);
             }
 

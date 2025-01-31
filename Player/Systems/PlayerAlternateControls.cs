@@ -20,7 +20,7 @@ namespace Player.Systems {
             var actionMap = inPauseMenu ? InputReader.ActionMapName.Player : InputReader.ActionMapName.UI;
             _inputReader.SwitchActionMap(actionMap);
             
-            if (InputUtils.IsUsingController()) {
+            if (InputUtils.WasLastInputController()) {
                 // Enable Mouse and Unlock Cursor if not in pause menu
                 Cursor.lockState = inPauseMenu ? CursorLockMode.Locked : CursorLockMode.None;
                 Cursor.visible = !inPauseMenu;

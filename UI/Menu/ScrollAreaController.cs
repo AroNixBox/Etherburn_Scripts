@@ -91,7 +91,7 @@ namespace UI.Menu {
         /// Scrolls the scroll rect to center the specified button.
         /// </summary>
         void ScrollToButton(Button button) {
-            if (!InputUtils.IsUsingController()) return;
+            if (!InputUtils.WasLastInputController()) return;
 
             // Find the ButtonElement for the given button
             var buttonElement = _buttonPairs.FirstOrDefault(bp => bp.Button == button);

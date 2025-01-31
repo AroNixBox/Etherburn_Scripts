@@ -61,13 +61,14 @@ namespace UI.Menu {
                 Debug.Log("Enabled Map: " + enabledMap);
             }
 
-            // TODO: Can only use one WithCancelingThrough from Unity API.. Find a solution:
+            // Workouround, only one .WithCancelingThrough() is allowed
             // https://discussions.unity.com/t/withcancelingthrough-not-accepting-more-than-one-binding/804335/2
-            var keyboardEscape = InputSystem.GetDevice<Keyboard>().escapeKey;
+            var excludingGamepadDevice = "<Gamepad>/select";
+            var excludingKeyboardDevice = "<Keyboard>/escape";
+            var excludingDevice = InputUtils.WasLastInputController() ? excludingGamepadDevice : excludingKeyboardDevice;
 
             var rebind = actionToRebind.PerformInteractiveRebinding(bindingIndex)
-                .WithCancelingThrough(keyboardEscape)
-                .WithControlsExcluding("<Gamepad>/select")
+                .WithCancelingThrough(excludingDevice)
                 .OnComplete(operation => {
                     rebindOverlay.gameObject.SetActive(false);
 
