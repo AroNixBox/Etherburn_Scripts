@@ -32,8 +32,6 @@ namespace Player.Systems {
                 optionMenuNavigation.controlsPanel.gameObject.SetActive(false);
             }
             else {
-                
-                
                 optionMenuNavigation.mainOptionsPanel.gameObject.SetActive(true);
             }
         }

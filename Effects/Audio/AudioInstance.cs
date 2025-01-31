@@ -2,6 +2,7 @@ using System;
 using UnityEngine;
 
 namespace Effects.Audio {
+    // TODO: Check Script unused?
     [Serializable]
     public class AudioInstance {
         /* @ Explanation
@@ -18,8 +19,8 @@ namespace Effects.Audio {
                 Debug.LogWarning("AudioClip is null");
                 return;
             }
-            
             AudioClip randomClip = audioClips[UnityEngine.Random.Range(0, audioClips.Length)];
+            Debug.Log($"Playing {randomClip.name}");
             AudioSource.PlayClipAtPoint(randomClip, spawnPosition);
         }
     }

@@ -1,12 +1,13 @@
 using Sensor;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Effects.Audio {
     [RequireComponent(typeof(AudioSource))]
     public class PlayAudio : MonoBehaviour {
         [SerializeField, Required] RaycastInBetweenTransformsSensor sensor;
-        [SerializeField, Required] AudioEffect audioEffect;
+        [FormerlySerializedAs("audioEffects")] [SerializeField, Required] AudioEffect audioEffect;
         AudioSource _audioSource;
 
         void Awake() {
