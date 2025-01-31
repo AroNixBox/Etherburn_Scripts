@@ -36,7 +36,7 @@ namespace UI.Menu {
         }
         void Rebind() {
             var bindingIndex = GetNextNonCompositeChildIndex(_inputActionName, (int)deviceType);
-            _rebindHandler.StartRebind(_inputActionName, bindingIndex, false, SetBindingDisplayText);
+            _rebindHandler.StartRebind(_inputActionName, bindingIndex, SetBindingDisplayText);
         }
         int GetNextNonCompositeChildIndex(string actionName, int startIndex) {
             var bindingIndex = startIndex;

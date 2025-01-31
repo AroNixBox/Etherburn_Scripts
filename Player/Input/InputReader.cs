@@ -28,13 +28,13 @@ namespace Player.Input {
         public event UnityAction<bool> IsLooking = delegate { };
         public event UnityAction<bool> Dodge = delegate { };
         public event UnityAction<bool> Run = delegate { };
-        public event UnityAction<bool> Attack = delegate { };
+        public event UnityAction<bool> LightAttack = delegate { };
         public event UnityAction<bool> SecondAttack = delegate { };
         public event UnityAction<bool> Ultimate = delegate { };
         public event UnityAction LockOnTarget = delegate { };
 
         // Helper method to check if the jump key is currently pressed
-        public bool IsJumpKeyPressed() => InputActions.Player.Jump.IsPressed();
+        public bool IsJumpKeyPressed() => InputActions.Player.Dodge.IsPressed();
         
         // Properties to get current movement and look directions
         public Vector2 Direction => InputActions.Player.Move.ReadValue<Vector2>();
@@ -64,6 +64,7 @@ namespace Player.Input {
 
         /// <summary> Tracks if we clicked with the middle mouse button </summary>
         public event UnityAction<bool> MiddleClickUI = delegate { };
+        public event UnityAction Pause = delegate { };
 
         #endregion 
         
@@ -100,18 +101,18 @@ namespace Player.Input {
 
         // Called when the player fires (e.g., clicks)
         // Dont Call the Action on Performed, its redundant since we only need started and canceled
-        public void OnFire(InputAction.CallbackContext context) {
+        public void OnLightAttack(InputAction.CallbackContext context) {
             switch (context.phase) {
                 case InputActionPhase.Started:
-                    Attack.Invoke(true);
+                    LightAttack.Invoke(true);
                     break;
                 case InputActionPhase.Canceled:
-                    Attack.Invoke(false);
+                    LightAttack.Invoke(false);
                     break;
             }
         }
 
-        public void OnSecondFire(InputAction.CallbackContext context) {
+        public void OnHeavyAttack(InputAction.CallbackContext context) {
             switch (context.phase) {
                 case InputActionPhase.Started:
                     SecondAttack.Invoke(true);
@@ -146,7 +147,7 @@ namespace Player.Input {
         }
 
         // Called when the player starts or stops jumping
-        public void OnJump(InputAction.CallbackContext context) {
+        public void OnDodge(InputAction.CallbackContext context) {
             switch (context.phase) {
                 case InputActionPhase.Started:
                     Dodge.Invoke(true);
@@ -212,10 +213,16 @@ namespace Player.Input {
         
         #region Global Map Input Reader Methods
         
-        public void OnMiddleClick(InputAction.CallbackContext context) {
+        public void OnWeaponMenu(InputAction.CallbackContext context) {
             if (context.phase is InputActionPhase.Started or InputActionPhase.Canceled) {
                 bool pressed = context.phase == InputActionPhase.Started;
                 MiddleClickUI.Invoke(pressed);
+            }
+        }
+
+        public void OnPause(InputAction.CallbackContext context) {
+            if (context.phase == InputActionPhase.Started) {
+                Pause.Invoke();
             }
         }
 
@@ -282,6 +289,45 @@ namespace Player.Input {
                 Debug.LogError($"Action map {newMap} not found. Make sure to add it to the InitializeActionMaps method.");
             }
         }
+        
+        /// <summary>
+        /// Disables all enabled action maps and returns a list of the action maps that were disabled.
+        /// </summary>
+        /// <returns>A list of ActionMapName enums representing the action maps that were disabled.</returns>
+        public List<ActionMapName> GetAllActiveActionMaps() {
+            List<ActionMapName> disabledMaps = new List<ActionMapName>();
+
+            foreach (var kvp in _actionMaps) {
+                if (kvp.Value.enabled) {
+                    disabledMaps.Add(kvp.Key);
+                }
+            }
+
+            return disabledMaps;
+        }
+        public void DisableActionMap(ActionMapName mapName) {
+            if (_actionMaps.TryGetValue(mapName, out var actionMap)) {
+                actionMap.Disable();
+            }
+        }
+        
+        public string[] GetActionMapNames() {
+            string[] names = new string[_actionMaps.Count];
+            int index = 0;
+            foreach (var kvp in _actionMaps) {
+                names[index] = kvp.Key.ToString();
+                index++;
+            }
+
+            return names;
+        }
+        
+        public void EnableActionMap(ActionMapName mapName) {
+            if (_actionMaps.TryGetValue(mapName, out var actionMap)) {
+                actionMap.Enable();
+            }
+        }
+        
         public enum ActionMapName {
             Player,
             UI, 

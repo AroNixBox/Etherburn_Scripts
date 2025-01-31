@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading.Tasks;
 using Player.Input;
 using TMPro;
 using UnityEngine;
@@ -21,7 +20,7 @@ namespace UI.Menu {
             _inputActions = inputReader.InputActions;
         }
 
-        public void StartRebind(string actionName, int bindingIndex, bool excludeMouse, Action rebindCompleted) {
+        public void StartRebind(string actionName, int bindingIndex, Action rebindCompleted) {
             InputAction action = _inputActions.FindAction(actionName);
 
             if (action == null || action.bindings.Count <= bindingIndex) {
@@ -30,20 +29,18 @@ namespace UI.Menu {
             }
 
             if (action.bindings[bindingIndex].isComposite) {
-                PerformCompositeRebind(action, bindingIndex, excludeMouse, rebindCompleted);
+                PerformCompositeRebind(action, bindingIndex, rebindCompleted);
             } else {
-                PerformRebind(action, bindingIndex, excludeMouse, rebindCompleted);
+                PerformRebind(action, bindingIndex, rebindCompleted);
             }
         }
 
-        void PerformRebind(InputAction actionToRebind, int bindingIndex, bool excludeMouse, Action rebindCompleted) {
+        void PerformRebind(InputAction actionToRebind, int bindingIndex, Action rebindCompleted) {
             if (actionToRebind == null || bindingIndex < 0) {
                 Debug.LogError("Action or Binding not found");
                 return;
             }
-
-            Debug.Log($"Rebinding action: {actionToRebind.name}, binding index: {bindingIndex}");
-
+            
             rebindOverlay.gameObject.SetActive(true);
             // Change to text to show the current action being rebound, if it is a composite, we show the name of the composite part
             var bindingName = actionToRebind.bindings[bindingIndex].isPartOfComposite
@@ -52,16 +49,32 @@ namespace UI.Menu {
             
             var rebindInformation = $"Rebinding: <b>{bindingName}</b>, press ANY key to rebind";
             rebindOverlayText.text = rebindInformation;
-            actionToRebind.Disable();
+            // Disable all Input Actions to prevent conflicts
+            var disabledMaps = inputReader.GetAllActiveActionMaps();
+            foreach (var disabledMap in disabledMaps) {
+                inputReader.DisableActionMap(disabledMap);
+            }
+            
+            // Debug all enabled action maps
+            var enabledMaps = inputReader.GetAllActiveActionMaps();
+            foreach (var enabledMap in enabledMaps) {
+                Debug.Log("Enabled Map: " + enabledMap);
+            }
+
+            // TODO: Can only use one WithCancelingThrough from Unity API.. Find a solution:
+            // https://discussions.unity.com/t/withcancelingthrough-not-accepting-more-than-one-binding/804335/2
+            var keyboardEscape = InputSystem.GetDevice<Keyboard>().escapeKey;
 
             var rebind = actionToRebind.PerformInteractiveRebinding(bindingIndex)
-                .WithCancelingThrough("<Keyboard>/escape")
+                .WithCancelingThrough(keyboardEscape)
+                .WithControlsExcluding("<Gamepad>/select")
                 .OnComplete(operation => {
-                    Debug.Log("Rebind completed, Rebinded: " + actionToRebind.name + " with: " + operation.selectedControl.displayName);
-
                     rebindOverlay.gameObject.SetActive(false);
-                    actionToRebind.Enable();
-                    Debug.Log("Current binding: " + actionToRebind.GetBindingDisplayString(bindingIndex));
+
+                    // Reenable all the disabled maps
+                    foreach (var disabledMap in disabledMaps) {
+                        inputReader.EnableActionMap(disabledMap);
+                    }
 
                     operation.Dispose();
                     rebindCompleted?.Invoke();
@@ -75,22 +88,25 @@ namespace UI.Menu {
                     }
 
                     rebindOverlay.gameObject.SetActive(false);
-                    actionToRebind.Enable();
+
+                    // Reenable all the disabled maps
+                    foreach (var disabledMap in disabledMaps) {
+                        inputReader.EnableActionMap(disabledMap);
+                    }
+
                     operation.Dispose();
                 });
 
-            if (excludeMouse) {
-                rebind.WithControlsExcluding("<Mouse>/escape");
-            }
+            rebind.Start();
 
             _rebindStarted?.Invoke(actionToRebind, bindingIndex);
             rebind.Start();
         }
 
-        void PerformCompositeRebind(InputAction actionToRebind, int bindingIndex, bool excludeMouse, Action rebindCompleted) {
+        void PerformCompositeRebind(InputAction actionToRebind, int bindingIndex, Action rebindCompleted) {
             void RebindNextPart(int partIndex) {
                 if (partIndex < actionToRebind.bindings.Count && actionToRebind.bindings[partIndex].isPartOfComposite) {
-                    PerformRebind(actionToRebind, partIndex, excludeMouse, () => RebindNextPart(partIndex + 1));
+                    PerformRebind(actionToRebind, partIndex, () => RebindNextPart(partIndex + 1));
                 } else {
                     rebindCompleted?.Invoke();
                 }

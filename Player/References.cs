@@ -103,7 +103,7 @@ namespace Player {
             input.Move += OnMove;
             input.Run += OnRun;
             input.Dodge += OnDodge;
-            input.Attack += OnAttack;
+            input.LightAttack += OnLightAttack;
             input.SecondAttack += OnSecondAttack;
             input.Ultimate += OnUltimate;
             
@@ -129,7 +129,7 @@ namespace Player {
         void OnRun(bool isKeyPressed) => RunKeyPressed = isKeyPressed;
         void OnMove(Vector2 movementInput) => MovementInput = movementInput;
         void OnDodge(bool isKeyPressed) => DodgeKeyPressed = isKeyPressed;
-        void OnAttack(bool isKeyPressed) => AttackKeyPressed = isKeyPressed;
+        void OnLightAttack(bool isKeyPressed) => AttackKeyPressed = isKeyPressed;
         void OnSecondAttack(bool isKeyPressed) => SecondAttackKeyPressed = isKeyPressed;
         void OnUltimate(bool isKeyPressed) => UltimateKeyPressed = isKeyPressed;
         #endregion
