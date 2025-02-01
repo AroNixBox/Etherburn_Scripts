@@ -229,7 +229,8 @@ namespace Player.Input {
         #endregion
 
         public void InitializeInputActionAsset() {
-            InputActions = new PlayerInputActions();
+            // Only Initialize the InputActions if they are not created yet
+            InputActions ??= new PlayerInputActions();
         }
         
         // Called in IInputReader on Enable

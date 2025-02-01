@@ -28,15 +28,10 @@ namespace Player.States {
 
         public void OnEnter() {
             _input.PointUI += TrackPointerInputPosition;
-            if (CursorManager.Instance == null) {
-                Debug.LogError("Cursor Manager not in the scene");
-            }
-            else {
-                if (!CursorManager.Instance.GetCursorVisible()) {
-                    CursorManager.Instance.SetCursorVisible(true);
-                    CursorManager.Instance.SetCursorLockMode(CursorLockMode.None);
-                }
-            }
+
+            Cursor.visible = true;
+            Cursor.lockState = CursorLockMode.None;
+            
             _input.SwitchActionMap(InputReader.ActionMapName.UI);
             _radialSelection.EnableRadialSelection(true);
             
@@ -75,15 +70,8 @@ namespace Player.States {
             // We dont need to track the input anymore
             _input.PointUI -= TrackPointerInputPosition;
             
-            if (CursorManager.Instance == null) {
-                Debug.LogError("Cursor Manager not in the scene");
-            }
-            else {
-                if (!CursorManager.Instance.GetCursorVisible()) {
-                    CursorManager.Instance.SetCursorVisible(false);
-                    CursorManager.Instance.SetCursorLockMode(CursorLockMode.Locked);
-                }
-            }
+            Cursor.visible = false;
+            Cursor.lockState = CursorLockMode.Locked;
             
             _input.SwitchActionMap(InputReader.ActionMapName.Player);
             _radialSelection.EnableRadialSelection(false);
