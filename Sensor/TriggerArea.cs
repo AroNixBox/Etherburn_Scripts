@@ -8,8 +8,14 @@ using UnityEngine.Events;
 namespace Sensor {
     [RequireComponent(typeof(Collider))]
     public class TriggerArea : MonoBehaviour, IRequireEntityColliderInteractionChannel {
+        [Header("Trigger Area")]
+        [Title("Event Cast")]
         [SerializeField] EntityType targetEntityType;
         [SerializeField] EMessageType messageType;
+        [SerializeField] bool multiApply = true;
+
+        bool _hasApplied;
+        
         Collider _collider;
         List<Entity> _targetEntities;
         
@@ -54,6 +60,10 @@ namespace Sensor {
         void OnTriggerEnter(Collider other) {
             if(!_isInitialized) { return; }
             if (messageType != EMessageType.Enter) { return; }
+            
+            if(_hasApplied) { return; }
+            if (!multiApply) { _hasApplied = true; }
+                        
             if(!other.TryGetComponent(out Entity entity)) { return; }
             if(!_targetEntities.Contains(entity)) { return; }
             if(other.TryGetComponent(out Rigidbody rigidbody)) {
@@ -89,6 +99,10 @@ namespace Sensor {
         void OnTriggerExit(Collider other) {
             if(!_isInitialized) { return; }
             if (messageType != EMessageType.Exit) { return; }
+            
+            if(_hasApplied) { return; }
+            if (!multiApply) { _hasApplied = true; }
+            
             if(!other.TryGetComponent(out Entity entity)) { return; }
             if(!_targetEntities.Contains(entity)) { return; }
             
