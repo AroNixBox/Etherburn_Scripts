@@ -7,6 +7,7 @@ using Player.Animation;
 using Player.Animation.MotionWarp;
 using Player.Input;
 using Player.Weapon;
+using Sirenix.OdinInspector;
 using TMPro;
 using UI;
 using UnityEngine;
@@ -14,8 +15,9 @@ using UnityEngine;
 namespace Player {
     [RequireComponent(typeof(References))]
     public class Brain : MonoBehaviour {
-        [SerializeField] TMP_Text debugText;
-        [SerializeField] TMP_Text debugFPS;
+        [SerializeField] bool debugMode;
+        [SerializeField] [ShowIf("@debugMode")] TMP_Text debugText;
+        [SerializeField] [ShowIf("@debugMode")] TMP_Text debugFPS;
         
         StateMachine _stateMachine;
         References _references;
@@ -42,6 +44,16 @@ namespace Player {
         }
 
         void Start() {
+            // Debug
+            if (!debugMode) {
+                if (debugText != null) {
+                    debugText.gameObject.SetActive(false);
+                }
+                if (debugFPS != null) {
+                    debugFPS.gameObject.SetActive(false);
+                }
+            }
+            
             _radialSelection = _references.radialSelection;
             _animationController = _references.animationController;
             
@@ -89,7 +101,7 @@ namespace Player {
             
             // End State Machine
             void DiscardStateMachine() {
-                if(debugText != null) {
+                if(debugMode && debugText != null) {
                     _stateMachine.OnDebugStateChanged -= UpdateDebugState;
                 }
                 _stateMachine = null;
@@ -162,8 +174,8 @@ namespace Player {
             Any(getHit, () => _healthAttribute.HasTakenDamage && !_healthAttribute.HasDied);
             Any(die, () => _healthAttribute.HasDied);
             At(getHit, groundedLocomotion, () => _references.GetHitEnded);
-            
-            if (debugText != null) {
+
+            if (debugText != null && debugText.isActiveAndEnabled) {
                 _stateMachine.OnDebugStateChanged += UpdateDebugState;
             }
             
@@ -203,7 +215,7 @@ namespace Player {
         }
 
         void Update() {
-            debugFPS.text = "FPS: " + (1.0f / Time.deltaTime).ToString("F2");
+            if(debugMode) { debugFPS.text = "FPS: " + (1.0f / Time.deltaTime).ToString("F2"); }
             if(_stateMachine == null) return;
             
             _stateMachine.Tick();
@@ -215,7 +227,7 @@ namespace Player {
         }
 
         void OnDestroy() {
-            if (debugText != null && _stateMachine != null) {
+            if (debugText != null && debugText.isActiveAndEnabled && _stateMachine != null) {
                 _stateMachine.OnDebugStateChanged -= UpdateDebugState;
             }
         }
