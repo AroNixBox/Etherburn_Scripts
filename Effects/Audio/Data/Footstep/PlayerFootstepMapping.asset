@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 033e19db86c34473ae49dbaaf3beeeda, type: 3}
+  m_Name: PlayerFootstepMapping
+  m_EditorClassIdentifier: 
+  effectData:
+  - material: {fileID: 13400000, guid: d85c7e236a4579d468c4f15c2143393c, type: 2}
+    associatedEffects:
+    - {fileID: 8300000, guid: f297de721b989f1478c8bba97392d49f, type: 3}
+    - {fileID: 8300000, guid: c02cc3b479f999c43b6c9ad58395e317, type: 3}
+    - {fileID: 8300000, guid: 4e7b48d8abee38646a94b583aee8b3b2, type: 3}
+    - {fileID: 8300000, guid: a4f51fcb8f1204f4b9042a40af6a1c99, type: 3}
+  - material: {fileID: 13400000, guid: d8d5ce28f7c3cd84cad91f9525e29912, type: 2}
+    associatedEffects:
+    - {fileID: 8300000, guid: f4338f676f0f0dd4c9c850a0d6b17d29, type: 3}
+    - {fileID: 8300000, guid: 25b210e44a028fb4d945f669f3c86d73, type: 3}
+    - {fileID: 8300000, guid: 276efbd0c2289eb4ca00d7efbafe0ea3, type: 3}

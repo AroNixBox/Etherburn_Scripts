@@ -131,7 +131,7 @@ namespace Game {
         IEnumerator UpdateLoadingSlider(List<AsyncOperation> asyncOperations) {
             loadingCanvas.gameObject.SetActive(true);
             
-            while(asyncOperations.Count > 0) {
+            while (asyncOperations.Any(op => !op.isDone)) {
                 loadingSlider.value = asyncOperations.Average(op => op.progress);
                 yield return null;
             }

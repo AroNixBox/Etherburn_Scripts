@@ -1,11 +1,16 @@
-﻿using Sirenix.OdinInspector;
+﻿using System;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace Player.Animation {
     public class EventForward : MonoBehaviour{
         [SerializeField, Required] Mover mover;
         [SerializeField, Required] References references;
+        
+        public Action OnFootstepPerformed;
+        public Action OnDodgePerformed;
         Animator _animator;
+
         void Awake() {
             _animator = GetComponent<Animator>();
         }
@@ -39,6 +44,17 @@ namespace Player.Animation {
             
             return highestWeightClip != null 
                    && currentClip == highestWeightClip;
+        }
+        
+        void OnFootstep(AnimationEvent evt) {
+            if (IsCurrentPerformedAnimation(evt.animatorClipInfo.clip)) { 
+                OnFootstepPerformed?.Invoke();
+            }
+        }
+        void OnDodge(AnimationEvent evt) {
+            if (IsCurrentPerformedAnimation(evt.animatorClipInfo.clip)) { 
+                OnDodgePerformed?.Invoke();
+            }
         }
         
         // Called when each of this Animation ends
