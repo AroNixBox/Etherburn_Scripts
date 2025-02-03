@@ -129,7 +129,7 @@ namespace Game {
                 }
                 
                 Cursor.lockState = CursorLockMode.None;
-                Cursor.visible = false;
+                Cursor.visible = true;
             }
         }
         IEnumerator UpdateLoadingSlider(List<AsyncOperation> asyncOperations) {
