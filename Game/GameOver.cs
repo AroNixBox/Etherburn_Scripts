@@ -1,9 +1,13 @@
+using System.Collections;
+using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Game {
     public class GameOver : MonoBehaviour {
+        [SerializeField] Image fadeOutImage;
         TargetEntitiesUnregisteredChannel.TargetEntitiesUnregisteredChannelEventHandler _handler;
-        private static bool _isQuitting;
+        static bool isQuitting;
 
         void OnEnable() {
             Application.quitting += OnApplicationQuit;
@@ -17,7 +21,7 @@ namespace Game {
             // Safety since player unregisters on application quit aswell from the EntityManager,
             // so the event is called but we dont want to load the game over scene
             
-            _isQuitting = true;
+            isQuitting = true;
         }
 
         async void Start() {
@@ -29,9 +33,11 @@ namespace Game {
             targetEntityUnregisteredChannel.RegisterListener(_handler);
         }
 
-        public void LoadGameOverScene() {
-            if (_isQuitting) return;
+        public async void LoadGameOverScene() {
+            if (isQuitting) return;
 
+            await FadeInAsync();
+            
             var sceneLoader = SceneLoader.Instance;
             if (sceneLoader == null) {
                 Debug.LogError("SceneLoader is not set in the inspector", transform);
@@ -41,8 +47,22 @@ namespace Game {
             sceneLoader.StartCoroutine(sceneLoader.LoadSceneAsync(SceneData.EMenuType.GameOver));
         }
 
+        async Task FadeInAsync() {
+            var duration = 1f;
+            var elapsedTime = 0f;
+            var color = fadeOutImage.color;
+            color.a = 0;
+            fadeOutImage.color = color;
+
+            while (elapsedTime < duration) {
+                elapsedTime += Time.deltaTime;
+                color.a = Mathf.Lerp(0f, 1f, elapsedTime / duration);
+                fadeOutImage.color = color;
+                await Task.Yield();
+            }
+        }
         public void LoadMainMenuScene() {
-            if (_isQuitting) return;
+            if (isQuitting) return;
 
             var sceneLoader = SceneLoader.Instance;
             if (sceneLoader == null) {
