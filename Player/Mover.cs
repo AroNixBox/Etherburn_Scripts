@@ -66,6 +66,7 @@ namespace Player {
         void ApplyNormalMotion(Vector3 deltaPosition, Quaternion deltaRotation) {
             const int maxIterations = 3; // Limit the number of collision adjustments
             var iteration = 0;
+            const float forceScale = 0.1f; // Scale down the force applied
 
             while (iteration < maxIterations) {
                 // Perform a SweepTest to detect potential collisions
@@ -75,6 +76,11 @@ namespace Player {
 
                     // Reduce the magnitude of deltaPosition slightly to avoid edge-case clipping
                     deltaPosition *= 0.95f;
+
+                    // Apply force to the other Rigidbody if it has one
+                    if (hit.rigidbody != null) {
+                        hit.rigidbody.AddForce(deltaPosition.normalized * _rb.mass * forceScale, ForceMode.Impulse);
+                    }
                 } else {
                     // No collision detected, break out of the loop
                     break;
@@ -94,9 +100,6 @@ namespace Player {
             // Apply root motion rotation change to this transform
             RotateModelRoot(deltaRotation);
         }
-
-
-
 
         void ApplyWarpedMotion(Vector3 deltaPosition) {
             // Warping
@@ -242,6 +245,5 @@ namespace Player {
             _rb.linearVelocity = _velocity;
         }
         #endregion
-        
     }
 }
