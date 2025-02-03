@@ -1,26 +1,31 @@
-using System;
+using System.Data;
 using System.Linq;
 using Extensions;
 using Player.Input;
 using Sirenix.OdinInspector;
+using UI;
 using UnityEngine;
 
 namespace Player.Cam {
     public class OrbitalController : MonoBehaviour {
         #region Fields
+        [Title("References")]
         [SerializeField, Required] References references;
         [SerializeField, Required] Transform headHeight;
+        [SerializeField, Required] UIOnscreenFocus uiOnScreenFocus;
+        
+        [Title("Settings")]
         [SerializeField] EntityType lockOnEntityType = EntityType.Enemy;
 
-        [Range(0f, 90f)] public float upperVerticalLimit = 35f;
-        [Range(0f, 90f)] public float lowerVerticalLimit = 35f;
+        [Range(0f, 90f)] [SerializeField] float upperVerticalLimit = 35f;
+        [Range(0f, 90f)] [SerializeField] float lowerVerticalLimit = 35f;
         
-        public bool invertVerticalAxis = true;
-        public bool invertHorizontalAxis;
+        [SerializeField] bool invertVerticalAxis = true;
+        [SerializeField] bool invertHorizontalAxis;
 
-        public float cameraSpeed = 50f;
-        public bool smoothCameraRotation;
-        [Range(1f, 50f)] public float cameraSmoothingFactor = 25f;
+        [SerializeField] float cameraSpeed = 50f;
+        [SerializeField] bool smoothCameraRotation;
+        [SerializeField] [Range(1f, 50f)] float cameraSmoothingFactor = 25f;
         [SerializeField] float controllerSpeedMultiplier = 25f;
         [SerializeField] bool debug;
         
@@ -92,6 +97,9 @@ namespace Player.Cam {
 
         void ToggleLockOnTarget() {
             if (LockedOnEnemyTarget != null) {
+                // Remove Lock on Visual
+                uiOnScreenFocus.RemoveTarget();
+                
                 // No more target
                 LockedOnEnemyTarget = null;
                 
@@ -119,6 +127,15 @@ namespace Player.Cam {
                 if(allEntitiesInVisionCone.Count == 0) { return; }
 
                 LockedOnEnemyTarget = allEntitiesInVisionCone.FirstOrDefault(entity => entity.EntityType == lockOnEntityType);
+                // Add Lock on Visual
+                if (LockedOnEnemyTarget != null) {
+                    if (LockedOnEnemyTarget.TryGetComponent(out EnemyBodyParts bodyParts)) {
+                        uiOnScreenFocus.SetTarget(bodyParts.head);
+                    } else {
+                        uiOnScreenFocus.SetTarget(LockedOnEnemyTarget.transform);
+                    }
+                }
+                
             }
         }
         public bool IsLockedOnTarget() => LockedOnEnemyTarget != null;
