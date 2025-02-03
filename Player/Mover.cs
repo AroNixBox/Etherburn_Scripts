@@ -66,7 +66,7 @@ namespace Player {
         void ApplyNormalMotion(Vector3 deltaPosition, Quaternion deltaRotation) {
             const int maxIterations = 3; // Limit the number of collision adjustments
             var iteration = 0;
-            const float forceScale = 0.1f; // Scale down the force applied
+            const float forceScale = 0.035f; // Scale down the force applied
 
             while (iteration < maxIterations) {
                 // Perform a SweepTest to detect potential collisions

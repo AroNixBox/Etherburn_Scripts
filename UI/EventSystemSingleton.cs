@@ -8,6 +8,7 @@ namespace UI {
     public class EventSystemSingleton : Singleton<EventSystemSingleton> {
         public EventSystem EventSystem { get; private set; }
         public InputSystemUIInputModule InputSystemUIInputModule { get; private set; }
+        protected override bool ShouldPersist => true;
         protected override void Awake() {
             base.Awake();
         

@@ -54,6 +54,9 @@ namespace Player {
                 }
             }
             
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+            
             _radialSelection = _references.radialSelection;
             _animationController = _references.animationController;
             

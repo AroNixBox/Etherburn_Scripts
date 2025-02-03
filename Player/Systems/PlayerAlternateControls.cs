@@ -20,19 +20,19 @@ namespace Player.Systems {
             var actionMap = inPauseMenu ? InputReader.ActionMapName.Player : InputReader.ActionMapName.UI;
             _inputReader.SwitchActionMap(actionMap);
             
-            if (InputUtils.WasLastInputController()) {
-                // Enable Mouse and Unlock Cursor if not in pause menu
-                Cursor.lockState = inPauseMenu ? CursorLockMode.Locked : CursorLockMode.None;
-                Cursor.visible = !inPauseMenu;
-            }
-            
             if (inPauseMenu) {
                 optionMenuNavigation.mainOptionsPanel.gameObject.SetActive(false);
                 optionMenuNavigation.systemPanel.gameObject.SetActive(false);
                 optionMenuNavigation.controlsPanel.gameObject.SetActive(false);
+                
+                Cursor.lockState = CursorLockMode.Locked;
+                Cursor.visible = false;
             }
             else {
                 optionMenuNavigation.mainOptionsPanel.gameObject.SetActive(true);
+                
+                Cursor.lockState = CursorLockMode.None;
+                Cursor.visible = true;
             }
         }
         

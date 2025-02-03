@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Extensions;
+using Player.Input;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -114,7 +115,7 @@ namespace Game {
                     .FirstOrDefault(go => go.name == "Game Over");
                 var mainMenuWindow = FindObjectsByType<GameObject>(FindObjectsInactive.Include, FindObjectsSortMode.None)
                     .FirstOrDefault(go => go.name == "Main Menu");
-
+                
                 if (gameOverWindow != null) {
                     gameOverWindow.SetActive(true);
                 } else {
@@ -126,6 +127,9 @@ namespace Game {
                 } else {
                     Debug.LogError("Main Menu object not found");
                 }
+                
+                Cursor.lockState = CursorLockMode.None;
+                Cursor.visible = false;
             }
         }
         IEnumerator UpdateLoadingSlider(List<AsyncOperation> asyncOperations) {
