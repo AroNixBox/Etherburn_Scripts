@@ -55,8 +55,7 @@ namespace Game {
                 }
             }
             
-            StartCoroutine(UpdateLoadingSlider());
-
+            StartCoroutine(UpdateLoadingSlider(_asyncOperations));
             
             // Wait for all scenes to load
             while (_asyncOperations.Any(op => op.progress < 0.9f)) {
@@ -68,11 +67,8 @@ namespace Game {
                 asyncOp.allowSceneActivation = true;
             }
             
-            // Cant Modify Collection While Iterating
-            List<AsyncOperation> asyncOperationsCopy = new List<AsyncOperation>(_asyncOperations);
-            
             // Wait for all scenes to activate
-            foreach (var asyncOp in asyncOperationsCopy) {
+            foreach (var asyncOp in _asyncOperations) {
                 while (!asyncOp.isDone) {
                     yield return null;
                 }
@@ -90,54 +86,30 @@ namespace Game {
         /// </summary>
         /// <returns></returns>
         public IEnumerator LoadSceneAsync(SceneData.EMenuType menuType) {
-            if(sceneData == null) {
+            if (sceneData == null) {
                 Debug.LogError("SceneData is not set in the inspector", transform);
             }
-            
+    
             // Load Menu Scene
             var menuSceneOperation = SceneManager.LoadSceneAsync(sceneData.MenuScenes[menuType].BuildIndex);
             menuSceneOperation.allowSceneActivation = false;
-            _asyncOperations.Add(menuSceneOperation);
-            
-            StartCoroutine(UpdateLoadingSlider());
-            
+    
+            StartCoroutine(UpdateLoadingSlider(new List<AsyncOperation> {menuSceneOperation}));
+    
             // Wait for all scenes to load
-            while (_asyncOperations.Any(op => op.progress < 0.9f)) {
+            while (menuSceneOperation.progress < 0.9f) {
                 yield return null;
             }
-            
+    
             // Activate all scenes
-            foreach (var asyncOp in _asyncOperations) {
-                asyncOp.allowSceneActivation = true;
+            menuSceneOperation.allowSceneActivation = true;
+            
+            // Wait for scene to activate
+            while (!menuSceneOperation.isDone) {
+                yield return null;
             }
-            
-            // Cant Modify Collection While Iterating
-            List<AsyncOperation> asyncOperationsCopy = new List<AsyncOperation>(_asyncOperations);
-            
-            // Wait for all scenes to activate
-            foreach (var asyncOp in asyncOperationsCopy) {
-                while (!asyncOp.isDone) {
-                    yield return null;
-                }
-            }
-            
-            // Clear Async Operations
-            _asyncOperations.Clear();
-            
-            /*
-            ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣀⣀⣤⣤⣤⣤⣄⡀⠀⠀⠀⠀⠀⠀⠀
-            ⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣴⡾⠟⠛⠉⠉⠉⠉⠉⠉⠙⠻⢷⣄⠀⠀⠀⠀
-            ⠀⠀⠀⠀⠀⠀⠀⢀⣾⠟⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀  ⠈⢿⡄⠀⠀⠀
-            ⠀⠀⠀⠀⠀⠀⠀⣾⡇⠀⠀⣀⣤⣴⠖⠀⠀⠶⣦⣄⡀⠀⠀ ⢸⡇⠀⠀⠀
-            ⠀⠀⠀⠀⠀⠀⢸⣿⠀⣴⡿⠿⠛⠁⠀⠀⠀⠀⠈⠙⠻⢷⡄ ⠘⣷⠀⠀⠀
-            ⠀⠀⠀⠀⠀⠀⠘⣿⠀⠻⠿⢿⣿⣷⠀⠀⠀⣿⣷⣾⡿⠿⠇⠀ ⣷⠀⠀⠀
-            ⠀⠀⠀⠀⠀⠀⠀⢿⡄⠀⠀⠀⠉⠁⢀⣀⡀⠈⠉⠀⠀⠀⣀⡀ ⢻⡄⠀⠀
-            ⠀⠀⠀⠀⠀⠀⠀⠈⢿⡄⠀⠀⠀⢰⡿⠉⠻⡆⠀⠀⠀⠾⠟⠀⣼⠇⠀⠀
-            ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠻⣦⡀⠀⠘⣧⡀⣀⡇⠀⠀⠀⣀⣤⡾⠃⠀⠀⠀
-            ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠻⢷⣦⣈⣉⣁⣀⣤⡶⠟⠋⠀⠀⠀⠀⠀⠀
-            ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠉⠉⠉⠉⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀
-            */
-            if(menuType == SceneData.EMenuType.GameOver) {
+    
+            if (menuType == SceneData.EMenuType.GameOver) {
                 var gameOverWindow = FindObjectsByType<GameObject>(FindObjectsInactive.Include, FindObjectsSortMode.None)
                     .FirstOrDefault(go => go.name == "Game Over");
                 var mainMenuWindow = FindObjectsByType<GameObject>(FindObjectsInactive.Include, FindObjectsSortMode.None)
@@ -156,11 +128,11 @@ namespace Game {
                 }
             }
         }
-        IEnumerator UpdateLoadingSlider() {
+        IEnumerator UpdateLoadingSlider(List<AsyncOperation> asyncOperations) {
             loadingCanvas.gameObject.SetActive(true);
             
-            while(_asyncOperations.Count > 0) {
-                loadingSlider.value = _asyncOperations.Average(op => op.progress);
+            while(asyncOperations.Count > 0) {
+                loadingSlider.value = asyncOperations.Average(op => op.progress);
                 yield return null;
             }
             

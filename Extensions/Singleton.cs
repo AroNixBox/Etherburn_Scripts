@@ -37,6 +37,7 @@ namespace Extensions {
                     DontDestroyOnLoad(gameObject);
                 }
             } else if (instance != this) {
+                Debug.Log("Instance already exists, destroying object", transform);
                 Destroy(gameObject);
             }
         }
