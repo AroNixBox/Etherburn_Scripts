@@ -78,9 +78,11 @@ public partial class DetectEntityInRangeAction : Action {
     }
 
     protected override Status OnUpdate() {
-        var targetsSorted = _entityVisionTargetQuery.GetTargetInRangeWithOutVisionCone(_associatedPlayerEntity);
+        var targetEntity = _entityVisionTargetQuery.GetTargetInRangeWithOutVisionCone(_associatedPlayerEntity);
         
-        Target.Value = targetsSorted.gameObject;
+        if(targetEntity == null) { return Status.Running; }
+        
+        Target.Value = targetEntity.gameObject;
         return Status.Success;
     }
 

@@ -12,13 +12,7 @@ namespace Extensions {
 
                     instance = (T)FindFirstObjectByType(typeof(T));
 
-                    if (instance != null) return instance;
-                    
-                    GameObject singletonObject = new GameObject();
-                    instance = singletonObject.AddComponent<T>();
-                    singletonObject.name = typeof(T) + " (Singleton)";
-
-                    return instance;
+                    return instance != null ? instance : null;
                 }
             }
         }
