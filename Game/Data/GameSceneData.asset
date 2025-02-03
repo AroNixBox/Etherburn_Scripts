@@ -12,6 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fdd4bb26a2db45d7a66bc14d89e3b25e, type: 3}
   m_Name: GameSceneData
   m_EditorClassIdentifier: 
+  bootstrapperScene:
+    asset: {fileID: 102900000, guid: 7f305ad6f9f702f4d94f85005de751d0, type: 3}
+    guid: 7f305ad6f9f702f4d94f85005de751d0
+  gameOverScene:
+    asset: {fileID: 102900000, guid: 7f305ad6f9f702f4d94f85005de751d0, type: 3}
+    guid: 7f305ad6f9f702f4d94f85005de751d0
   playerScene:
     asset: {fileID: 102900000, guid: a1fd04929a4c2714d9e3cafad9d8d85b, type: 3}
     guid: a1fd04929a4c2714d9e3cafad9d8d85b

@@ -1,19 +1,11 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Extensions;
 using UnityEngine;
 
-public class EntityManager : MonoBehaviour {
+public class EntityManager : Singleton<EntityManager> {
     readonly List<Entity> _entities = new ();
-    public static EntityManager Instance { get; private set; }
     readonly Dictionary<EntityType, TargetEntitiesUnregisteredChannel> _onEntityUnregisteredChannels = new ();
-    
-    void Awake() {
-        if (Instance == null) {
-            Instance = this;
-        } else {
-            Destroy(gameObject);
-        }
-    }
     
     public void RegisterEntity(Entity entity) {
         _entities.Add(entity);

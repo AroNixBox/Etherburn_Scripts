@@ -1,28 +1,22 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Extensions;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 namespace Game {
-    public class SceneLoader : MonoBehaviour {
+    public class SceneLoader : Singleton<SceneLoader> {
         [SerializeField] SceneData sceneData;
-        [SerializeField] RectTransform loadingElement;
+        [SerializeField] Canvas loadingCanvas;
         [SerializeField] Slider loadingSlider;
         readonly List<AsyncOperation> _asyncOperations = new ();
         
+        protected override bool ShouldPersist => true;
+        
         public SceneData.ELevelType CurrentLevelType { get; private set; }
         
-        public static SceneLoader Instance { get; private set; }
-
-        void Awake() {
-            if(Instance == null) {
-                Instance = this;
-            } else {
-                Destroy(gameObject);
-            }
-        }
         public IEnumerator LoadScenesAsync(SceneData.ELevelType levelType) {
             if(sceneData == null) {
                 Debug.LogError("SceneData is not set in the inspector", transform);
@@ -44,8 +38,6 @@ namespace Game {
             playerSceneOperation.allowSceneActivation = false;
             _asyncOperations.Add(playerSceneOperation);
             
-            StartCoroutine(UpdateLoadingSlider());
-
             // Load Navmesh Scene
             SceneData.NavMeshScenePackage[] navMeshPackages = sceneData.navMeshes.Where(navMesh => navMesh.levelType == levelType).ToArray();
             foreach (var navMeshPackage in navMeshPackages) {
@@ -63,6 +55,9 @@ namespace Game {
                 }
             }
             
+            StartCoroutine(UpdateLoadingSlider());
+
+            
             // Wait for all scenes to load
             while (_asyncOperations.Any(op => op.progress < 0.9f)) {
                 yield return null;
@@ -73,8 +68,11 @@ namespace Game {
                 asyncOp.allowSceneActivation = true;
             }
             
+            // Cant Modify Collection While Iterating
+            List<AsyncOperation> asyncOperationsCopy = new List<AsyncOperation>(_asyncOperations);
+            
             // Wait for all scenes to activate
-            foreach (var asyncOp in _asyncOperations) {
+            foreach (var asyncOp in asyncOperationsCopy) {
                 while (!asyncOp.isDone) {
                     yield return null;
                 }
@@ -86,15 +84,87 @@ namespace Game {
             // Unload Bootstrapper Scene
             SceneManager.UnloadSceneAsync(currentBuildIndex);
         }
+
+        /// <summary>
+        /// Used to load one scene async at a time
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerator LoadSceneAsync(SceneData.EMenuType menuType) {
+            if(sceneData == null) {
+                Debug.LogError("SceneData is not set in the inspector", transform);
+            }
+            
+            // Load Menu Scene
+            var menuSceneOperation = SceneManager.LoadSceneAsync(sceneData.MenuScenes[menuType].BuildIndex);
+            menuSceneOperation.allowSceneActivation = false;
+            _asyncOperations.Add(menuSceneOperation);
+            
+            StartCoroutine(UpdateLoadingSlider());
+            
+            // Wait for all scenes to load
+            while (_asyncOperations.Any(op => op.progress < 0.9f)) {
+                yield return null;
+            }
+            
+            // Activate all scenes
+            foreach (var asyncOp in _asyncOperations) {
+                asyncOp.allowSceneActivation = true;
+            }
+            
+            // Cant Modify Collection While Iterating
+            List<AsyncOperation> asyncOperationsCopy = new List<AsyncOperation>(_asyncOperations);
+            
+            // Wait for all scenes to activate
+            foreach (var asyncOp in asyncOperationsCopy) {
+                while (!asyncOp.isDone) {
+                    yield return null;
+                }
+            }
+            
+            // Clear Async Operations
+            _asyncOperations.Clear();
+            
+            /*
+            ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣀⣀⣤⣤⣤⣤⣄⡀⠀⠀⠀⠀⠀⠀⠀
+            ⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣴⡾⠟⠛⠉⠉⠉⠉⠉⠉⠙⠻⢷⣄⠀⠀⠀⠀
+            ⠀⠀⠀⠀⠀⠀⠀⢀⣾⠟⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀  ⠈⢿⡄⠀⠀⠀
+            ⠀⠀⠀⠀⠀⠀⠀⣾⡇⠀⠀⣀⣤⣴⠖⠀⠀⠶⣦⣄⡀⠀⠀ ⢸⡇⠀⠀⠀
+            ⠀⠀⠀⠀⠀⠀⢸⣿⠀⣴⡿⠿⠛⠁⠀⠀⠀⠀⠈⠙⠻⢷⡄ ⠘⣷⠀⠀⠀
+            ⠀⠀⠀⠀⠀⠀⠘⣿⠀⠻⠿⢿⣿⣷⠀⠀⠀⣿⣷⣾⡿⠿⠇⠀ ⣷⠀⠀⠀
+            ⠀⠀⠀⠀⠀⠀⠀⢿⡄⠀⠀⠀⠉⠁⢀⣀⡀⠈⠉⠀⠀⠀⣀⡀ ⢻⡄⠀⠀
+            ⠀⠀⠀⠀⠀⠀⠀⠈⢿⡄⠀⠀⠀⢰⡿⠉⠻⡆⠀⠀⠀⠾⠟⠀⣼⠇⠀⠀
+            ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠻⣦⡀⠀⠘⣧⡀⣀⡇⠀⠀⠀⣀⣤⡾⠃⠀⠀⠀
+            ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠻⢷⣦⣈⣉⣁⣀⣤⡶⠟⠋⠀⠀⠀⠀⠀⠀
+            ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠉⠉⠉⠉⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀
+            */
+            if(menuType == SceneData.EMenuType.GameOver) {
+                var gameOverWindow = FindObjectsByType<GameObject>(FindObjectsInactive.Include, FindObjectsSortMode.None)
+                    .FirstOrDefault(go => go.name == "Game Over");
+                var mainMenuWindow = FindObjectsByType<GameObject>(FindObjectsInactive.Include, FindObjectsSortMode.None)
+                    .FirstOrDefault(go => go.name == "Main Menu");
+
+                if (gameOverWindow != null) {
+                    gameOverWindow.SetActive(true);
+                } else {
+                    Debug.LogError("Game Over object not found");
+                }
+
+                if (mainMenuWindow != null) {
+                    mainMenuWindow.SetActive(false);
+                } else {
+                    Debug.LogError("Main Menu object not found");
+                }
+            }
+        }
         IEnumerator UpdateLoadingSlider() {
-            loadingElement.gameObject.SetActive(true);
+            loadingCanvas.gameObject.SetActive(true);
             
             while(_asyncOperations.Count > 0) {
                 loadingSlider.value = _asyncOperations.Average(op => op.progress);
                 yield return null;
             }
             
-            loadingElement.gameObject.SetActive(false);
+            loadingCanvas.gameObject.SetActive(false);
         }
     }
 }

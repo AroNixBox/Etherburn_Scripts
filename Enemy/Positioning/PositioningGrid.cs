@@ -67,7 +67,6 @@ namespace Enemy.Positioning {
             
             if (_targetEntitiesUnregisteredChannel != null) {
                 // Create a delegate instance and subscribe to the event
-                _handler = HandlePlayerUnregistered;
                 _targetEntitiesUnregisteredChannel.RegisterListener(_handler);
             }
             
@@ -78,13 +77,10 @@ namespace Enemy.Positioning {
 #endif
         }
 
-        void HandlePlayerUnregistered() {
-            
-        }
-
         void LoadGridFromScriptableObject() {
             if(SceneLoader.Instance == null) {
-#if UNITY_EDITOR // Sceneloader will be null when in the Editor and started not from the Bootstrapper Scene
+#if UNITY_EDITOR 
+                // Sceneloader will be null when in the Editor and started not from the Bootstrapper Scene
                 
                 // Pause the Editor
                 UnityEditor.EditorApplication.isPaused = true;

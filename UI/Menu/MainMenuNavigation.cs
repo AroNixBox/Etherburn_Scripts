@@ -8,9 +8,6 @@ using UnityEngine.UI;
 
 namespace UI.Menu {
     public class MainMenuNavigation : MonoBehaviour {
-        [Header("References")]
-        [SerializeField, Required] SceneLoader sceneLoader;
-        
         [Header("User Interface")] 
         [Title("Buttons")] 
         [SerializeField, Required] Button startGameButton;
@@ -70,6 +67,12 @@ namespace UI.Menu {
         void StartGame() { 
             // Disable all UI elements
             mainMenuPanel.SetActive(false);
+            
+            var sceneLoader = SceneLoader.Instance;
+            if(sceneLoader == null) {
+                Debug.LogError("SceneLoader is not in the scene", transform);
+                return;
+            }
             
             // Make the call to the SceneLoader to load the first level
             sceneLoader.StartCoroutine(sceneLoader.LoadScenesAsync(SceneData.ELevelType.Level_One));

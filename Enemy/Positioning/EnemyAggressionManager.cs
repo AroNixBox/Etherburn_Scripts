@@ -1,10 +1,10 @@
 using System.Collections.Generic;
+using Extensions;
 using UnityEngine;
 
 namespace Enemy.Positioning {
     // NO Instance needed, communication is via Event Channels
-    public class EnemyAggressionManager : MonoBehaviour {
-        public static EnemyAggressionManager Instance;
+    public class EnemyAggressionManager : Singleton<EnemyAggressionManager> {
         [SerializeField] PositioningGrid positioningGrid;
         
         Transform _playerTransform;
@@ -15,15 +15,6 @@ namespace Enemy.Positioning {
         // Enemies
         readonly List<EnemyData> _inactiveEnemyDatas = new(); // Sleeping
         EnemyData _activeEnemyData; // Active
-
-        void Awake() {
-            if (Instance == null) {
-                Instance = this;
-            }
-            else {
-                Destroy(gameObject);
-            }
-        }
 
         async void Start() {
             await EntityManager.Instance.WaitTillInitialized();
@@ -160,13 +151,12 @@ namespace Enemy.Positioning {
                         }
                     }
                 }
-           }
-           else {
+            } else {
                 // If the entry exists, send a signal to the enemy in case he missed the signal, while being in another state.
                 var enemyData = _inactiveEnemyDatas.Find(e => e.Enemy.name == enemy.name);
                 enemyData.ChangeAggressionChannel.SendEventMessage(false);
                 enemyData.OptimalPositionChangedChannel.SendEventMessage(enemyData.CurrentCell.NavMeshSamplePosition);
-           }
+            }
         }
         public void UnregisterEnemy(GameObject enemy) {
             if(_isPlayerUnregistered) {
@@ -206,6 +196,7 @@ namespace Enemy.Positioning {
                 }
             }
         }
+        
         bool FindBestFittingCell(EnemyData enemyData) {
             var optimalCell = positioningGrid.GetClosestGridObjectWithinMinMaxRange(enemyData.Enemy, enemyData.CurrentCell);
             if(optimalCell == null) {
@@ -254,7 +245,8 @@ namespace Enemy.Positioning {
         
         // Checks the distance between [enemy] and the player and see if its smaller than the parameter [distanceToCompareWith]
         bool IsDistanceToPlayerCloser(GameObject enemy, float distanceToCompareWith) {
-            return (enemy.transform.position - _playerTransform.position).sqrMagnitude < distanceToCompareWith;
+            return (enemy.transform.position - _playerTransform.position)
+                .sqrMagnitude < distanceToCompareWith;
         }
 
         void OnDestroy() {
