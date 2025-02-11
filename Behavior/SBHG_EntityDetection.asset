@@ -156,83 +156,6 @@ MonoBehaviour:
     RefIds:
     - rid: -2
       type: {class: , ns: , asm: }
-    - rid: 1744855261529244226
-      type: {class: 'TypedVariableModel`1[[UnityEngine.GameObject, UnityEngine.CoreModule]]',
-        ns: Unity.Behavior.GraphFramework, asm: Unity.Behavior.GraphFramework}
-      data:
-        ID:
-          m_Value0: 1
-          m_Value1: 0
-        Name: Self
-        IsExposed: 1
-        m_IsShared: 0
-        m_Value: {fileID: 0}
-    - rid: 1744855261529244227
-      type: {class: 'TypedVariableModel`1[[UnityEngine.GameObject, UnityEngine.CoreModule]]',
-        ns: Unity.Behavior.GraphFramework, asm: Unity.Behavior.GraphFramework}
-      data:
-        ID:
-          m_Value0: 8393712751803517602
-          m_Value1: 15673964697732851669
-        Name: Target
-        IsExposed: 1
-        m_IsShared: 0
-        m_Value: {fileID: 0}
-    - rid: 1744855261529244228
-      type: {class: 'TypedVariableModel`1[[System.Single, mscorlib]]', ns: Unity.Behavior.GraphFramework,
-        asm: Unity.Behavior.GraphFramework}
-      data:
-        ID:
-          m_Value0: 950598734489599609
-          m_Value1: 16353272675223498705
-        Name: DetectionRange
-        IsExposed: 1
-        m_IsShared: 0
-        m_Value: 0
-    - rid: 1744855261529244229
-      type: {class: 'TypedVariableModel`1[[System.Single, mscorlib]]', ns: Unity.Behavior.GraphFramework,
-        asm: Unity.Behavior.GraphFramework}
-      data:
-        ID:
-          m_Value0: 1440958042071166951
-          m_Value1: 11118701446493653324
-        Name: VisionConeAngle
-        IsExposed: 1
-        m_IsShared: 0
-        m_Value: 0
-    - rid: 1744855261529244230
-      type: {class: 'TypedVariableModel`1[[System.Boolean, mscorlib]]', ns: Unity.Behavior.GraphFramework,
-        asm: Unity.Behavior.GraphFramework}
-      data:
-        ID:
-          m_Value0: 11979036010392807467
-          m_Value1: 2271663333943568558
-        Name: ShowDebug
-        IsExposed: 1
-        m_IsShared: 0
-        m_Value: 0
-    - rid: 1744855261529244231
-      type: {class: 'TypedVariableModel`1[[System.Single, mscorlib]]', ns: Unity.Behavior.GraphFramework,
-        asm: Unity.Behavior.GraphFramework}
-      data:
-        ID:
-          m_Value0: 12182606397375607258
-          m_Value1: 10872085432190065140
-        Name: DetectionFrequency
-        IsExposed: 1
-        m_IsShared: 0
-        m_Value: 0
-    - rid: 1744855261529244232
-      type: {class: 'TypedVariableModel`1[[System.Single, mscorlib]]', ns: Unity.Behavior.GraphFramework,
-        asm: Unity.Behavior.GraphFramework}
-      data:
-        ID:
-          m_Value0: 14954365780565662593
-          m_Value1: 7244812346962009970
-        Name: ForceWaitTimeAfterAgressionLoss
-        IsExposed: 1
-        m_IsShared: 0
-        m_Value: 0
     - rid: 1788444943980692006
       type: {class: StartNodeModel, ns: Unity.Behavior, asm: Unity.Behavior.Authoring}
       data:
@@ -479,7 +402,7 @@ MonoBehaviour:
         LocalValue:
           rid: 1788444943980692318
         LinkedVariable:
-          rid: 1744855261529244226
+          rid: 1835446733942817130
     - rid: 1788444943980692297
       type: {class: BehaviorGraphNodeModel/FieldModel, ns: Unity.Behavior, asm: Unity.Behavior.Authoring}
       data:
@@ -489,7 +412,7 @@ MonoBehaviour:
         LocalValue:
           rid: 1788444943980692320
         LinkedVariable:
-          rid: 1744855261529244226
+          rid: 1835446733942817130
     - rid: 1788444943980692298
       type: {class: PortModel, ns: Unity.Behavior.GraphFramework, asm: Unity.Behavior.GraphFramework}
       data:
@@ -708,7 +631,7 @@ MonoBehaviour:
         LocalValue:
           rid: 1788444943980692331
         LinkedVariable:
-          rid: 1744855261529244227
+          rid: 1835446733942817131
     - rid: 1788444943980692324
       type: {class: BehaviorGraphNodeModel/FieldModel, ns: Unity.Behavior, asm: Unity.Behavior.Authoring}
       data:
@@ -730,7 +653,7 @@ MonoBehaviour:
         LocalValue:
           rid: 1788444943980692333
         LinkedVariable:
-          rid: 1744855261529244231
+          rid: 1835446733942817135
     - rid: 1788444943980692328
       type: {class: BehaviorGraphNodeModel/FieldModel, ns: Unity.Behavior, asm: Unity.Behavior.Authoring}
       data:
@@ -741,7 +664,7 @@ MonoBehaviour:
         LocalValue:
           rid: 1788444943980692336
         LinkedVariable:
-          rid: 1744855261529244232
+          rid: 1835446733942817136
     - rid: 1788444943980692329
       type: {class: BehaviorGraphNodeModel/FieldModel, ns: Unity.Behavior, asm: Unity.Behavior.Authoring}
       data:
@@ -828,7 +751,7 @@ MonoBehaviour:
         LocalValue:
           rid: 1788444943980692411
         LinkedVariable:
-          rid: 1744855261529244228
+          rid: 1835446733942817132
     - rid: 1788444943980692409
       type: {class: BehaviorGraphNodeModel/FieldModel, ns: Unity.Behavior, asm: Unity.Behavior.Authoring}
       data:
@@ -839,7 +762,7 @@ MonoBehaviour:
         LocalValue:
           rid: 1788444943980692412
         LinkedVariable:
-          rid: 1744855261529244229
+          rid: 1835446733942817133
     - rid: 1788444943980692410
       type: {class: BehaviorGraphNodeModel/FieldModel, ns: Unity.Behavior, asm: Unity.Behavior.Authoring}
       data:
@@ -850,7 +773,7 @@ MonoBehaviour:
         LocalValue:
           rid: 1788444943980692413
         LinkedVariable:
-          rid: 1744855261529244230
+          rid: 1835446733942817134
     - rid: 1788444943980692411
       type: {class: 'BlackboardVariable`1[[System.Single, mscorlib]]', ns: Unity.Behavior,
         asm: Unity.Behavior}
@@ -908,7 +831,7 @@ MonoBehaviour:
         LocalValue:
           rid: 1788444944107045809
         LinkedVariable:
-          rid: 1744855261529244232
+          rid: 1835446733942817136
     - rid: 1788444944107045808
       type: {class: BehaviorGraphNodeModel/FieldModel, ns: Unity.Behavior, asm: Unity.Behavior.Authoring}
       data:
@@ -937,6 +860,83 @@ MonoBehaviour:
           m_Value0: 0
           m_Value1: 0
         Name: 
+        m_Value: 0
+    - rid: 1835446733942817130
+      type: {class: 'TypedVariableModel`1[[UnityEngine.GameObject, UnityEngine.CoreModule]]',
+        ns: Unity.Behavior.GraphFramework, asm: Unity.Behavior.GraphFramework}
+      data:
+        ID:
+          m_Value0: 1
+          m_Value1: 0
+        Name: Self
+        IsExposed: 1
+        m_IsShared: 0
+        m_Value: {fileID: 0}
+    - rid: 1835446733942817131
+      type: {class: 'TypedVariableModel`1[[UnityEngine.GameObject, UnityEngine.CoreModule]]',
+        ns: Unity.Behavior.GraphFramework, asm: Unity.Behavior.GraphFramework}
+      data:
+        ID:
+          m_Value0: 8393712751803517602
+          m_Value1: 15673964697732851669
+        Name: Target
+        IsExposed: 1
+        m_IsShared: 0
+        m_Value: {fileID: 0}
+    - rid: 1835446733942817132
+      type: {class: 'TypedVariableModel`1[[System.Single, mscorlib]]', ns: Unity.Behavior.GraphFramework,
+        asm: Unity.Behavior.GraphFramework}
+      data:
+        ID:
+          m_Value0: 950598734489599609
+          m_Value1: 16353272675223498705
+        Name: DetectionRange
+        IsExposed: 1
+        m_IsShared: 0
+        m_Value: 0
+    - rid: 1835446733942817133
+      type: {class: 'TypedVariableModel`1[[System.Single, mscorlib]]', ns: Unity.Behavior.GraphFramework,
+        asm: Unity.Behavior.GraphFramework}
+      data:
+        ID:
+          m_Value0: 1440958042071166951
+          m_Value1: 11118701446493653324
+        Name: VisionConeAngle
+        IsExposed: 1
+        m_IsShared: 0
+        m_Value: 0
+    - rid: 1835446733942817134
+      type: {class: 'TypedVariableModel`1[[System.Boolean, mscorlib]]', ns: Unity.Behavior.GraphFramework,
+        asm: Unity.Behavior.GraphFramework}
+      data:
+        ID:
+          m_Value0: 11979036010392807467
+          m_Value1: 2271663333943568558
+        Name: ShowDebug
+        IsExposed: 1
+        m_IsShared: 0
+        m_Value: 0
+    - rid: 1835446733942817135
+      type: {class: 'TypedVariableModel`1[[System.Single, mscorlib]]', ns: Unity.Behavior.GraphFramework,
+        asm: Unity.Behavior.GraphFramework}
+      data:
+        ID:
+          m_Value0: 12182606397375607258
+          m_Value1: 10872085432190065140
+        Name: DetectionFrequency
+        IsExposed: 1
+        m_IsShared: 0
+        m_Value: 0
+    - rid: 1835446733942817136
+      type: {class: 'TypedVariableModel`1[[System.Single, mscorlib]]', ns: Unity.Behavior.GraphFramework,
+        asm: Unity.Behavior.GraphFramework}
+      data:
+        ID:
+          m_Value0: 14954365780565662593
+          m_Value1: 7244812346962009970
+        Name: ForceWaitTimeAfterAgressionLoss
+        IsExposed: 1
+        m_IsShared: 0
         m_Value: 0
 --- !u!114 &807925731725124325
 MonoBehaviour:

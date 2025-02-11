@@ -58,6 +58,8 @@ MonoBehaviour:
       guid: ef74cfc14e142da4d8acab453c0c3197
     - asset: {fileID: 102900000, guid: aa7a759bf33b10a4498d7c478b22f450, type: 3}
       guid: aa7a759bf33b10a4498d7c478b22f450
+    - asset: {fileID: 102900000, guid: df36cb3e9cc6f2348a39006fa3e4d1c0, type: 3}
+      guid: df36cb3e9cc6f2348a39006fa3e4d1c0
     levelType: 2
   navMeshes:
   - navMeshScene:
