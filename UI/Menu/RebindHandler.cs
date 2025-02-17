@@ -15,8 +15,7 @@ namespace UI.Menu {
         Action _rebindCompleted;
         Action<InputAction, int> _rebindStarted;
 
-        void Awake() {
-            inputReader.InitializeInputActionAsset();
+        void Start() {
             _inputActions = inputReader.InputActions;
         }
 

@@ -1,7 +1,5 @@
-using System.Collections.Generic;
 using Sirenix.OdinInspector;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace UI.Menu {
@@ -12,9 +10,9 @@ namespace UI.Menu {
         [SerializeField, Required] Button controlsButton;
 
         [Title("Panels")]
-        [Required] public GameObject mainOptionsPanel;
-        [Required] public GameObject systemPanel;
-        [Required] public GameObject controlsPanel;
+        [Required] public BaseMenuNavigation mainOptionsPanel;
+        [Required] public BaseMenuNavigation systemPanel;
+        [Required] public BaseMenuNavigation controlsPanel;
 
         void Start() {
             SetupButtonNavigation();
@@ -25,13 +23,9 @@ namespace UI.Menu {
             controlsButton.onClick.AddListener(() => SwitchPanel(controlsPanel));
         }
 
-        void SwitchPanel(GameObject p0) {
-            p0.SetActive(true);
-            mainOptionsPanel.SetActive(false);
-        }
-
-        public bool IsAnyPanelActive() {
-            return systemPanel.activeSelf || controlsPanel.activeSelf || mainOptionsPanel.activeSelf;
+        void SwitchPanel(BaseMenuNavigation switchPanel) {
+            switchPanel.gameObject.SetActive(true);
+            mainOptionsPanel.gameObject.SetActive(false);
         }
     }
 }

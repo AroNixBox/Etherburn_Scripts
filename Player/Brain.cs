@@ -68,8 +68,6 @@ namespace Player {
             _mover = _references.mover;
             
             _input = _references.input;
-            // Check if Playeractions are enabled
-            _input.EnablePlayerActions();
             
             _rootMotionWarpingController = _references.mover.RootMotionWarpingControllerController;
             _abilityTargetQuery = _references.abilityTargetQuery;

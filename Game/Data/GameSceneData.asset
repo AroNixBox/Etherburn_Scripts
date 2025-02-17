@@ -15,9 +15,6 @@ MonoBehaviour:
   bootstrapperScene:
     asset: {fileID: 102900000, guid: 7f305ad6f9f702f4d94f85005de751d0, type: 3}
     guid: 7f305ad6f9f702f4d94f85005de751d0
-  gameOverScene:
-    asset: {fileID: 102900000, guid: 7f305ad6f9f702f4d94f85005de751d0, type: 3}
-    guid: 7f305ad6f9f702f4d94f85005de751d0
   playerScene:
     asset: {fileID: 102900000, guid: a1fd04929a4c2714d9e3cafad9d8d85b, type: 3}
     guid: a1fd04929a4c2714d9e3cafad9d8d85b
@@ -66,3 +63,12 @@ MonoBehaviour:
       asset: {fileID: 102900000, guid: 440c63deb1734e94d814b826966382ee, type: 3}
       guid: 440c63deb1734e94d814b826966382ee
     levelType: 2
+  uiScenePackages:
+  - uiScene:
+      asset: {fileID: 102900000, guid: cbcb03cf02dc66e4d987d3884cce06fb, type: 3}
+      guid: cbcb03cf02dc66e4d987d3884cce06fb
+    uiSceneType: 1
+  - uiScene:
+      asset: {fileID: 102900000, guid: 454ee15cf52e3614d98c0bb1932537d1, type: 3}
+      guid: 454ee15cf52e3614d98c0bb1932537d1
+    uiSceneType: 2

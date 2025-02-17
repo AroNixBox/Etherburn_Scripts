@@ -1,4 +1,3 @@
-using System;
 using Player.Input;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -10,11 +9,12 @@ using UnityEngine.UI;
 namespace UI.Menu {
     public class BaseMenuNavigation : MonoBehaviour {
         [Header("User Interface")]
-        [SerializeField, Required] Button closeButton;
         [SerializeField, Required] Button firstSelectedButton;
+        [SerializeField] bool closable = true;
+        [SerializeField, Required] [ShowIf("@closable")] Button closeButton;
         
         [Header("Events")]
-        [SerializeField] UnityEvent onCloseButtonPressed;
+        [ShowIf("@closable")] public UnityEvent onCloseButtonPressed;
         
         EventSystem _sceneEventSystem;
 
@@ -37,6 +37,12 @@ namespace UI.Menu {
         }
 
         void Start() {
+            if (!closable) { return; }
+            if(closeButton == null) {
+                Debug.LogError("Close Button is not set in the inspector", transform);
+                return;
+            }
+            
             closeButton.onClick.AddListener(() => {
                 onCloseButtonPressed?.Invoke();
             });

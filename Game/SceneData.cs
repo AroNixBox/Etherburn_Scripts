@@ -1,16 +1,22 @@
 ﻿using System.Collections.Generic;
 using Eflatun.SceneReference;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace Game {
     [CreateAssetMenu(menuName = "Game/SceneData")]
     public class SceneData : ScriptableObject {
+        [Title("Systems")]
         public SceneReference bootstrapperScene;
-        public SceneReference gameOverScene;
         public SceneReference playerScene;
         public SceneReference systemsScene;
+        
+        [Title("Levels")]
         public ScenePackage[] levels;
         public NavMeshScenePackage[] navMeshes;
+        
+        [Title("UI")]
+        public UIScenePackage[] uiScenePackages;
         
         [System.Serializable]
         public class ScenePackage {
@@ -23,12 +29,11 @@ namespace Game {
             public SceneReference navMeshScene;
             public ELevelType levelType;
         }
-
-        public Dictionary<EMenuType, SceneReference> MenuScenes { get; private set; } = new();
-
-        void OnEnable() {
-            MenuScenes.Add(EMenuType.Main, bootstrapperScene);
-            MenuScenes.Add(EMenuType.GameOver, gameOverScene);
+        
+        [System.Serializable]
+        public class UIScenePackage {
+            public SceneReference uiScene;
+            public EUISceneType uiSceneType;
         }
 
         public enum ELevelType {
@@ -36,10 +41,10 @@ namespace Game {
             Nixon_Testing,
             Level_One
         }
-
-        public enum EMenuType {
+        
+        public enum EUISceneType {
             None,
-            Main,
+            MainMenu,
             GameOver
         }
     }

@@ -1,23 +1,23 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Extensions;
-using Player.Input;
+using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 namespace Game {
     public class SceneLoader : Singleton<SceneLoader> {
-        [SerializeField] SceneData sceneData;
-        [SerializeField] Canvas loadingCanvas;
-        [SerializeField] Slider loadingSlider;
+        [SerializeField, Required] SceneData sceneData;
+        [SerializeField, Required] Canvas loadingCanvas;
+        [SerializeField, Required] Slider loadingSlider;
         readonly List<AsyncOperation> _asyncOperations = new ();
         
         protected override bool ShouldPersist => true;
-        
         public SceneData.ELevelType CurrentLevelType { get; private set; }
-        
+
         public IEnumerator LoadScenesAsync(SceneData.ELevelType levelType) {
             if(sceneData == null) {
                 Debug.LogError("SceneData is not set in the inspector", transform);
@@ -26,25 +26,28 @@ namespace Game {
             // Set Current Level Type
             CurrentLevelType = levelType;
             
-            // Save Bootstrapper Scene Build Index
-            var currentBuildIndex = SceneManager.GetActiveScene().buildIndex;
-            
             // Load Systems Scene
             var systemsSceneOperation = SceneManager.LoadSceneAsync(sceneData.systemsScene.BuildIndex, LoadSceneMode.Additive);
-            systemsSceneOperation.allowSceneActivation = false;
-            _asyncOperations.Add(systemsSceneOperation);
-            
+            if (systemsSceneOperation != null) {
+                systemsSceneOperation.allowSceneActivation = false;
+                _asyncOperations.Add(systemsSceneOperation);
+            }
+
             // Load Player Scene
             var playerSceneOperation = SceneManager.LoadSceneAsync(sceneData.playerScene.BuildIndex, LoadSceneMode.Additive);
-            playerSceneOperation.allowSceneActivation = false;
-            _asyncOperations.Add(playerSceneOperation);
-            
+            if (playerSceneOperation != null) {
+                playerSceneOperation.allowSceneActivation = false;
+                _asyncOperations.Add(playerSceneOperation);
+            }
+
             // Load Navmesh Scene
             SceneData.NavMeshScenePackage[] navMeshPackages = sceneData.navMeshes.Where(navMesh => navMesh.levelType == levelType).ToArray();
             foreach (var navMeshPackage in navMeshPackages) {
                 var navSceneOperation = SceneManager.LoadSceneAsync(navMeshPackage.navMeshScene.BuildIndex, LoadSceneMode.Additive);
-                navSceneOperation.allowSceneActivation = false;
-                _asyncOperations.Add(navSceneOperation);
+                if (navSceneOperation != null) {
+                    navSceneOperation.allowSceneActivation = false;
+                    _asyncOperations.Add(navSceneOperation);
+                }
             }
             
             SceneData.ScenePackage[] levelPackages = sceneData.levels.Where(level => level.levelType == levelType).ToArray();
@@ -78,60 +81,82 @@ namespace Game {
             // Clear Async Operations
             _asyncOperations.Clear();
             
-            // Unload Bootstrapper Scene
-            SceneManager.UnloadSceneAsync(currentBuildIndex);
+            // Loading Scenes will always be a new Level...
+            var gameBrain = GameBrain.Instance;
+            if(gameBrain == null) {
+                Debug.LogError("GameBrain is not set in the inspector", transform);
+            }
+            gameBrain.PlayTriggered = true;
         }
 
-        /// <summary>
-        /// Used to load one scene async at a time
-        /// </summary>
-        /// <returns></returns>
-        public IEnumerator LoadSceneAsync(SceneData.EMenuType menuType) {
-            if (sceneData == null) {
+        // Loading UI Scene doesnt require a progress bar
+        public void LoadSceneAsync(SceneData.EUISceneType uiSceneType) {
+            if(sceneData == null) {
                 Debug.LogError("SceneData is not set in the inspector", transform);
             }
-    
-            // Load Menu Scene
-            var menuSceneOperation = SceneManager.LoadSceneAsync(sceneData.MenuScenes[menuType].BuildIndex);
-            menuSceneOperation.allowSceneActivation = false;
-    
-            StartCoroutine(UpdateLoadingSlider(new List<AsyncOperation> {menuSceneOperation}));
-    
-            // Wait for all scenes to load
-            while (menuSceneOperation.progress < 0.9f) {
-                yield return null;
-            }
-    
-            // Activate all scenes
-            menuSceneOperation.allowSceneActivation = true;
             
-            // Wait for scene to activate
-            while (!menuSceneOperation.isDone) {
-                yield return null;
+            SceneData.UIScenePackage uiScenePackage = sceneData.uiScenePackages.FirstOrDefault(uiScene => uiScene.uiSceneType == uiSceneType);
+            if (uiScenePackage.uiSceneType != uiSceneType) {
+                Debug.LogError("UI Scene Type does not match the UI Scene Package", transform);
             }
-    
-            if (menuType == SceneData.EMenuType.GameOver) {
-                var gameOverWindow = FindObjectsByType<GameObject>(FindObjectsInactive.Include, FindObjectsSortMode.None)
-                    .FirstOrDefault(go => go.name == "Game Over");
-                var mainMenuWindow = FindObjectsByType<GameObject>(FindObjectsInactive.Include, FindObjectsSortMode.None)
-                    .FirstOrDefault(go => go.name == "Main Menu");
-                
-                if (gameOverWindow != null) {
-                    gameOverWindow.SetActive(true);
-                } else {
-                    Debug.LogError("Game Over object not found");
-                }
+            
+            SceneManager.LoadSceneAsync(uiScenePackage.uiScene.BuildIndex, LoadSceneMode.Additive);
+        }
+        
+        public void UnloadScene(SceneData.EUISceneType uiSceneType) {
+            SceneData.UIScenePackage uiScenePackage = sceneData.uiScenePackages.FirstOrDefault(uiScene => uiScene.uiSceneType == uiSceneType);
+            if (uiScenePackage != null && uiScenePackage.uiSceneType != uiSceneType) {
+                Debug.LogError("UI Scene Type does not match the UI Scene Package", transform);
+            }
 
-                if (mainMenuWindow != null) {
-                    mainMenuWindow.SetActive(false);
-                } else {
-                    Debug.LogError("Main Menu object not found");
+            if (uiScenePackage != null) SceneManager.UnloadSceneAsync(uiScenePackage.uiScene.BuildIndex);
+        }
+        public bool IsInUIScene(SceneData.EUISceneType uiSceneType) {
+            SceneData.UIScenePackage first = sceneData.uiScenePackages.FirstOrDefault(uiScene => uiScene.uiSceneType == uiSceneType);
+            return first != null && SceneManager.GetSceneByBuildIndex(first.uiScene.BuildIndex).isLoaded;
+        }
+        
+        public bool IsInLevel() {
+            return CurrentLevelType != SceneData.ELevelType.None;
+        }
+
+        public void UnloadScenes(SceneData.ELevelType sceneLevelType) {
+            if(sceneData == null) {
+                Debug.LogError("SceneData is not set in the inspector", transform);
+            }
+            
+            // Unload Systems Scene
+            var systemsScene = sceneData.systemsScene;
+            if (systemsScene != null) {
+                SceneManager.UnloadSceneAsync(systemsScene.BuildIndex);
+            }
+
+            // Unload Player Scene
+            var playerScene = sceneData.playerScene;
+            if (playerScene != null) {
+                SceneManager.UnloadSceneAsync(playerScene.BuildIndex);
+            }
+
+            // Unload Navmesh Scene
+            var navMeshPackages = sceneData.navMeshes
+                .Where(navMesh => navMesh.levelType == sceneLevelType).ToArray();
+            foreach (var navMeshPackage in navMeshPackages) {
+                var navMeshScene = navMeshPackage.navMeshScene;
+                if (navMeshScene != null) {
+                    SceneManager.UnloadSceneAsync(navMeshScene.BuildIndex);
                 }
-                
-                Cursor.lockState = CursorLockMode.None;
-                Cursor.visible = true;
+            }
+            
+            // Unload Level Package
+            var levelPackages = sceneData.levels
+                .Where(level => level.levelType == sceneLevelType).ToArray();
+            foreach (var levelPackage in levelPackages) {
+                foreach (var scene in levelPackage.levelScenes) {
+                    SceneManager.UnloadSceneAsync(scene.BuildIndex);
+                }
             }
         }
+        
         IEnumerator UpdateLoadingSlider(List<AsyncOperation> asyncOperations) {
             loadingCanvas.gameObject.SetActive(true);
             

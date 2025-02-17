@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.InputSystem;
@@ -236,6 +235,8 @@ namespace Player.Input {
         // Called in IInputReader on Enable
         public void EnablePlayerActions() {
             if(InputActions == null) {
+                Debug.LogError("InputActions not initialized, GameBrain should have initialized this");
+                
                 InitializeInputActionAsset();
             }
             

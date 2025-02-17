@@ -23,9 +23,6 @@ public partial class GetCurrentNavMeshPositionAction : Action
             Debug.LogError($"Missing type: {missingType}");
             return Status.Failure;
         }
-        
-        Debug.Log($"Data: {DataToStore}");
-        Debug.Log($"DataToStore: {DataToStore.Value}");
 
         switch (DataToStore.Value) {
             case DataType.Position:
