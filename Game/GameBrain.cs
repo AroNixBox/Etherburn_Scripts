@@ -2,6 +2,7 @@ using System;
 using Extensions.FSM;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace Game {
     public class GameBrain : Extensions.Singleton<GameBrain> {
@@ -57,7 +58,18 @@ namespace Game {
             
             At(gameOverState, menuState, () => QuitTriggered);
             
-            _stateMachine.SetInitialState(menuState);
+            IState initialState = menuState;
+            
+            #if UNITY_EDITOR
+            
+            // If we are in the editor and not in the Bootstrapper Scene..
+            if (SceneManager.GetActiveScene().name != "LevelBootstrapper") {
+                initialState = playState;
+            }
+            
+            #endif
+            
+            _stateMachine.SetInitialState(initialState);
             
             return;
             
