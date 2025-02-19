@@ -142,6 +142,12 @@ MonoBehaviour:
         BlackboardReference:
           rid: 1788445003030462864
         BlackboardGroupReferences: []
+        ProcessedNodes: []
+        m_RunningNodes: []
+        m_NodesToEnd:
+          rid: 1835447069429203479
+        m_EndedNodes:
+          rid: 1835447069429203480
         m_VersionTimestamp: 638718542684027437
     - rid: 1788445003030462863
       type: {class: ParallelAllComposite, ns: Unity.Behavior, asm: Unity.Behavior}
@@ -624,6 +630,14 @@ MonoBehaviour:
         m_Value: {fileID: 0}
         m_LinkedVariable:
           rid: 1788445003030462878
+    - rid: 1835447069429203479
+      type: {class: 'Stack`1[[Unity.Behavior.Node, Unity.Behavior]]', ns: System.Collections.Generic,
+        asm: mscorlib}
+      data: 
+    - rid: 1835447069429203480
+      type: {class: 'HashSet`1[[Unity.Behavior.Node, Unity.Behavior]]', ns: System.Collections.Generic,
+        asm: System.Core}
+      data: 
 --- !u!114 &-228998370847441155
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -634,7 +648,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2dd922ae02c94c87a66e46a10a7319b9, type: 3}
-  m_Name: SBHG_Retreat Blackboard Editor
+  m_Name: SBHG_Retreat Blackboard
   m_EditorClassIdentifier: 
   AssetID:
     m_Value0: 2655330623740317785
@@ -788,6 +802,7 @@ MonoBehaviour:
   - rid: 2108069882666680843
   m_VersionTimestamp: 638718542684027437
   m_DebugInfo: {fileID: 7889365972640161872}
+  m_RuntimeGraph: {fileID: -8503214872198040566}
   AssetID:
     m_Value0: 2655330623740317785
     m_Value1: 4987641982474479403
@@ -987,6 +1002,7 @@ MonoBehaviour:
       Tooltip: 
     NamedChildren: []
   m_Blackboards: []
+  m_MainBlackboardAuthoringAsset: {fileID: -228998370847441155}
   m_CommandBuffer:
     m_Commands: []
   references:
@@ -2338,7 +2354,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5c02bb70996b49eba31d0c206e28da24, type: 3}
-  m_Name: SBHG_Retreat Blackboard Editor
+  m_Name: SBHG_Retreat Blackboard
   m_EditorClassIdentifier: 
   VersionTimestamp: 638718542684538817
   AssetID:

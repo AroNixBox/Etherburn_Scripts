@@ -27,6 +27,7 @@ MonoBehaviour:
   - rid: 1788444943980692293
   m_VersionTimestamp: 638720472819725825
   m_DebugInfo: {fileID: 8336446922130249496}
+  m_RuntimeGraph: {fileID: 3168072713838068154}
   AssetID:
     m_Value0: 7245688560139604166
     m_Value1: 15121302175927109195
@@ -149,6 +150,7 @@ MonoBehaviour:
     - True
     - False
   m_Blackboards: []
+  m_MainBlackboardAuthoringAsset: {fileID: 807925731725124325}
   m_CommandBuffer:
     m_Commands: []
   references:
@@ -948,7 +950,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2dd922ae02c94c87a66e46a10a7319b9, type: 3}
-  m_Name: SBHG_EntityDetection Blackboard Editor
+  m_Name: SBHG_EntityDetection Blackboard
   m_EditorClassIdentifier: 
   AssetID:
     m_Value0: 7245688560139604166
@@ -1115,6 +1117,12 @@ MonoBehaviour:
         BlackboardReference:
           rid: 1788445015237984363
         BlackboardGroupReferences: []
+        ProcessedNodes: []
+        m_RunningNodes: []
+        m_NodesToEnd:
+          rid: 1835447069429203485
+        m_EndedNodes:
+          rid: 1835447069429203486
         m_VersionTimestamp: 638720472819725825
     - rid: 1788445015237984362
       type: {class: Start, ns: Unity.Behavior, asm: Unity.Behavior}
@@ -1366,6 +1374,14 @@ MonoBehaviour:
         m_Value: {fileID: 0}
         m_LinkedVariable:
           rid: 1788445015237984369
+    - rid: 1835447069429203485
+      type: {class: 'Stack`1[[Unity.Behavior.Node, Unity.Behavior]]', ns: System.Collections.Generic,
+        asm: mscorlib}
+      data: 
+    - rid: 1835447069429203486
+      type: {class: 'HashSet`1[[Unity.Behavior.Node, Unity.Behavior]]', ns: System.Collections.Generic,
+        asm: System.Core}
+      data: 
 --- !u!114 &7607003459747413924
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1376,7 +1392,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5c02bb70996b49eba31d0c206e28da24, type: 3}
-  m_Name: SBHG_EntityDetection Blackboard Editor
+  m_Name: SBHG_EntityDetection Blackboard
   m_EditorClassIdentifier: 
   VersionTimestamp: 638720472819725825
   AssetID:

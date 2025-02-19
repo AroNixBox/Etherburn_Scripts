@@ -23,7 +23,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5c02bb70996b49eba31d0c206e28da24, type: 3}
-  m_Name: SBHG_Attack Blackboard Editor
+  m_Name: SBHG_Attack Blackboard
   m_EditorClassIdentifier: 
   VersionTimestamp: 638722716407581841
   AssetID:
@@ -217,6 +217,7 @@ MonoBehaviour:
   - rid: 3489942573279084862
   m_VersionTimestamp: 638722716406880771
   m_DebugInfo: {fileID: -9140641597734748957}
+  m_RuntimeGraph: {fileID: 4780519700044430155}
   AssetID:
     m_Value0: 17605840374535629470
     m_Value1: 15104332234359360635
@@ -443,6 +444,7 @@ MonoBehaviour:
       Tooltip: 
     NamedChildren: []
   m_Blackboards: []
+  m_MainBlackboardAuthoringAsset: {fileID: 3109515502557598786}
   m_CommandBuffer:
     m_Commands: []
   references:
@@ -2515,7 +2517,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2dd922ae02c94c87a66e46a10a7319b9, type: 3}
-  m_Name: SBHG_Attack Blackboard Editor
+  m_Name: SBHG_Attack Blackboard
   m_EditorClassIdentifier: 
   AssetID:
     m_Value0: 17605840374535629470
@@ -2883,6 +2885,12 @@ MonoBehaviour:
         BlackboardReference:
           rid: 1788445014327558661
         BlackboardGroupReferences: []
+        ProcessedNodes: []
+        m_RunningNodes: []
+        m_NodesToEnd:
+          rid: 1835447069429203487
+        m_EndedNodes:
+          rid: 1835447069429203488
         m_VersionTimestamp: 638722716406880771
     - rid: 1788445014327558660
       type: {class: Start, ns: Unity.Behavior, asm: Unity.Behavior}
@@ -3522,3 +3530,11 @@ MonoBehaviour:
         m_Value: {fileID: 0}
         m_LinkedVariable:
           rid: 1788445014327558674
+    - rid: 1835447069429203487
+      type: {class: 'Stack`1[[Unity.Behavior.Node, Unity.Behavior]]', ns: System.Collections.Generic,
+        asm: mscorlib}
+      data: 
+    - rid: 1835447069429203488
+      type: {class: 'HashSet`1[[Unity.Behavior.Node, Unity.Behavior]]', ns: System.Collections.Generic,
+        asm: System.Core}
+      data: 

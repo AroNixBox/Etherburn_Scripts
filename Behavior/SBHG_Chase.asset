@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5c02bb70996b49eba31d0c206e28da24, type: 3}
-  m_Name: SBHG_Chase Blackboard Editor
+  m_Name: SBHG_Chase Blackboard
   m_EditorClassIdentifier: 
   VersionTimestamp: 638718542631316585
   AssetID:
@@ -92,7 +92,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2dd922ae02c94c87a66e46a10a7319b9, type: 3}
-  m_Name: SBHG_Chase Blackboard Editor
+  m_Name: SBHG_Chase Blackboard
   m_EditorClassIdentifier: 
   AssetID:
     m_Value0: 10684032300045680616
@@ -204,6 +204,7 @@ MonoBehaviour:
   - rid: 3489942300423357216
   m_VersionTimestamp: 638718542630809247
   m_DebugInfo: {fileID: 4978131481951560671}
+  m_RuntimeGraph: {fileID: 2219913611889424371}
   AssetID:
     m_Value0: 10684032300045680616
     m_Value1: 7382014399027084345
@@ -352,6 +353,7 @@ MonoBehaviour:
       Tooltip: 
     NamedChildren: []
   m_Blackboards: []
+  m_MainBlackboardAuthoringAsset: {fileID: -1390177887106427506}
   m_CommandBuffer:
     m_Commands: []
   references:
@@ -1420,6 +1422,12 @@ MonoBehaviour:
         BlackboardReference:
           rid: 1788445002987471871
         BlackboardGroupReferences: []
+        ProcessedNodes: []
+        m_RunningNodes: []
+        m_NodesToEnd:
+          rid: 1835447069429203475
+        m_EndedNodes:
+          rid: 1835447069429203476
         m_VersionTimestamp: 638718542630809247
     - rid: 1788445002987471870
       type: {class: Start, ns: Unity.Behavior, asm: Unity.Behavior}
@@ -1765,6 +1773,14 @@ MonoBehaviour:
         m_Value: {fileID: 0}
         m_LinkedVariable:
           rid: 1788445003006345222
+    - rid: 1835447069429203475
+      type: {class: 'Stack`1[[Unity.Behavior.Node, Unity.Behavior]]', ns: System.Collections.Generic,
+        asm: mscorlib}
+      data: 
+    - rid: 1835447069429203476
+      type: {class: 'HashSet`1[[Unity.Behavior.Node, Unity.Behavior]]', ns: System.Collections.Generic,
+        asm: System.Core}
+      data: 
 --- !u!114 &4978131481951560671
 MonoBehaviour:
   m_ObjectHideFlags: 0
