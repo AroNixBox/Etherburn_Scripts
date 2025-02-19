@@ -10,7 +10,7 @@ namespace Enemy {
     [RequireComponent(typeof(Animator))]
     public class EnemyEventForward : MonoBehaviour {
         [SerializeField, Required] EnemyMover enemyMover;
-        [SerializeField, Required] DamageDealingObject weapon;
+        [SerializeField, Required] DamageDealingObject[] weapons;
         [SerializeField] List<AnimationEventAction> specialAnimEvents = new();
         Animator _animator;
 
@@ -44,14 +44,20 @@ namespace Enemy {
         // Animation Events
         void EnableHitDetection(AnimationEvent evt) {
             if (IsInAnimationTransition(evt)) { return; }
-            if(weapon == null) { return; } // [WeaponController.cs] will be null when Enemy dies, all Components get destroyed except [EnemyEventForward.cs] and [Animator]
-            weapon.CastForObjects(true);
+            if(weapons.Length == 0) { return; } // [WeaponController.cs] will be null when Enemy dies, all Components get destroyed except [EnemyEventForward.cs] and [Animator]
+
+            foreach (var weapon in weapons) {
+                weapon.CastForObjects(true);
+            }
         }
         
         void DisableHitDetection(AnimationEvent evt) {
             if (IsInAnimationTransition(evt)) { return; }
-            if(weapon == null) { return; } // [WeaponController.cs] will be null when Enemy dies, all Components get destroyed except [EnemyEventForward.cs] and [Animator]
-            weapon.CastForObjects(false);
+            if(weapons.Length == 0) { return; } // [WeaponController.cs] will be null when Enemy dies, all Components get destroyed except [EnemyEventForward.cs] and [Animator]
+
+            foreach (var weapon in weapons) {
+                weapon.CastForObjects(false);
+            }
         }
         
         bool IsInAnimationTransition(AnimationEvent evt) {
