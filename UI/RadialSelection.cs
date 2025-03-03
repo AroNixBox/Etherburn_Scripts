@@ -10,6 +10,7 @@ namespace UI {
         [SerializeField, Required] RadialImage radialSelectionPrefab;
         [SerializeField, Required] Transform radialSelectionsParent;
         [SerializeField] Transform weaponSelectionParent;
+        [SerializeField] Transform weaponSelectionBackground;
         [SerializeField] Transform weaponInformation;
         [SerializeField] TMP_Text weaponHeaderText;
         [SerializeField] TMP_Text weaponDescriptionText;
@@ -25,6 +26,7 @@ namespace UI {
         void Start() {
             // Disable the radial selection on start
             weaponSelectionParent.gameObject.SetActive(false);
+            weaponSelectionBackground.gameObject.SetActive(false);
         }
         public int GetSelectedIndex() => _selectedIndex;
         public void InitializeRadialParts(List<Player.Weapon.WeaponSO> weapons, int initialSelectedIndex) {
@@ -71,8 +73,11 @@ namespace UI {
             // Set the initial selected index
             _selectedIndex = initialSelectedIndex;
         }
-        
-        public void EnableRadialSelection(bool enabled) => weaponSelectionParent.gameObject.SetActive(enabled);
+
+        public void EnableRadialSelection(bool enabled) {
+            weaponSelectionParent.gameObject.SetActive(enabled);
+            weaponSelectionBackground.gameObject.SetActive(enabled);
+        }
 
         public void SelectRadialPart(Vector2 inputPosition, bool isMouseInput) {
             Vector2 localPosition;
