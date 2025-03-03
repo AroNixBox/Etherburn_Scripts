@@ -72,3 +72,7 @@ MonoBehaviour:
       asset: {fileID: 102900000, guid: 454ee15cf52e3614d98c0bb1932537d1, type: 3}
       guid: 454ee15cf52e3614d98c0bb1932537d1
     uiSceneType: 2
+  - uiScene:
+      asset: {fileID: 102900000, guid: 3d5c94744cfcb67479d3716993defc3a, type: 3}
+      guid: 3d5c94744cfcb67479d3716993defc3a
+    uiSceneType: 3

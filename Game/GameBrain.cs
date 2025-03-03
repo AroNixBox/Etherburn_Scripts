@@ -12,7 +12,6 @@ namespace Game {
         [Required] public Camera menuCamera;
         
         [Title("User Interface")]
-        [SerializeField, Required] UI.Menu.OptionMenuNavigation optionMenuNavigation;
         [Required] public UnityEngine.UI.Image fadeOutImage;
         public bool PauseToggleTriggered { get; set; }
         public bool GameOverTriggered { get; set; }
@@ -45,7 +44,7 @@ namespace Game {
             var menuState = new State.MenuState(inputReader, this);
             var gameOverState = new State.GameOverState(inputReader, this);
             var playState = new State.PlayState(inputReader, this);
-            var pauseState = new State.PauseState(inputReader, this, optionMenuNavigation);
+            var pauseState = new State.PauseState(inputReader, this);
             
             At(menuState, playState, () => PlayTriggered);
             At(menuState, pauseState, () => PauseToggleTriggered);

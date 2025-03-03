@@ -45,7 +45,8 @@ namespace Game {
         public enum EUISceneType {
             None,
             MainMenu,
-            GameOver
+            GameOver,
+            PauseMenu
         }
     }
 }

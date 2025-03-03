@@ -127,14 +127,12 @@ namespace Player.Cam {
                 if(allEntitiesInVisionCone.Count == 0) { return; }
 
                 LockedOnEnemyTarget = allEntitiesInVisionCone.FirstOrDefault(entity => entity.EntityType == lockOnEntityType);
+                
                 // Add Lock on Visual
-                if (LockedOnEnemyTarget != null) {
-                    if (LockedOnEnemyTarget.TryGetComponent(out EnemyBodyParts bodyParts)) {
-                        uiOnScreenFocus.SetTarget(bodyParts.head);
-                    } else {
-                        uiOnScreenFocus.SetTarget(LockedOnEnemyTarget.transform);
-                    }
-                }
+                if (LockedOnEnemyTarget == null) { return; }
+                uiOnScreenFocus.SetTarget(LockedOnEnemyTarget.TryGetComponent(out EnemyBodyParts bodyParts)
+                    ? bodyParts.head
+                    : LockedOnEnemyTarget.transform);
                 
             }
         }

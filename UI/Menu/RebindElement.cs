@@ -2,7 +2,6 @@ using Sirenix.OdinInspector;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.UI;
 
 namespace UI.Menu {
     public class RebindElement : MonoBehaviour {
@@ -11,7 +10,6 @@ namespace UI.Menu {
         [SerializeField] InputActionReference inputActionReference;
         [Title("User Interface")]
         [SerializeField] TMP_Text actionNameText;
-        [SerializeField] Image buttonBackground;
         
         string _inputActionName;
         void Start() {
