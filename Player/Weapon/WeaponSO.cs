@@ -7,6 +7,8 @@ namespace Player.Weapon {
     public class WeaponSO : ScriptableObject {
         [Title("User Interface")]
         public string weaponName;
+        [Tooltip("The speed multiplier for the ground locomotion animations, e.g. Katana Ground Locomotion was too slow, thats how to speed the animation up or slow it down")]
+        [Range(0.7f, 2f)] public float groundLocomotionSpeedMultiplier = 1;
         [TextArea(2, 4)] public string weaponDescription;
         public Sprite weaponSprite;
         public GameObject weaponPrefab;

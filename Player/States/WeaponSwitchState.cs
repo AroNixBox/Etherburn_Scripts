@@ -37,6 +37,10 @@ namespace Player.States {
            // Replace the Animator Controller
            _animationController.OverrideAnimatorController(selectedWeapon.animatorOverrideController);
            
+           // Change the Animation Speed Multiplier for Ground Locomotion
+           var newGroundSpeedMultiplier = selectedWeapon.groundLocomotionSpeedMultiplier;
+           _animationController.ChangeAnimationClipSpeed(Animation.AnimationParameters.GroundLocomotionSpeedMultiplier, newGroundSpeedMultiplier);
+           
            // Reset the Weapon Parents Position and Rotation if there was any
            _references.weaponSocket.localPosition = _references.InitialWeaponSocketPosition;
            _references.weaponSocket.localRotation = _references.InitialWeaponSocketRotation;

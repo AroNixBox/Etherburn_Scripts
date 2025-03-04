@@ -7,6 +7,9 @@ namespace Player.Animation {
     /// </summary>
     public class AnimationController : MonoBehaviour {
         [SerializeField] Animator animator;
+        public void ChangeAnimationClipSpeed(int speedMultiplierParam, float newSpeed) {
+            animator.SetFloat(speedMultiplierParam, newSpeed);
+        }
         public void OverrideAnimatorController(RuntimeAnimatorController controller) {
             animator.runtimeAnimatorController = controller;
         }

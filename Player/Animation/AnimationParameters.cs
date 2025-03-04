@@ -11,6 +11,8 @@ namespace Player.Animation {
         // Get Hit
         public static readonly int HitDirectionX = Animator.StringToHash("HitDirectionX");
         public static readonly int HitDirectionZ = Animator.StringToHash("HitDirectionZ");
+        // Speed Multipliers
+        public static readonly int GroundLocomotionSpeedMultiplier = Animator.StringToHash("GroundLocomotionSpeedMultiplier");
          
         public static readonly int GroundLocomotion = Animator.StringToHash("GroundLocomotion");
         public static readonly int Fall = Animator.StringToHash("Fall");

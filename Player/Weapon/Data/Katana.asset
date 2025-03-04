@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Katana
   m_EditorClassIdentifier: 
   weaponName: Moonlight Fang Katana
+  groundLocomotionSpeedMultiplier: 1.3
   weaponDescription: 'A sleek katana with a blade that shimmers like moonlight on
     still water. Its edge, honed to perfection by master swordsmiths, cuts through
     flesh and bone with terrifying ease. '
