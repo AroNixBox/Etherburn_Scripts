@@ -13,10 +13,11 @@ namespace Extensions {
         
         public void DisableComponents() {
             foreach (var component in componentsToDisable) {
-                component.enabled = false;
+                // detatch the component from the GameObject
+                Destroy(component);
             }
              
-            enabled = false;
+            Destroy(this);
         }
     }
 }
