@@ -40,7 +40,11 @@ namespace Player.Weapon {
             // Which weapon do we start with?
             radialSelection.InitializeRadialParts(weapons, _selectedIndex);
         }
-        
+        public void AddWeapon(WeaponSO newWeapon) {
+            weapons.Add(newWeapon);
+            radialSelection.ClearRadialParts();
+            radialSelection.InitializeRadialParts(weapons, _selectedIndex);
+        }
         public void ResetAttackIndex() {
             _attackIndex = 0;
         }

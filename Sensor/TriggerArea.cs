@@ -13,18 +13,25 @@ namespace Sensor {
         [SerializeField] EntityType targetEntityType;
         [SerializeField] EMessageType messageType;
         [SerializeField] bool multiApply = true;
+        [SerializeField] bool useEventChannel = true;
+        [ShowIf("@!useEventChannel")]
+        public UnityEvent onCollisionEvent;
+        
+        [Title("Player Specific")]
+        [ShowIf("@targetEntityType == EntityType.Player")]
+        [SerializeField] bool weaponUpgrade;
+        [ShowIf("@targetEntityType == EntityType.Player && weaponUpgrade")]
+        [SerializeField] Player.Weapon.WeaponSO weaponSO;
+        
 
         bool _hasApplied;
         
         Collider _collider;
         List<Entity> _targetEntities;
         
-        [SerializeField] bool useEventChannel = true;
         EntityColliderInteractionChannel _entityColliderInteractionChannel;
         bool _isInitialized;
         
-        [ShowIf("@!useEventChannel")]
-        public UnityEvent onCollisionEvent;
         void Start() {
             _collider = GetComponent<Collider>();
             
@@ -72,6 +79,7 @@ namespace Sensor {
                     if (IsColliderIntersecting(other)) {
                         FireEvent();
                         FireSpecificAction(entity);
+                        FirePlayerSpecificAction(entity);
                     }
                     return;
                 }
@@ -80,6 +88,7 @@ namespace Sensor {
             if (IsColliderIntersecting(other)) {
                 FireEvent();
                 FireSpecificAction(entity);
+                FirePlayerSpecificAction(entity);
             }
         }
         
@@ -93,6 +102,16 @@ namespace Sensor {
             }
             else {
                 onCollisionEvent?.Invoke();
+            }
+        }
+        
+        // Unclean, does very specific thing.
+        void FirePlayerSpecificAction(Entity entity) {
+            if(targetEntityType != EntityType.Player) { return; }
+            if (!weaponUpgrade) { return; }
+            
+            if (entity.TryGetComponent(out Player.Weapon.WeaponManager weaponManager)) {
+                weaponManager.AddWeapon(weaponSO);
             }
         }
         protected virtual void FireSpecificAction(Entity entity) { }
@@ -111,6 +130,7 @@ namespace Sensor {
                     if (!IsColliderIntersecting(other)) {
                         FireEvent();
                         FireSpecificAction(entity);
+                        FirePlayerSpecificAction(entity);
                     }
                     return;
                 }
@@ -119,6 +139,7 @@ namespace Sensor {
             if (!IsColliderIntersecting(other)) {
                 FireEvent();
                 FireSpecificAction(entity);
+                FirePlayerSpecificAction(entity);
             }
         }
     

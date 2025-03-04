@@ -29,6 +29,12 @@ namespace UI {
             weaponSelectionBackground.gameObject.SetActive(false);
         }
         public int GetSelectedIndex() => _selectedIndex;
+        public void ClearRadialParts() {
+            foreach (var radialPart in _radialParts) {
+                Destroy(radialPart.RadialImage.gameObject);
+            }
+            _radialParts.Clear();
+        }
         public void InitializeRadialParts(List<Player.Weapon.WeaponSO> weapons, int initialSelectedIndex) {
             _numberOfOptions = weapons.Count;
             for (var i = 0; i < _numberOfOptions; i++) {
