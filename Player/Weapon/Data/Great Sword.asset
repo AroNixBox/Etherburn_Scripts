@@ -21,7 +21,30 @@ MonoBehaviour:
   weaponRotation: {x: 0, y: 180, z: 20}
   animatorOverrideController: {fileID: 22100000, guid: 4a1d35e4503d19b4486234e797f82d40,
     type: 2}
+  groundLocomotionSpeedMultiplier: 1
   lightAttack:
+    attackClips:
+    - animationClip: {fileID: 1827226128182048838, guid: 0b4c7ac83031d3e4ea5c15994c32cc51,
+        type: 3}
+      effect:
+        particleSystem: {fileID: 5275736863541973407, guid: fc424d8197b2dbd478aa8d4e59142e2c,
+          type: 3}
+        spawnPosition: {x: 0, y: 0, z: 0}
+        spawnRotation: {x: 65, y: 20, z: -173.243}
+        spawnSound: {fileID: 8300000, guid: 761c6f1207edb8240b828b81b76a4a73, type: 3}
+    - animationClip: {fileID: 1827226128182048838, guid: 655dfca887666984d973826c0edca901,
+        type: 3}
+      effect:
+        particleSystem: {fileID: 5275736863541973407, guid: fc424d8197b2dbd478aa8d4e59142e2c,
+          type: 3}
+        spawnPosition: {x: 0, y: 0, z: 0}
+        spawnRotation: {x: 54, y: -223.665, z: -16}
+        spawnSound: {fileID: 8300000, guid: 761c6f1207edb8240b828b81b76a4a73, type: 3}
+    attributeData:
+      damage: 40
+      stamina: 40
+      ultimate: 40
+  heavyAttack:
     attackClips:
     - animationClip: {fileID: 1827226128182048838, guid: d3ad7cfe17545ae409a9bc9ce926d6c1,
         type: 3}
@@ -31,27 +54,22 @@ MonoBehaviour:
         spawnPosition: {x: 0, y: 0, z: 0}
         spawnRotation: {x: 82.7, y: 106, z: -104}
         spawnSound: {fileID: 8300000, guid: 761c6f1207edb8240b828b81b76a4a73, type: 3}
-    attributeData:
-      damage: 40
-      stamina: 40
-      ultimate: 40
-  heavyAttack:
-    attackClips:
-    - animationClip: {fileID: 1827226128182048838, guid: e2faec2e6436c0b4ab5249e096cb6a81,
+    - animationClip: {fileID: 1827226128182048838, guid: 0c85f2f0b727ef2418b07e6155b5f552,
         type: 3}
       effect:
         particleSystem: {fileID: 5275736863541973407, guid: fc424d8197b2dbd478aa8d4e59142e2c,
           type: 3}
-        spawnPosition: {x: -0.13, y: 0.06, z: -0.24}
-        spawnRotation: {x: 123.577, y: -187.474, z: -309}
-        spawnSound: {fileID: 8300000, guid: 5fac730eeb998a1458a0929a8e34d1d8, type: 3}
+        spawnPosition: {x: 0, y: 0, z: 0}
+        spawnRotation: {x: 82.7, y: 106, z: -104}
+        spawnSound: {fileID: 8300000, guid: 761c6f1207edb8240b828b81b76a4a73, type: 3}
     attributeData:
       damage: 80
       stamina: 80
       ultimate: 80
   finisherData:
     finisherWarpAnimation:
-    - {fileID: 11400000, guid: f89ca1438f90cac42909c9eb424d6639, type: 2}
+    - {fileID: 11400000, guid: d65411770d06c684d9a7ffaeef61ca4a, type: 2}
+    - {fileID: 11400000, guid: f7f016fb3cd215c499ea11d7ec9a0b5f, type: 2}
     attributeData:
       damage: 100
       stamina: 100

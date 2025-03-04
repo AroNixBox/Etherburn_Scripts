@@ -35,8 +35,8 @@ namespace Player.Animation {
             {Dodge, 0.25f},
             {ChangeWeapon, 0.05f},
             {AttackFinisher, 0.1f},
-            {Attack, 0.15f},
-            {Attack2, 0.15f},
+            {Attack, 0.1f},
+            {Attack2, 0.1f},
             {GetHit, 0.1f},
             {Die, 0.1f}
         };

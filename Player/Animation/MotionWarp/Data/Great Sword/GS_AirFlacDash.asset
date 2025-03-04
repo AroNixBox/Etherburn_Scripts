@@ -10,18 +10,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6359d42e89d54f918d5ca098311a63c7, type: 3}
-  m_Name: GS_JumpAttack
+  m_Name: GS_AirFlacDash
   m_EditorClassIdentifier: 
-  clip: {fileID: 1827226128182048838, guid: 4e6d5bf82fb1eea468d883e0ea4c00ec, type: 3}
+  clip: {fileID: 1827226128182048838, guid: 6d5ccc51fcb16404986af26e7bb32082, type: 3}
   targetObject: {fileID: 100160, guid: 5ae02fce3fd08f140888c4d8f1f2cfc3, type: 3}
-  totalRootMotion: {x: 0.17297837, y: 0, z: 2.843229}
-  startFrame: 20
-  endFrame: 60
-  totalRootMotionUntilWarpStartFrame: {x: 0.0712896, y: 0, z: 0.6264765}
-  totalRootMotionBetweenWarpStartAndEndFrame: {x: 0.006980486, y: 0, z: 1.9208698}
+  totalRootMotion: {x: 0.11328238, y: 0, z: 5.6670804}
+  startFrame: 8
+  endFrame: 19
+  totalRootMotionUntilWarpStartFrame: {x: 0.08046756, y: 0, z: 1.0145972}
+  totalRootMotionBetweenWarpStartAndEndFrame: {x: 0.037614882, y: 0, z: 2.744521}
   effectInstance:
     particleSystem: {fileID: 5275736863541973407, guid: fc424d8197b2dbd478aa8d4e59142e2c,
       type: 3}
-    spawnPosition: {x: -0.306, y: -0.372, z: -0.33}
-    spawnRotation: {x: 75, y: 0, z: -135}
+    spawnPosition: {x: 0, y: 0, z: 0}
+    spawnRotation: {x: 124, y: 103, z: 30}
     spawnSound: {fileID: 8300000, guid: 5fac730eeb998a1458a0929a8e34d1d8, type: 3}
