@@ -127,6 +127,14 @@ namespace Sensor {
             if (entity.TryGetComponent(out Player.Weapon.WeaponManager weaponManager)) {
                 weaponManager.AddWeapon(weaponSO);
             }
+            
+            var saveManager = Game.Save.SaveManager.Instance;
+            if (saveManager == null) {
+                Debug.LogError("SaveManager is null"); 
+                return;
+            }
+            
+            saveManager.RegisterWeapon(weaponSO.name);
         }
 
         void SaveBonfireProgress(Entity entity) {

@@ -37,10 +37,18 @@ namespace Player.Weapon {
         int _attackIndex;
 
         void Start() {
+            // Ask SaveManager for the Weapons in our Inventory (additionally to our Katana, that is always there)
+            var saveManager = Game.Save.SaveManager.Instance;
+            var savedWeapons = saveManager.LoadWeapons();
+            weapons.AddRange(savedWeapons);
+            
             // Which weapon do we start with?
             radialSelection.InitializeRadialParts(weapons, _selectedIndex);
         }
         public void AddWeapon(WeaponSO newWeapon) {
+            // Only add the weapon if we don't have it already
+            if (weapons.Contains(newWeapon)) { return; }
+            
             weapons.Add(newWeapon);
             radialSelection.ClearRadialParts();
             radialSelection.InitializeRadialParts(weapons, _selectedIndex);
@@ -48,7 +56,6 @@ namespace Player.Weapon {
         public void ResetAttackIndex() {
             _attackIndex = 0;
         }
-        
         public bool HasSelectedNewWeapon(int selectedIndex) {
             return _selectedIndex != selectedIndex;
         }
