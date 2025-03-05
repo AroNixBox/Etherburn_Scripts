@@ -3,10 +3,12 @@ using Behavior;
 using Behavior.Events.Interfaces;
 using Interfaces.Attribute;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace Attribute {
     public class EnergyBase : MonoBehaviour, IEnergy, IRequireAttributeEventChannel {
         [SerializeField] protected float maxEnergy = 100;
+        [SerializeField] UnityEvent onEnergyHitZero;
         protected float CurrentEnergy;
         
         EnergyValueChanged _energyValueChanged;
@@ -34,6 +36,10 @@ namespace Attribute {
             CurrentEnergy = Mathf.Clamp(CurrentEnergy, 0, maxEnergy);
             
             _energyValueChanged?.SendEventMessage(CurrentEnergy, hitPosition);
+            
+            if (CurrentEnergy <= 0) {
+                onEnergyHitZero.Invoke();
+            }
         }
 
         public bool HasEnough(float requiredAmount) {
