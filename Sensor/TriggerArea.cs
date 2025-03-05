@@ -8,8 +8,7 @@ using UnityEngine.Events;
 namespace Sensor {
     [RequireComponent(typeof(Collider))]
     public class TriggerArea : MonoBehaviour, IRequireEntityColliderInteractionChannel {
-        [Header("Trigger Area")]
-        [Title("Event Cast")]
+        [Header("Event Cast")]
         [SerializeField] EntityType targetEntityType;
         [SerializeField] EMessageType messageType;
         [SerializeField] bool multiApply = true;
@@ -17,11 +16,18 @@ namespace Sensor {
         [ShowIf("@!useEventChannel")]
         public UnityEvent onCollisionEvent;
         
-        [Title("Player Specific")]
+        [Header("Player Specific")]
+        [Title("Weapon Upgrade")]
         [ShowIf("@targetEntityType == EntityType.Player")]
         [SerializeField] bool weaponUpgrade;
         [ShowIf("@targetEntityType == EntityType.Player && weaponUpgrade")]
         [SerializeField] Player.Weapon.WeaponSO weaponSO;
+        
+        [Title("Bonfire")]
+        [ShowIf("@targetEntityType == EntityType.Player")]
+        [SerializeField] bool bonfire;
+        [ShowIf("@targetEntityType == EntityType.Player && bonfire")]
+        [SerializeField] Transform bonfireRespawnPoint;
         
 
         bool _hasApplied;
@@ -108,11 +114,29 @@ namespace Sensor {
         // Unclean, does very specific thing.
         void FirePlayerSpecificAction(Entity entity) {
             if(targetEntityType != EntityType.Player) { return; }
-            if (!weaponUpgrade) { return; }
-            
+
+            if (weaponUpgrade) {
+                UpgradeWeapon(entity);
+            }
+
+            if (bonfire) {
+                SaveBonfireProgress(entity);
+            }
+        }
+        void UpgradeWeapon(Entity entity) {
             if (entity.TryGetComponent(out Player.Weapon.WeaponManager weaponManager)) {
                 weaponManager.AddWeapon(weaponSO);
             }
+        }
+
+        void SaveBonfireProgress(Entity entity) {
+            var saveManager = Game.Save.SaveManager.Instance;
+            if (saveManager == null) {
+                Debug.LogError("SaveManager is null"); 
+                return;
+            }
+            
+            saveManager.RegisterObject(entity.name, bonfireRespawnPoint.position);
         }
         protected virtual void FireSpecificAction(Entity entity) { }
         void OnTriggerExit(Collider other) {

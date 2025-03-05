@@ -54,6 +54,10 @@ namespace Player {
             _rb.isKinematic = isKinematic;
         }
         
+        public void Teleport(Vector3 position) {
+            _rb.MovePosition(position);
+        }
+        
         // All OnAnimatorMove is done in this class, redirected from {Player.Animation.EventForward.cs}
         public void AnimatorMove(Vector3 deltaPosition, Quaternion deltaRotation) {
             if (RootMotionWarpingControllerController.IsWarpTargetAssigned) {

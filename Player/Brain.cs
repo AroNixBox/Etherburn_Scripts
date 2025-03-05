@@ -100,6 +100,9 @@ namespace Player {
             var getHit = new States.GetHitState(_references);
             var die = new States.DieState(_references, DiscardStateMachine);
             
+            // Teleport
+            var teleport = new States.TeleportState(_references);
+            
             // End State Machine
             void DiscardStateMachine() {
                 if(debugMode && debugText != null) {
@@ -108,6 +111,8 @@ namespace Player {
                 _stateMachine = null;
             }
             
+            // Teleport
+            At(teleport, weaponSwitchState, () => teleport.TeleportEnded);
             
             // Grounded Locomotion
             At(groundedLocomotion, falling, () => !_mover.IsGrounded());
@@ -145,11 +150,13 @@ namespace Player {
             At(landing, groundedLocomotion, () => _references.LandEnded);
             
             
+            // UI
             At(ui_weaponMenu, groundedLocomotion, () => !_references.MiddleKeyPressed 
                                                         && !_weaponManager.HasSelectedNewWeapon(_radialSelection.GetSelectedIndex()));
             At(ui_weaponMenu, weaponSwitchState, () => !_references.MiddleKeyPressed 
                                                   && _weaponManager.HasSelectedNewWeapon(_radialSelection.GetSelectedIndex()));
             
+            // Weapon
             At(weaponSwitchState, groundedLocomotion, () => _references.ChangeWeaponEnded);
             
             At(attackUltimate, groundedLocomotion, () => _references.ExecutionEnded);
@@ -172,6 +179,7 @@ namespace Player {
                                                && _references.AttackKeyPressed
                                                && _staminaAttribute.HasEnough(LightAttackStaminaCost()));
             
+            // Health
             Any(getHit, () => _healthAttribute.HasTakenDamage && !_healthAttribute.HasDied);
             Any(die, () => _healthAttribute.HasDied);
             At(getHit, groundedLocomotion, () => _references.GetHitEnded);
@@ -180,7 +188,17 @@ namespace Player {
                 _stateMachine.OnDebugStateChanged += UpdateDebugState;
             }
             
-            _stateMachine.SetInitialState(weaponSwitchState);
+            var saveManager = Game.Save.SaveManager.Instance;
+            if (saveManager == null) {
+                Debug.LogError("Save Manager is not present in the Scene.");
+                return;
+            }
+            
+            IState initialState = saveManager.GetObjectPosition(_mover.gameObject.name) != null 
+                ? teleport 
+                : weaponSwitchState;
+            
+            _stateMachine.SetInitialState(initialState);
             
             return;
             
