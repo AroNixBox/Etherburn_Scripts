@@ -8,6 +8,7 @@ namespace Player.Animation {
         [SerializeField, Required] References references;
         
         public Action OnFootstepPerformed;
+        public Action OnLandPerformed;
         public Action OnDodgePerformed;
         Animator _animator;
 
@@ -51,6 +52,8 @@ namespace Player.Animation {
                 OnFootstepPerformed?.Invoke();
             }
         }
+        
+        void OnLand(AnimationEvent evt) => OnLandPerformed?.Invoke();
         void OnDodge(AnimationEvent evt) {
             if (IsCurrentPerformedAnimation(evt.animatorClipInfo.clip)) { 
                 OnDodgePerformed?.Invoke();

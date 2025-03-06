@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 033e19db86c34473ae49dbaaf3beeeda, type: 3}
+  m_Name: PlayerLand
+  m_EditorClassIdentifier: 
+  effectData:
+  - material: {fileID: 13400000, guid: d85c7e236a4579d468c4f15c2143393c, type: 2}
+    associatedEffects:
+    - {fileID: 8300000, guid: 8de319144a5b3ee4ebcb258b2cd648b8, type: 3}
+  - material: {fileID: 13400000, guid: d8d5ce28f7c3cd84cad91f9525e29912, type: 2}
+    associatedEffects:
+    - {fileID: 8300000, guid: bf6f02299caea944a882879dab0ef44b, type: 3}
