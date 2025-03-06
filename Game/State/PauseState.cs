@@ -34,6 +34,7 @@ namespace Game.State {
             // Exit Condition is triggered after the PauseToggleTriggered is set to true,
             // so we can directly reset it here.
             _gameBrain.PauseToggleTriggered = false;
+            _gameBrain.HomePressed = false;
         }
     }
 }

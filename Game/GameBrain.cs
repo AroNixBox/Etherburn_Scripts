@@ -15,6 +15,7 @@ namespace Game {
         [Required] public UnityEngine.UI.Image fadeOutImage;
         public bool PauseToggleTriggered { get; set; }
         public bool GameOverTriggered { get; set; }
+        public bool HomePressed { get; set; }
         public bool QuitTriggered { get; set; }
         public bool PlayTriggered { get; set; }
         
@@ -54,6 +55,7 @@ namespace Game {
             
             At(pauseState, playState, () => PauseToggleTriggered && SceneLoader.Instance.IsInLevel());
             At(pauseState, menuState, () => PauseToggleTriggered && !SceneLoader.Instance.IsInLevel());
+            At(pauseState, menuState, () => HomePressed);
             
             At(gameOverState, menuState, () => QuitTriggered);
             
@@ -77,7 +79,6 @@ namespace Game {
         }
         
         public bool IsGamePaused => _stateMachine.GetCurrentState() is State.PauseState;
-
         void Update() {
             _stateMachine.Tick();
         }
