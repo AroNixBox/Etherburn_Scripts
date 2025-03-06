@@ -62,7 +62,6 @@ namespace Player {
         public float stopLerpSpeedWhenNoInputEnabled = 2.5f;
         [Header("Stamina Costs")]
         public float runStaminaCostPerSecond = 5f;
-        public float dodgeStaminaCost = 10f;
         
         [Header("Movement Speed: Controlled by RM Animations")]
         [Tooltip("WalkSpeed in the Animator Controller")]

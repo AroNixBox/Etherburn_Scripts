@@ -38,10 +38,8 @@ namespace Player.States {
             _stamina = references.StaminaAttribute;
             _collider = references.collider;
             
-            // Timers
-            
             // Values
-            _dodgeStaminaCost = references.dodgeStaminaCost;
+            _dodgeStaminaCost = references.weaponManager.GetSelectedWeapon().dodgeStaminaCost;
         }
         public void OnEnter() {
             // Physics

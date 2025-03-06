@@ -210,7 +210,7 @@ namespace Player {
             // Stamina
             float LightAttackStaminaCost() => _weaponManager.GetSelectedWeapon().lightAttack.attributeData.stamina;
             float HeavyAttackStaminaCost() => _weaponManager.GetSelectedWeapon().heavyAttack.attributeData.stamina;
-            float DodgeStaminaCost() => _references.dodgeStaminaCost;
+            float DodgeStaminaCost() => _references.weaponManager.GetSelectedWeapon().dodgeStaminaCost;
             
             // Ultimate Attribute Cost
             float UltimateAttributeCost() => _weaponManager.GetSelectedWeapon().finisherData.attributeData.ultimate;
