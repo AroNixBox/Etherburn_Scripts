@@ -13,8 +13,12 @@ namespace Player {
         [SerializeField, Required] Transform modelRoot;
         [SerializeField] float turnSpeed = 200f;
         public bool CanApplyModelRotationInCameraForward { get; set; }
-        
-        [Header("Physics")]
+
+        [Header("Physics")] 
+        [SerializeField] float groundCastRadius = 0.05f;
+        [Tooltip("The Cast is between the two spheres, so make sure the origin in above from where we want to start the cast")]
+        [SerializeField, Required] Transform sphereCastOrigin;
+        [Tooltip("CastLength is how far we cast the ray down to check if we are grounded")]
         [SerializeField] float groundedCastLength = 0.25f;
         [SerializeField, Range(0f, 1f)] float airResistance = 0.05f;
         [SerializeField, Range(-1, -100f)] float gravity = -20f;
@@ -26,11 +30,10 @@ namespace Player {
         public RootMotionWarpingController RootMotionWarpingControllerController { get; private set; }
         
         References _references;
-        Sensor.RaycastSensor _sensor;
+        Sensor.SpherecastSensor _sensor;
         Rigidbody _rb;
         OrbitalController _orbitalController;
         Transform _transform;
-        CapsuleCollider _collider;
         
         bool _isGrounded;
         float _currentYRotation;
@@ -42,7 +45,6 @@ namespace Player {
             _references = GetComponent<References>();
             _rb = GetComponent<Rigidbody>();
             _transform = transform;
-            _collider = GetComponent<CapsuleCollider>();
             
             RootMotionWarpingControllerController = new RootMotionWarpingController(rootAnimatedGameObject, modelRoot, _references);
         }
@@ -174,12 +176,10 @@ namespace Player {
 
         void RecalibrateSensor() {
             // If the sensor is null, create a new one
-            _sensor ??= new Sensor.RaycastSensor(_transform);
+            _sensor ??= new Sensor.SpherecastSensor(_transform);
             
-            // buffer to prevent clipping
-            const float buffer = 0.1f;
-            _sensor.SetCastOrigin(_transform.position + Vector3.up * buffer);            
-            _sensor.SetCastDirection(Sensor.RaycastSensor.CastDirection.Down);
+            _sensor.SetCastOrigin(sphereCastOrigin.position);         
+            _sensor.SetCastDirection(Sensor.SpherecastSensor.CastDirection.Down);
             
             // TODO Only cast on the ground layer
             _sensor.Layermask = Physics.AllLayers;
@@ -187,6 +187,7 @@ namespace Player {
             // How far do we want to cast the ray?
             // So how much have we adjusted the collider height and incorporate the step height ratio
             _sensor.CastLength = groundedCastLength;
+            _sensor.Radius = groundCastRadius;
         }
         public void SetGravity(bool enabled) {
             _rb.useGravity = enabled;
