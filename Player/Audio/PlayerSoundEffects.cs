@@ -1,5 +1,4 @@
 using Effects;
-using Player.Animation;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -7,19 +6,12 @@ namespace Player.Audio {
     public class PlayerSoundEffects : MonoBehaviour {
         [Header("References")]
         [SerializeField, Required] References references;
+        [SerializeField, Required] Mover mover;
         [SerializeField, Required] AudioSource effectAudioSource;
         
-        [Header("Ground Contact")]
-        [Tooltip("The offset from the center feet position up to make the raycast hit the ground 100%")]
-        [SerializeField] float castStartOffset = 0.5f;
-        [SerializeField] float rayCastLength = 1f;
-        
-        
         [Title("Footsteps")]
-        [SerializeField, Required] Transform centerFeetPosition;
         [Tooltip("Animation Events are captured through his component")]
         [SerializeField, Required] AudioEffect footstepEffectAsset;
-        [SerializeField] LayerMask groundLayers;
         [Space(10f)]
         [SerializeField] float footStepVolume = .05f;
         
@@ -46,9 +38,12 @@ namespace Player.Audio {
         }
 
         void PlayGroundContactSound(EGroundContactType groundContactType) {
-            if (Physics.Raycast(centerFeetPosition.position + Vector3.up * castStartOffset, Vector3.down, out var hit, rayCastLength, groundLayers)) {
+            mover.RecalibrateSensor();
+            mover.GroundedSensor.Cast();
+            
+            if (mover.GroundedSensor.HasDetectedHit()) {
                 // Check the physics material of the object we hit
-                
+                var hit = mover.GroundedSensor.GetHit();
                 var audioEffect = groundContactType == EGroundContactType.Footstep 
                     ? footstepEffectAsset.GetEffectData(hit.collider.sharedMaterial)
                     : landEffectAsset.GetEffectData(hit.collider.sharedMaterial);

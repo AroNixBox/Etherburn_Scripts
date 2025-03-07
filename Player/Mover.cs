@@ -30,7 +30,7 @@ namespace Player {
         public RootMotionWarpingController RootMotionWarpingControllerController { get; private set; }
         
         References _references;
-        Sensor.SpherecastSensor _sensor;
+        public Sensor.SpherecastSensor GroundedSensor { get; private set; }
         Rigidbody _rb;
         OrbitalController _orbitalController;
         Transform _transform;
@@ -154,7 +154,7 @@ namespace Player {
         // So even if the rb pulls us down with gravity, we stay on the slope
         public bool IsGroundTooSteep() {
             // Get the normal of the hit
-            Vector3 normal = _sensor.GetNormal();
+            Vector3 normal = GroundedSensor.GetNormal();
             // If there is no normal, return out early
             if (normal == Vector3.zero) { return false; }
             // Calculate the angle between the normal and the up vector
@@ -169,25 +169,25 @@ namespace Player {
         
         void CheckGrounded() {
             RecalibrateSensor();
-            _sensor.Cast();
+            GroundedSensor.Cast();
             
-            _isGrounded = _sensor.HasDetectedHit();
+            _isGrounded = GroundedSensor.HasDetectedHit();
         }
 
-        void RecalibrateSensor() {
+        public void RecalibrateSensor() {
             // If the sensor is null, create a new one
-            _sensor ??= new Sensor.SpherecastSensor(_transform);
+            GroundedSensor ??= new Sensor.SpherecastSensor(_transform);
             
-            _sensor.SetCastOrigin(sphereCastOrigin.position);         
-            _sensor.SetCastDirection(Sensor.SpherecastSensor.CastDirection.Down);
+            GroundedSensor.SetCastOrigin(sphereCastOrigin.position);         
+            GroundedSensor.SetCastDirection(Sensor.SpherecastSensor.CastDirection.Down);
             
             // TODO Only cast on the ground layer
-            _sensor.Layermask = Physics.AllLayers;
+            GroundedSensor.Layermask = Physics.AllLayers;
             
             // How far do we want to cast the ray?
             // So how much have we adjusted the collider height and incorporate the step height ratio
-            _sensor.CastLength = groundedCastLength;
-            _sensor.Radius = groundCastRadius;
+            GroundedSensor.CastLength = groundedCastLength;
+            GroundedSensor.Radius = groundCastRadius;
         }
         public void SetGravity(bool enabled) {
             _rb.useGravity = enabled;
@@ -213,7 +213,7 @@ namespace Player {
         // TODO:
         public void HandleSliding() {
             // Get the ground normal
-            Vector3 groundNormal = _sensor.GetNormal();
+            Vector3 groundNormal = GroundedSensor.GetNormal();
 
             // Calculate the slide direction (down the slope)
             Vector3 slideDirection = (Vector3.ProjectOnPlane(_transform.up, groundNormal).normalized - _transform.up).normalized;

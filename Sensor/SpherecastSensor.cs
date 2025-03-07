@@ -50,5 +50,6 @@ namespace Sensor {
         public Vector3 GetPosition() => _hitInfo.point;
         public Collider GetCollider() => _hitInfo.collider;
         public Transform GetTransform() => _hitInfo.transform;
+        public RaycastHit GetHit() => _hitInfo;
     }
 }
