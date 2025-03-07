@@ -100,6 +100,10 @@ namespace Game {
             }
             
             SceneManager.LoadSceneAsync(uiScenePackage.uiScene.BuildIndex, LoadSceneMode.Additive);
+            
+            if(uiSceneType is SceneData.EUISceneType.MainMenu or SceneData.EUISceneType.GameOver) {
+                CurrentLevelType = SceneData.ELevelType.None;
+            }
         }
         
         public void UnloadScene(SceneData.EUISceneType uiSceneType) {
@@ -123,18 +127,6 @@ namespace Game {
             if(sceneData == null) {
                 Debug.LogError("SceneData is not set in the inspector", transform);
             }
-            
-            // Unload Systems Scene
-            var systemsScene = sceneData.systemsScene;
-            if (systemsScene != null) {
-                SceneManager.UnloadSceneAsync(systemsScene.BuildIndex);
-            }
-
-            // Unload Player Scene
-            var playerScene = sceneData.playerScene;
-            if (playerScene != null) {
-                SceneManager.UnloadSceneAsync(playerScene.BuildIndex);
-            }
 
             // Unload Navmesh Scene
             var navMeshPackages = sceneData.navMeshes
@@ -153,6 +145,18 @@ namespace Game {
                 foreach (var scene in levelPackage.levelScenes) {
                     SceneManager.UnloadSceneAsync(scene.BuildIndex);
                 }
+            }
+            
+            // Unload Player Scene
+            var playerScene = sceneData.playerScene;
+            if (playerScene != null) {
+                SceneManager.UnloadSceneAsync(playerScene.BuildIndex);
+            }
+            
+            // Unload Systems Scene Last!!!
+            var systemsScene = sceneData.systemsScene;
+            if (systemsScene != null) {
+                SceneManager.UnloadSceneAsync(systemsScene.BuildIndex);
             }
         }
         

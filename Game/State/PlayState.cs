@@ -7,8 +7,8 @@ namespace Game.State {
         readonly Player.Input.InputReader _inputReader;
         
         TargetEntitiesUnregisteredChannel _targetEntitiesUnregisteredChannel;
-        TargetEntitiesUnregisteredChannel.TargetEntitiesUnregisteredChannelEventHandler _handler;
-        
+        TargetEntitiesUnregisteredChannel.TargetEntitiesUnregisteredChannelEventHandler _uninitializeGameHandler;
+        TargetEntitiesUnregisteredChannel.TargetEntitiesUnregisteredChannelEventHandler _gameOverSetHandler;
         public PlayState(Player.Input.InputReader inputReader, GameBrain gameBrain) {
             _gameBrain = gameBrain;
             _inputReader = inputReader;
@@ -33,8 +33,10 @@ namespace Game.State {
             _ = EntityManager.Instance
                 .GetEntityOfType(EntityType.Player, out _targetEntitiesUnregisteredChannel).transform;
 
-            _handler = _gameBrain.UninitializeGame;
-            _targetEntitiesUnregisteredChannel.RegisterListener(_handler);
+            _uninitializeGameHandler = _gameBrain.UninitializeGame;
+            _gameOverSetHandler = _gameBrain.TriggerGameOver;
+            _targetEntitiesUnregisteredChannel.RegisterListener(_uninitializeGameHandler);
+            _targetEntitiesUnregisteredChannel.RegisterListener(_gameOverSetHandler);
         }
         
         public void Tick() { }
@@ -43,9 +45,10 @@ namespace Game.State {
 
         public void OnExit() {
             // We need to unregister here, because we can only die in PlayState!            
-            if (_handler == null) { return; }
+            if (_uninitializeGameHandler == null) { return; }
             if(_targetEntitiesUnregisteredChannel == null) { return; }
-            _targetEntitiesUnregisteredChannel.UnregisterListener(_handler);
+            _targetEntitiesUnregisteredChannel.UnregisterListener(_uninitializeGameHandler);
+            _targetEntitiesUnregisteredChannel.UnregisterListener(_gameOverSetHandler);
         }
     }
 }

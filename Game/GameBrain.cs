@@ -54,8 +54,7 @@ namespace Game {
             At(playState, gameOverState, () => GameOverTriggered);
             
             At(pauseState, playState, () => PauseToggleTriggered && SceneLoader.Instance.IsInLevel());
-            At(pauseState, menuState, () => PauseToggleTriggered && !SceneLoader.Instance.IsInLevel());
-            At(pauseState, menuState, () => HomePressed);
+            At(pauseState, menuState, () => (PauseToggleTriggered && !SceneLoader.Instance.IsInLevel()) || HomePressed);
             
             At(gameOverState, menuState, () => QuitTriggered);
             
@@ -99,8 +98,9 @@ namespace Game {
             }
             
             sceneLoader.UnloadScenes(SceneData.ELevelType.Level_One);
-            
-            // Trigger Game Over State
+        }
+        
+        public void TriggerGameOver() {
             GameOverTriggered = true;
         }
 
