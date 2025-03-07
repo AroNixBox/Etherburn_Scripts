@@ -32,7 +32,7 @@ namespace Player.Animation {
             {GroundLocomotion, 0.125f},
             {Fall, 0.25f},
             {Land, 0.25f},
-            {Dodge, 0.25f},
+            {Dodge, 0.125f},
             {ChangeWeapon, 0.05f},
             {AttackFinisher, 0.1f},
             {Attack, 0.1f},
