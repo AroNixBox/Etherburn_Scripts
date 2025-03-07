@@ -48,6 +48,7 @@ namespace Player {
         [Header("UI")]
         [Tooltip("WeaponWheel UI")] 
         public RadialSelection radialSelection;
+        [Required] public Canvas[] uiCanvases;
         
         [Header("Audio")]
         public AudioSource weapon2DSource;

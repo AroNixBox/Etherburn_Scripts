@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Extensions;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -12,6 +13,16 @@ namespace Game {
         [SerializeField, Required] SceneData sceneData;
         [SerializeField, Required] Canvas loadingCanvas;
         [SerializeField, Required] Slider loadingSlider;
+        
+        // Async Operations are cleared when all scenes are loaded
+        bool IsLoading => _asyncOperations is { Count: > 0 };
+        public async Task<bool> WaitUntilLoadingComplete() {
+            while (IsLoading) {
+                await Task.Delay(100);
+            }
+
+            return true;
+        }
         readonly List<AsyncOperation> _asyncOperations = new ();
         
         protected override bool ShouldPersist => true;
@@ -57,26 +68,26 @@ namespace Game {
                     _asyncOperations.Add(environmentSceneOperation);
                 }
             }
-            
+
             StartCoroutine(UpdateLoadingSlider(_asyncOperations));
-            
+
             // Wait for all scenes to load
             while (_asyncOperations.Any(op => op.progress < 0.9f)) {
                 yield return null;
             }
-            
+
             // Activate all scenes
             foreach (var asyncOp in _asyncOperations) {
                 asyncOp.allowSceneActivation = true;
             }
-            
+
             // Wait for all scenes to activate
             foreach (var asyncOp in _asyncOperations) {
                 while (!asyncOp.isDone) {
                     yield return null;
                 }
             }
-            
+
             // Clear Async Operations
             _asyncOperations.Clear();
             

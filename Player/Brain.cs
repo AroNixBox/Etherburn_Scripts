@@ -43,7 +43,12 @@ namespace Player {
             _references = GetComponent<References>();
         }
 
-        void Start() {
+        async void Start() {
+            // Disable all UI Canvases until Game is ready
+            foreach (var canvas in _references.uiCanvases) {
+                canvas.enabled = false;
+            }
+            
             // Debug
             if (!debugMode) {
                 if (debugText != null) {
@@ -71,6 +76,16 @@ namespace Player {
             
             _rootMotionWarpingController = _references.mover.RootMotionWarpingControllerController;
             _abilityTargetQuery = _references.abilityTargetQuery;
+            
+            // Before starting the State Machine, we want to wait for our Scenes to be loaded.
+            var sceneLoader = Game.SceneLoader.Instance;
+            if (sceneLoader != null) {
+                await sceneLoader.WaitUntilLoadingComplete();
+            }
+            
+            foreach (var canvas in _references.uiCanvases) {
+                canvas.enabled = true;
+            }
             
             SetupStateMachine();
         }
