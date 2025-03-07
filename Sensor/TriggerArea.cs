@@ -75,7 +75,6 @@ namespace Sensor {
             if (messageType != EMessageType.Enter) { return; }
             
             if(_hasApplied) { return; }
-            if (!multiApply) { _hasApplied = true; }
                         
             if(!other.TryGetComponent(out Entity entity)) { return; }
             if(!_targetEntities.Contains(entity)) { return; }
@@ -83,6 +82,8 @@ namespace Sensor {
                 if (rigidbody.isKinematic) {
                     // If the other Object is Kinematic, check for intersection first
                     if (IsColliderIntersecting(other)) {
+                        if (!multiApply) { _hasApplied = true; }
+                        
                         FireEvent();
                         FireSpecificAction(entity);
                         FirePlayerSpecificAction(entity);
@@ -92,6 +93,8 @@ namespace Sensor {
             }
             
             if (IsColliderIntersecting(other)) {
+                if (!multiApply) { _hasApplied = true; }
+                
                 FireEvent();
                 FireSpecificAction(entity);
                 FirePlayerSpecificAction(entity);
@@ -152,7 +155,6 @@ namespace Sensor {
             if (messageType != EMessageType.Exit) { return; }
             
             if(_hasApplied) { return; }
-            if (!multiApply) { _hasApplied = true; }
             
             if(!other.TryGetComponent(out Entity entity)) { return; }
             if(!_targetEntities.Contains(entity)) { return; }
@@ -160,6 +162,8 @@ namespace Sensor {
             if(other.TryGetComponent(out Rigidbody rigidbody)) {
                 if (rigidbody.isKinematic) {
                     if (!IsColliderIntersecting(other)) {
+                        if (!multiApply) { _hasApplied = true; }
+                        
                         FireEvent();
                         FireSpecificAction(entity);
                         FirePlayerSpecificAction(entity);
@@ -169,6 +173,8 @@ namespace Sensor {
             }
             // Doublecheck if is really outside of the collider
             if (!IsColliderIntersecting(other)) {
+                if (!multiApply) { _hasApplied = true; }
+                
                 FireEvent();
                 FireSpecificAction(entity);
                 FirePlayerSpecificAction(entity);
