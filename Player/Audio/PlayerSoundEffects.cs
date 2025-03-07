@@ -6,7 +6,7 @@ using UnityEngine;
 namespace Player.Audio {
     public class PlayerSoundEffects : MonoBehaviour {
         [Header("References")]
-        [SerializeField, Required] EventForward eventForward;
+        [SerializeField, Required] References references;
         [SerializeField, Required] AudioSource effectAudioSource;
         
         [Header("Ground Contact")]
@@ -33,9 +33,9 @@ namespace Player.Audio {
         [SerializeField] float dodgeVolume = .2f;
 
         void Start() {
-            eventForward.OnFootstepPerformed += PlayFootstepSound;
-            eventForward.OnLandPerformed += PlayLandSound;
-            eventForward.OnDodgePerformed += PlayDodgeSound;
+            references.OnFootstepPerformed += PlayFootstepSound;
+            references.OnLandPerformed += PlayLandSound;
+            references.OnDodgeStarted += PlayDodgeSound;
         }
         
         void PlayFootstepSound() {
@@ -72,9 +72,9 @@ namespace Player.Audio {
         }
 
         void OnDestroy() {
-            eventForward.OnFootstepPerformed -= PlayFootstepSound;
-            eventForward.OnLandPerformed -= PlayLandSound;
-            eventForward.OnDodgePerformed -= PlayDodgeSound;
+            references.OnFootstepPerformed -= PlayFootstepSound;
+            references.OnLandPerformed -= PlayLandSound;
+            references.OnDodgeStarted -= PlayDodgeSound;
         }
 
         enum EGroundContactType {

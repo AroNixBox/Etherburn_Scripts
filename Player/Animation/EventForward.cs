@@ -7,9 +7,6 @@ namespace Player.Animation {
         [SerializeField, Required] Mover mover;
         [SerializeField, Required] References references;
         
-        public Action OnFootstepPerformed;
-        public Action OnLandPerformed;
-        public Action OnDodgePerformed;
         Animator _animator;
 
         void Awake() {
@@ -49,14 +46,14 @@ namespace Player.Animation {
         
         void OnFootstep(AnimationEvent evt) {
             if (IsCurrentPerformedAnimation(evt.animatorClipInfo.clip)) { 
-                OnFootstepPerformed?.Invoke();
+                references.OnFootstepPerformed?.Invoke();
             }
         }
         
-        void OnLand(AnimationEvent evt) => OnLandPerformed?.Invoke();
+        void OnLand(AnimationEvent evt) => references.OnLandPerformed?.Invoke();
         void OnDodge(AnimationEvent evt) {
             if (IsCurrentPerformedAnimation(evt.animatorClipInfo.clip)) { 
-                OnDodgePerformed?.Invoke();
+                references.OnDodgeStarted?.Invoke();
             }
         }
         

@@ -155,6 +155,11 @@ namespace Player {
         public Action DisableHitDetection { get; set; } = delegate { };
         public Action OnMaterializeWeapon { get; set; } = delegate { };
         public Action OnDissolveWeapon { get; set; } = delegate { };
+        
+        //public Action Dodge
+        public Action OnFootstepPerformed { get; set; } = delegate { };
+        public Action OnLandPerformed { get; set; } = delegate { };
+        public Action OnDodgeStarted { get; set; } = delegate { };
 
         #endregion
     }

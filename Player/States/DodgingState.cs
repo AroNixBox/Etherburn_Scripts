@@ -1,4 +1,5 @@
-﻿using Extensions;
+﻿using Attribute;
+using Extensions;
 using Extensions.FSM;
 using Interfaces.Attribute;
 using Player.Animation;
@@ -14,6 +15,7 @@ namespace Player.States {
         readonly AnimationController _animationController;
         readonly Mover _mover;
         readonly IEnergy _stamina;
+        readonly IHealth _health;
         readonly CapsuleCollider _collider;
 
         readonly Vector2[] _dodgeDirections =  {
@@ -37,6 +39,7 @@ namespace Player.States {
             _mover = references.mover;
             _stamina = references.StaminaAttribute;
             _collider = references.collider;
+            _health = references.HealthAttribute;
             
             // Values
             _dodgeStaminaCost = references.weaponManager.GetSelectedWeapon().dodgeStaminaCost;
@@ -48,9 +51,15 @@ namespace Player.States {
             PlayAnimation();
 
             _stamina.Decrease(_dodgeStaminaCost);
-            ReduceColliderSize();
+
+            _references.OnDodgeStarted += ReduceColliderSize;
+            _references.OnDodgeStarted += EnableInvincibility;
         }
-        
+
+        void EnableInvincibility() {
+            _health.IsInvincible = true;
+        }
+
         void ReduceColliderSize() {
             _collider.height /= 2;
             _collider.center = new Vector3(_collider.center.x, _collider.height / 2, _collider.center.z);
@@ -88,10 +97,16 @@ namespace Player.States {
         // Reset the Flag that tells the dodge has ended
         public void OnExit() {
             // Reset State Leave Flag
+            _references.OnDodgeStarted -= ReduceColliderSize;
+            _references.OnDodgeStarted -= EnableInvincibility;
+            
             _references.DodgeEnded = false;
             
             // Physics
             _mover.SetGravity(false);
+            
+            // Health Reset
+            _health.IsInvincible = false;
             
             ResetColliderSize();
         }

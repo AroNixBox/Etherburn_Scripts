@@ -6,8 +6,11 @@ namespace Attribute {
         public Vector3 HitPosition { get; private set; }
         public bool HasTakenDamage { get; set; }
         public bool HasDied { get; set; }
+        public bool IsInvincible { get; set; }
         
         public override void Decrease(float amount, Vector3? hitPosition = null) {
+            if(IsInvincible) { return; }
+            
             base.Decrease(amount, hitPosition);
             
             // Get the normalized hit direction

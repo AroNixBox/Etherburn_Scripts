@@ -152,6 +152,9 @@ namespace Sensor {
                     
                     if (CollisionWithSelfOrParent(hitInfo.collider)) continue;
                     if (!_hitObjects.Add(hitInfo.collider)) continue;
+                    
+                    // Check if the hit collides with a health component and if its invincible
+                    if(hitInfo.collider.TryGetComponent(out Interfaces.Attribute.IHealth health) && health.IsInvincible) continue;
 
                     hitList.Add(hitInfo);
                     // Debug and collision events

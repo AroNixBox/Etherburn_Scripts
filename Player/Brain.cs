@@ -132,12 +132,13 @@ namespace Player {
                                                       && !_animationController.IsInTransition(0));
             
             // Dodging
-            // TODO: If we want a Dodging to Dodging, we also need to use two States in the Animator Controller to allow the Crossfade
             At(dodging, groundedLocomotion, () => _references.DodgeEnded 
                                                   && _mover.IsGrounded()
                                                   && !_mover.IsGroundTooSteep());
             At(dodging, falling, () => _references.DodgeEnded
-                                       && (!_mover.IsGrounded() || _mover.IsGroundTooSteep()));
+                                       && !_mover.IsGrounded());
+            At(dodging, sliding, () => _references.DodgeEnded
+                                       && _mover.IsGrounded() && _mover.IsGroundTooSteep());
             
             // Falling
             At(falling, landing, () => _mover.IsGrounded() && !_mover.IsGroundTooSteep());
