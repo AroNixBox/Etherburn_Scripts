@@ -87,36 +87,54 @@ public partial class SetRootMotionTargetPositionAction : Action
             var sortedList = _distanceIndependentRootMotionDatas
                 .OrderByDescending(kvp => kvp.Key.selectionProbability)
                 .ToList();
-
-            // Get the highest selectionProbability
-            var highestProbabilityData = sortedList.First().Key;
-            uint highestProbability = highestProbabilityData.selectionProbability;
             
-            // Generate a random number between 1 and 100
-            System.Random random = new System.Random();
-            int randomNumber = random.Next(1, 101);
+            RootMotionAnimationDataSO highestReachableProbabilityData = null;
             
-            // Check if the random number is less than or equal to the highest selectionProbability
-            if (randomNumber <= highestProbability) {
-                // success
+            //Get the highest selectionProbability that can be reached from the NavMeshAgent
+            foreach (var rmData in sortedList) {
+                var rmWorldRootMotion = Self.Value.transform.TransformDirection(rmData.Key.totalRootMotion);
+                rmWorldRootMotion.y = 0;
                 
-                // Decrease the executionAmount by 1
-                _distanceIndependentRootMotionDatas[highestProbabilityData] -= 1;
-                if (_distanceIndependentRootMotionDatas[highestProbabilityData] == 0) {
-                    // Remove the RootMotionData from the Dict if the executionAmount is 0
-                    _distanceIndependentRootMotionDatas.Remove(highestProbabilityData);
+                // Check if we can reach the target position
+                if (!NavMesh.SamplePosition(selfPosition + rmWorldRootMotion, out NavMeshHit hit, 0.1f, NavMesh.AllAreas)) {
+                    continue;
                 }
                 
-                return highestProbabilityData;
+                // If the target position is reachable, set the highestReachableProbabilityData and break the loop
+                highestReachableProbabilityData = rmData.Key;
+                break;
+            }
+            
+            // If the highestReachableProbabilityData is not null, means we found at least one reachable RootMotionData without distance dependency
+            if (highestReachableProbabilityData != null) {
+                uint highestProbability = highestReachableProbabilityData.selectionProbability;
+            
+                // Generate a random number between 1 and 100
+                System.Random random = new System.Random();
+                int randomNumber = random.Next(1, 101);
+            
+                // Check if the random number is less than or equal to the highest selectionProbability
+                if (randomNumber <= highestProbability) {
+                    // success
+                
+                    // Decrease the executionAmount by 1
+                    _distanceIndependentRootMotionDatas[highestReachableProbabilityData] -= 1;
+                    if (_distanceIndependentRootMotionDatas[highestReachableProbabilityData] == 0) {
+                        // Remove the RootMotionData from the Dict if the executionAmount is 0
+                        _distanceIndependentRootMotionDatas.Remove(highestReachableProbabilityData);
+                    }
+                
+                    // Bail out early, since we have a RootMotionData without distance dependency that won the probability check
+                    return highestReachableProbabilityData;
+                }
             }
         }
 
         RootMotionAnimationDataSO bestDistanceDependentRootMotionData = null;
         float bestDistance = float.MaxValue;
-        var rmDataList = RootMotionDataWrapper.Value.GetRootMotionData(RootMotionType.Value);
-        rmDataList.Shuffle();
+        _distanceDependentRootMotionDatas.Shuffle();
 
-        foreach (var rmData in rmDataList) {
+        foreach (var rmData in _distanceDependentRootMotionDatas) {
             var rmWorldRootMotion = Self.Value.transform.TransformDirection(rmData.totalRootMotion);
             rmWorldRootMotion.y = 0;
 
@@ -141,7 +159,7 @@ public partial class SetRootMotionTargetPositionAction : Action
         
         if(bestDistanceDependentRootMotionData == null) {
             // Fallback, check if we have an AttackClip with 0,0,0 RootMotion
-            foreach (var rmData in rmDataList) {
+            foreach (var rmData in _distanceDependentRootMotionDatas) {
                 if (rmData.totalRootMotion == Vector3.zero) {
                     bestDistanceDependentRootMotionData = rmData;
                     break;
