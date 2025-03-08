@@ -5,8 +5,17 @@ namespace Motion.RootMotion {
     [CreateAssetMenu(fileName = "Root Motion Animation Data", menuName = "Animation Helper/Root Motion Animation Data")]
     public class RootMotionAnimationDataSO : ScriptableObject {
         [InfoBox("Specify the frame range to apply the root motion warp")]
-        [Required] 
-        public AnimationClip clip;
+        [Required] public AnimationClip clip;
+        
+        // TODO: Currently this is only used for enemies. Even tho we also use this Asset for the Player
+        // Missing time ;)
+        public bool distanceIndependent;
+        [ShowIf("@distanceIndependent")]
+        [Tooltip("Selecting an AnimationClip if DistanceIndependent is not based on the distance to the target, but rather on the probability of selection")]
+        [Range(1, 100)] public uint selectionProbability;
+        [ShowIf("@distanceIndependent")]
+        [Tooltip("The maximum amount how often this animation can be executed")]
+        public uint executionAmount;
         
         [BoxGroup("Precompute Root Motion")]
         public GameObject targetObject;

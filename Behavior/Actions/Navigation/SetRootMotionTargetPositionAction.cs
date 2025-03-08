@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using Behavior.Enemy.State.Animation;
 using Motion.RootMotion;
 using Unity.Behavior;
@@ -27,12 +29,30 @@ public partial class SetRootMotionTargetPositionAction : Action
     [SerializeReference] public BlackboardVariable<NPCAnimationStates> CurrentAnimationState;
     [SerializeReference] public BlackboardVariable<float> MinAttackDistance;
     [SerializeReference] public BlackboardVariable<RootMotionDataWrapper.RootMotionType> RootMotionType;
+    
+    bool _initialized;
+    Dictionary<RootMotionAnimationDataSO, int> _distanceIndependentRootMotionDatas = new();
+    List<RootMotionAnimationDataSO> _distanceDependentRootMotionDatas = new();
 
     protected override Status OnStart() {
         var missingType = MissingType();
         if(missingType != null) {
             Debug.LogError($"{missingType} is missing.");
             return Status.Failure;
+        }
+        
+        if(!_initialized) {
+            _distanceDependentRootMotionDatas = RootMotionDataWrapper.Value
+                .GetRootMotionData(RootMotionType.Value)
+                .Where(data => !data.distanceIndependent)
+                .ToList();
+            
+            _distanceIndependentRootMotionDatas = RootMotionDataWrapper.Value
+                .GetRootMotionData(RootMotionType.Value)
+                .Where(data => data.distanceIndependent)
+                .ToDictionary(data => data, data => (int)data.executionAmount);
+            
+            _initialized = true;
         }
 
         Vector3 selfPosition = Self.Value.transform.position;
@@ -62,7 +82,36 @@ public partial class SetRootMotionTargetPositionAction : Action
     }
 
     RootMotionAnimationDataSO FindBestRootMotionData(Vector3 selfPosition) {
-        RootMotionAnimationDataSO bestRootMotionData = null;
+        if (_distanceIndependentRootMotionDatas.Count > 0) {
+            // Sort the list by selectionProbability in descending order
+            var sortedList = _distanceIndependentRootMotionDatas
+                .OrderByDescending(kvp => kvp.Key.selectionProbability)
+                .ToList();
+
+            // Get the highest selectionProbability
+            var highestProbabilityData = sortedList.First().Key;
+            uint highestProbability = highestProbabilityData.selectionProbability;
+            
+            // Generate a random number between 1 and 100
+            System.Random random = new System.Random();
+            int randomNumber = random.Next(1, 101);
+            
+            // Check if the random number is less than or equal to the highest selectionProbability
+            if (randomNumber <= highestProbability) {
+                // success
+                
+                // Decrease the executionAmount by 1
+                _distanceIndependentRootMotionDatas[highestProbabilityData] -= 1;
+                if (_distanceIndependentRootMotionDatas[highestProbabilityData] == 0) {
+                    // Remove the RootMotionData from the Dict if the executionAmount is 0
+                    _distanceIndependentRootMotionDatas.Remove(highestProbabilityData);
+                }
+                
+                return highestProbabilityData;
+            }
+        }
+
+        RootMotionAnimationDataSO bestDistanceDependentRootMotionData = null;
         float bestDistance = float.MaxValue;
         var rmDataList = RootMotionDataWrapper.Value.GetRootMotionData(RootMotionType.Value);
         rmDataList.Shuffle();
@@ -81,26 +130,26 @@ public partial class SetRootMotionTargetPositionAction : Action
 
                 if (Mathf.Abs(distanceToTarget - MinAttackDistance) < bestDistance) {
                     bestDistance = Mathf.Abs(distanceToTarget - MinAttackDistance);
-                    bestRootMotionData = rmData;
+                    bestDistanceDependentRootMotionData = rmData;
                 }
                 continue;
             }
             
-            bestRootMotionData = rmData;
+            bestDistanceDependentRootMotionData = rmData;
             break;
         }
         
-        if(bestRootMotionData == null) {
+        if(bestDistanceDependentRootMotionData == null) {
             // Fallback, check if we have an AttackClip with 0,0,0 RootMotion
             foreach (var rmData in rmDataList) {
                 if (rmData.totalRootMotion == Vector3.zero) {
-                    bestRootMotionData = rmData;
+                    bestDistanceDependentRootMotionData = rmData;
                     break;
                 }
             }
         }
 
-        return bestRootMotionData;
+        return bestDistanceDependentRootMotionData;
     }
 
     protected override Status OnUpdate() {
