@@ -17,6 +17,13 @@ namespace Motion.RootMotion {
         [Tooltip("The maximum amount how often this animation can be executed")]
         public uint executionAmount;
         
+        [ShowIf("@!distanceIndependent")]
+        [Tooltip("If the Attack has an impact radius, the attack end will be an area instead of a point")]
+        public bool hasAttackRadius;
+        [ShowIf("@hasAttackRadius && !distanceIndependent")]
+        [Tooltip("The radius of the attack")]
+        public float attackRadius;
+        
         [BoxGroup("Precompute Root Motion")]
         public GameObject targetObject;
         

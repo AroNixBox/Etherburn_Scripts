@@ -33,6 +33,8 @@ public partial class SetRootMotionTargetPositionAction : Action
     bool _initialized;
     Dictionary<RootMotionAnimationDataSO, int> _distanceIndependentRootMotionDatas = new();
     List<RootMotionAnimationDataSO> _distanceDependentRootMotionDatas = new();
+    List<RootMotionAnimationDataSO> _distanceDependentRootMotionDatasWithImpactRadius = new();
+    RootMotionAnimationDataSO _lastUsedAttack;
 
     protected override Status OnStart() {
         var missingType = MissingType();
@@ -44,7 +46,12 @@ public partial class SetRootMotionTargetPositionAction : Action
         if(!_initialized) {
             _distanceDependentRootMotionDatas = RootMotionDataWrapper.Value
                 .GetRootMotionData(RootMotionType.Value)
-                .Where(data => !data.distanceIndependent)
+                .Where(data => !data.distanceIndependent && !data.hasAttackRadius)
+                .ToList();
+            
+            _distanceDependentRootMotionDatasWithImpactRadius = RootMotionDataWrapper.Value
+                .GetRootMotionData(RootMotionType.Value)
+                .Where(data => !data.distanceIndependent && data.hasAttackRadius)
                 .ToList();
             
             _distanceIndependentRootMotionDatas = RootMotionDataWrapper.Value
@@ -146,17 +153,52 @@ public partial class SetRootMotionTargetPositionAction : Action
             if (BasedOnTarget.Value) {
                 var distanceToTarget = (Target.Value.transform.position - (selfPosition + rmWorldRootMotion)).magnitude;
 
-                if (Mathf.Abs(distanceToTarget - MinAttackDistance) < bestDistance) {
+                if (Mathf.Abs(distanceToTarget - MinAttackDistance) < bestDistance && rmData != _lastUsedAttack) {
                     bestDistance = Mathf.Abs(distanceToTarget - MinAttackDistance);
                     bestDistanceDependentRootMotionData = rmData;
                 }
                 continue;
             }
-            
-            bestDistanceDependentRootMotionData = rmData;
-            break;
+
+            if (rmData != _lastUsedAttack) {
+                bestDistanceDependentRootMotionData = rmData;
+                break;
+            }
         }
-        
+
+        foreach (var rmData in _distanceDependentRootMotionDatasWithImpactRadius) {
+            var rmWorldRootMotion = Self.Value.transform.TransformDirection(rmData.totalRootMotion);
+            rmWorldRootMotion.y = 0;
+
+            if (!NavMesh.SamplePosition(selfPosition + rmWorldRootMotion, out NavMeshHit hit, 0.1f, NavMesh.AllAreas)) {
+                continue;
+            }
+
+            if (BasedOnTarget.Value) {
+                var distanceToTarget = (Target.Value.transform.position - (selfPosition + rmWorldRootMotion)).magnitude;
+
+                if (distanceToTarget <= rmData.attackRadius) {
+                    float distancePercentage = distanceToTarget / rmData.attackRadius;
+                    float accuracyMultiplier = 1.0f - distancePercentage; // Reduce accuracy based on distance percentage
+
+                    float adjustedDistance = Mathf.Abs(distanceToTarget - MinAttackDistance) * accuracyMultiplier;
+
+                    if (adjustedDistance < bestDistance && rmData != _lastUsedAttack) {
+                        bestDistance = adjustedDistance;
+                        bestDistanceDependentRootMotionData = rmData;
+                    }
+                }
+            }
+        }
+
+        // If no alternative found, allow the last used attack
+        if (bestDistanceDependentRootMotionData == null) {
+            bestDistanceDependentRootMotionData = _lastUsedAttack;
+        }
+
+        // Update the last used attack
+        _lastUsedAttack = bestDistanceDependentRootMotionData;
+
         if(bestDistanceDependentRootMotionData == null) {
             // Fallback, check if we have an AttackClip with 0,0,0 RootMotion
             foreach (var rmData in _distanceDependentRootMotionDatas) {
