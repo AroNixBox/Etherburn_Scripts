@@ -110,6 +110,19 @@ namespace Player {
             // Global Events (Always Active)
             input.MiddleClickUI += OnMiddleClickUI;
         }
+        
+        void OnDestroy() {
+            // Player Input Events
+            input.Move -= OnMove;
+            input.Run -= OnRun;
+            input.Dodge -= OnDodge;
+            input.LightAttack -= OnLightAttack;
+            input.SecondAttack -= OnSecondAttack;
+            input.Ultimate -= OnUltimate;
+        
+            // Global Events (Always Active)
+            input.MiddleClickUI -= OnMiddleClickUI;
+        }
     }
 
     // Internal References, also doesnt need to be saved

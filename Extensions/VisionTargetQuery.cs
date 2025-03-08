@@ -15,7 +15,7 @@ namespace Extensions {
         readonly Collider[] _colliders;
         
         RedrawScope _redrawScope;
-         VisionTargetQuery(Transform head, Transform[] rayCheckOrigins, int maxTargets, float detectionRadius, float visionConeAngle, bool debug) {
+        VisionTargetQuery(Transform head, Transform[] rayCheckOrigins, int maxTargets, float detectionRadius, float visionConeAngle, bool debug) {
             _head = head;
             _rayCheckOrigins = rayCheckOrigins;
             _detectionRadius = detectionRadius;

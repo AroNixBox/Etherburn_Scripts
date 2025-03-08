@@ -1,3 +1,4 @@
+using System;
 using System.Data;
 using System.Linq;
 using Extensions;
@@ -47,7 +48,6 @@ namespace Player.Cam {
 
         InputReader _input;
         VisionTargetQuery<Entity> _visionEnemyWarpTargetQuery;
-
 
         #endregion
         
@@ -122,9 +122,8 @@ namespace Player.Cam {
                     return;
                 }
             
-                var allEnemies = entityManager.GetEntitiesOfType(lockOnEntityType, out _); // TODO: Use "_" if want to perform something when no more Enemies are alive                
+                var allEnemies = entityManager.GetEntitiesOfType(lockOnEntityType, out _); // TODO: Use "_" if want to perform something when no more Enemies are alive  
                 var allEntitiesInVisionCone = _visionEnemyWarpTargetQuery.GetAllTargetsInVisionConeSorted(allEnemies);
-                if(allEntitiesInVisionCone.Count == 0) { return; }
 
                 LockedOnEnemyTarget = allEntitiesInVisionCone.FirstOrDefault(entity => entity.EntityType == lockOnEntityType);
                 
@@ -206,6 +205,10 @@ namespace Player.Cam {
 
         void OnDestroy() {
             _visionEnemyWarpTargetQuery.Dispose();
+            
+            _input.LockOnTarget -= ToggleLockOnTarget;
+            _input.Look -= ChangeLookValues;
+            _input.IsLooking -= ToggleLook;
         }
     }
 }
