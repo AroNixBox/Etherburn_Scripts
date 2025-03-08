@@ -14,6 +14,12 @@ namespace UI.Menu {
         string _inputActionName;
         void Start() {
             _inputActionName = inputActionReference.action.name;
+            
+            if(rebindHandler == null) {
+                Debug.LogError("Rebind Handler is not set");
+                return;
+            }
+            
             actionNameText.text = rebindHandler.GetActionName(_inputActionName);
             
             var rebindButtonChildren = GetComponentsInChildren<RebindButton>();

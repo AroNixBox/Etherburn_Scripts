@@ -15,7 +15,7 @@ namespace UI.Menu {
         Action _rebindCompleted;
         Action<InputAction, int> _rebindStarted;
 
-        void Start() {
+        void Awake() {
             _inputActions = inputReader.InputActions;
         }
 
@@ -121,10 +121,36 @@ namespace UI.Menu {
         /// <param name="actionName"></param>
         /// <param name="bindingIndex"></param>
         /// <returns></returns>
-        public string GetBindingName(string actionName, int bindingIndex) { InputAction action = _inputActions.FindAction(actionName); return action.GetBindingDisplayString(bindingIndex); }
-        public string GetActionName(string actionName) { return _inputActions.FindAction(actionName).name; }
+        public string GetBindingName(string actionName, int bindingIndex) {
+            InputAction action = _inputActions.FindAction(actionName);
+            return action.GetBindingDisplayString(bindingIndex);
+        }
+
+        public string GetActionName(string actionName) {
+            if(_inputActions == null) {
+                Debug.LogError("Input Actions not found");
+                return string.Empty;
+            }
+            
+            if(_inputActions.FindAction(actionName) == null) {
+                Debug.LogError("Action not found");
+                return string.Empty;
+            }
+            
+            return _inputActions.FindAction(actionName).name;
+        }
         
         public bool IsChildOfComposite(string actionName, int bindingIndex) {
+            if(_inputActions == null) {
+                Debug.LogError("Input Actions not found");
+                return false;
+            }
+            
+            if(_inputActions.FindAction(actionName) == null) {
+                Debug.LogError("Action not found");
+                return false;
+            }
+            
             InputAction action = _inputActions.FindAction(actionName);
             return action.bindings[bindingIndex].isPartOfComposite;
         }
