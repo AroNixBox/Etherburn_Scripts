@@ -74,9 +74,25 @@ namespace Player {
             var iteration = 0;
             const float forceScale = 0.035f; // Scale down the force applied
 
+            // Get the collider properties
+            var playerCollider = _references.collider;
+            var sphereCastRadius = playerCollider.radius;
+            var halfHeight = Mathf.Max(0, playerCollider.height * 0.5f - sphereCastRadius); // Distance from center to top/bottom
+
+            // Calculate the sphere cast origins
+            Vector3 sphereCastOriginTop = playerCollider.bounds.center + Vector3.up * halfHeight;
+            Vector3 sphereCastOriginBottom = playerCollider.bounds.center - Vector3.up * halfHeight;
+
             while (iteration < maxIterations) {
-                // Perform a SweepTest to detect potential collisions
-                if (_rb.SweepTest(deltaPosition.normalized, out RaycastHit hit, deltaPosition.magnitude, QueryTriggerInteraction.Ignore)) {
+                bool topHit = Physics.SphereCast(sphereCastOriginTop, sphereCastRadius, deltaPosition.normalized, out RaycastHit topHitInfo, deltaPosition.magnitude, ~0, QueryTriggerInteraction.Ignore);
+                bool bottomHit = Physics.SphereCast(sphereCastOriginBottom, sphereCastRadius, deltaPosition.normalized, out RaycastHit bottomHitInfo, deltaPosition.magnitude, ~0, QueryTriggerInteraction.Ignore);
+
+                if (topHit || bottomHit) {
+                    // Select the closest hit
+                    var hit = topHit && bottomHit 
+                        ? topHitInfo.distance < bottomHitInfo.distance ? topHitInfo : bottomHitInfo 
+                        : topHit ? topHitInfo : bottomHitInfo;
+
                     // Adjust the deltaPosition to prevent penetration
                     deltaPosition = Vector3.ProjectOnPlane(deltaPosition, hit.normal);
 
@@ -97,6 +113,7 @@ namespace Player {
 
             // If the iterations exceeded the maximum, block the movement entirely
             if (iteration >= maxIterations) {
+                Debug.LogWarning("Max iterations reached, blocking movement");
                 deltaPosition = Vector3.zero;
             }
 
@@ -106,6 +123,7 @@ namespace Player {
             // Apply root motion rotation change to this transform
             RotateModelRoot(deltaRotation);
         }
+
 
         void ApplyWarpedMotion(Vector3 deltaPosition) {
             // Warping
