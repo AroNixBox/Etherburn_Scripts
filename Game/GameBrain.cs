@@ -100,8 +100,22 @@ namespace Game {
             sceneLoader.UnloadScenes(SceneData.ELevelType.Level_One);
         }
         
-        public void TriggerGameOver() {
-            GameOverTriggered = true;
+        public async void UninitializeGame(bool isGameOver) {
+            if (isQuitting) return;
+            
+            await FadeOutAsync();
+            
+            var sceneLoader = SceneLoader.Instance;
+            if (sceneLoader == null) {
+                Debug.LogError("SceneLoader is not set in the inspector");
+                return;
+            }
+            
+            sceneLoader.UnloadScenes(SceneData.ELevelType.Level_One);
+
+            if (isGameOver) {
+                GameOverTriggered = true;
+            }
         }
 
         async System.Threading.Tasks.Task FadeOutAsync() {

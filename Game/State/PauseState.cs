@@ -37,7 +37,7 @@ namespace Game.State {
             
             if(_gameBrain.HomePressed) {
                 if (SceneLoader.Instance.IsInLevel()) {
-                    _gameBrain.UninitializeGame();
+                    _gameBrain.UninitializeGame(false);
                 }
                 _gameBrain.HomePressed = false;
             }
