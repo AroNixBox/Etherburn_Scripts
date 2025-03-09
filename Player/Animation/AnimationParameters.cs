@@ -13,7 +13,7 @@ namespace Player.Animation {
         public static readonly int HitDirectionZ = Animator.StringToHash("HitDirectionZ");
         // Speed Multipliers
         public static readonly int GroundLocomotionSpeedMultiplier = Animator.StringToHash("GroundLocomotionSpeedMultiplier");
-         
+        
         public static readonly int GroundLocomotion = Animator.StringToHash("GroundLocomotion");
         public static readonly int Fall = Animator.StringToHash("Fall");
         public static readonly int Land = Animator.StringToHash("Land");
@@ -24,7 +24,7 @@ namespace Player.Animation {
         public static readonly int Attack2 = Animator.StringToHash("Attack2");
         public static readonly int GetHit = Animator.StringToHash("Get Hit");
         public static readonly int Die = Animator.StringToHash("Die");
-
+        public static readonly int Reincarnation = Animator.StringToHash("Reincarnation");
         
         static readonly Dictionary<int, float> AnimationDurations = new (){
             // .1f Seconds for fixing "snap", because crossFade sometimes lets one animation end
@@ -38,7 +38,8 @@ namespace Player.Animation {
             {Attack, 0.1f},
             {Attack2, 0.1f},
             {GetHit, 0.1f},
-            {Die, 0.1f}
+            {Die, 0.1f},
+            {Reincarnation, 0f}
         };
         
         public static float GetAnimationDuration(int animationHash) {

@@ -116,7 +116,7 @@ namespace Player {
             var die = new States.DieState(_references, DiscardStateMachine);
             
             // Teleport
-            var teleport = new States.TeleportState(_references);
+            var reincarnation = new States.ReincarnationState(_references);
             
             // End State Machine
             void DiscardStateMachine() {
@@ -127,7 +127,7 @@ namespace Player {
             }
             
             // Teleport
-            At(teleport, weaponSwitchState, () => teleport.TeleportEnded);
+            At(reincarnation, weaponSwitchState, () => _references.ReincarnationEnded);
             
             // Grounded Locomotion
             At(groundedLocomotion, falling, () => !_mover.IsGrounded());
@@ -211,7 +211,7 @@ namespace Player {
             }
             
             IState initialState = saveManager.GetObjectPosition(_mover.gameObject.name) != null 
-                ? teleport 
+                ? reincarnation 
                 : weaponSwitchState;
             
             _stateMachine.SetInitialState(initialState);

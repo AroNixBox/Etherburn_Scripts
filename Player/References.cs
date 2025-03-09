@@ -160,6 +160,7 @@ namespace Player {
         public bool AttackEnded { get; set; }
         public bool GetHitEnded { get; set; }
         public bool ChangeWeaponEnded { get; set; }
+        public bool ReincarnationEnded { get; set; }
 
         #endregion
 

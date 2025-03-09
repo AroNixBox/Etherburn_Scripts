@@ -71,6 +71,7 @@ namespace Player.Animation {
                 references.GetHitEnded = true;
             }
         }
+        void ReincarnationEnd(AnimationEvent evt) => references.ReincarnationEnded = true;
         void ChangeWeaponEnd(AnimationEvent evt) => references.ChangeWeaponEnded = true;
         
         // In Animation Trigger Events
