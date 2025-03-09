@@ -15,7 +15,8 @@ namespace Game.Save {
             var objectState = saveManager.GetObjectState(gameObject.name);
             if (objectState == null) {
                 // Object is not saved yet
-                saveManager.RegisterObject(gameObject.name, false);
+                
+                // Dont do anything
             } else {
                 // Object is saved
                 // Use the saved state
