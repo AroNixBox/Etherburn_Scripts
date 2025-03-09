@@ -60,6 +60,10 @@ namespace ShaderControl {
             if (_currentMode == dissolveMode) { return; }
             await LerpDissolve(dissolveMode);
         }
+        
+        public bool IsCurrentDissolveMode(DissolveMode dissolveMode) {
+            return _currentMode == dissolveMode;
+        }
 
         async Task LerpDissolve(DissolveMode dissolveMode) {
             var startAmount = GetDissolveMode(_currentMode);

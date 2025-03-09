@@ -4,6 +4,7 @@ using Player.Ability;
 using Player.Audio;
 using Player.Cam;
 using Player.Input;
+using ShaderControl;
 using Sirenix.OdinInspector;
 using UI;
 using UnityEngine;
@@ -23,6 +24,7 @@ namespace Player {
         public OrbitalController orbitalController;
         [FormerlySerializedAs("abilityTargetProvider")] public AbilityTargetQuery abilityTargetQuery;
         public CapsuleCollider collider;
+        public DissolveControl playerMeshDissolveControl;
 
         
         [Header("Body Parts")]

@@ -1,5 +1,6 @@
 ﻿using Extensions.FSM;
 using Player.Weapon;
+using ShaderControl;
 using UnityEngine;
 
 namespace Player.States {
@@ -9,18 +10,25 @@ namespace Player.States {
         readonly WeaponManager _weaponManager;
         readonly UI.RadialSelection _radialSelection;
         readonly Animation.AnimationController _animationController;
+        readonly DissolveControl _playerDissolveControl;
 
         public WeaponSwitchState(References references) {
             _references = references;
             _weaponManager = _references.weaponManager;
             _radialSelection = _references.radialSelection;
             _animationController = _references.animationController;
+            _playerDissolveControl = _references.playerMeshDissolveControl;
         }
        public void OnEnter() {
            _references.OnMaterializeWeapon += MaterializeNewWeapon;
            _references.OnDissolveWeapon += DissolveOldWeapon;
            
-            PlayAnimation();
+           // Check if the player is materialized itsself
+           if (_playerDissolveControl.IsCurrentDissolveMode(DissolveControl.DissolveMode.Dissolve)) {
+               _ = _playerDissolveControl.ChangeDissolveMode(DissolveControl.DissolveMode.Materialize);
+           }
+
+           PlayAnimation();
        }
 
        void MaterializeNewWeapon() {
