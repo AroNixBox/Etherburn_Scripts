@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Player.Input;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -12,6 +13,15 @@ namespace UI.Menu {
         [SerializeField, Required] Button firstSelectedButton;
         [SerializeField] bool closable = true;
         [SerializeField, Required] [ShowIf("@closable")] Button closeButton;
+        [BoxGroup("Selectables")]
+        [SerializeField, Required] List<Selectable> selectables = new List<Selectable>();
+        
+        [Button("Capture Selectables In Order")]
+        [BoxGroup("Selectables")]
+        void CaptureSelectablesInOrder() {
+    selectables.Clear();
+    selectables.AddRange(GetComponentsInChildren<Selectable>(true));
+}
         
         [Header("Events")]
         [ShowIf("@closable")] public UnityEvent onCloseButtonPressed;
@@ -26,15 +36,29 @@ namespace UI.Menu {
                 Debug.LogError("No EventSystem found in scene");
                 return;
             }
-            
+            SetNavigationOrder();
             // Check if the menu was opened with a controller
             if (InputUtils.WasLastInputController()) {
+                
+                
                 _sceneEventSystem.SetSelectedGameObject(firstSelectedButton.gameObject);
             }
 
             // Subscribe to device change events
             InputSystem.onDeviceChange += OnDeviceChange;
         }
+        
+        void SetNavigationOrder() {
+            for (int i = 0; i < selectables.Count; i++) {
+                Navigation nav = new Navigation {
+                    mode = Navigation.Mode.Explicit,
+                    selectOnUp = i > 0 ? selectables[i - 1] : null, // Vorheriges Element
+                    selectOnDown = i < selectables.Count - 1 ? selectables[i + 1] : null // Nächstes Element
+                };
+                selectables[i].navigation = nav;
+            }
+        }
+
 
         void Start() {
             if (!closable) { return; }
