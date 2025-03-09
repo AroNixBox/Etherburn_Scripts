@@ -8,7 +8,6 @@ namespace Game.State {
         
         TargetEntitiesUnregisteredChannel _targetEntitiesUnregisteredChannel;
         TargetEntitiesUnregisteredChannel.TargetEntitiesUnregisteredChannelEventHandler _uninitializeGameHandler;
-        TargetEntitiesUnregisteredChannel.TargetEntitiesUnregisteredChannelEventHandler _gameOverSetHandler;
         public PlayState(Player.Input.InputReader inputReader, GameBrain gameBrain) {
             _gameBrain = gameBrain;
             _inputReader = inputReader;
@@ -34,9 +33,7 @@ namespace Game.State {
                 .GetEntityOfType(EntityType.Player, out _targetEntitiesUnregisteredChannel).transform;
 
             _uninitializeGameHandler = _gameBrain.UninitializeGame;
-            _gameOverSetHandler = _gameBrain.TriggerGameOver;
             _targetEntitiesUnregisteredChannel.RegisterListener(_uninitializeGameHandler);
-            _targetEntitiesUnregisteredChannel.RegisterListener(_gameOverSetHandler);
         }
         
         public void Tick() { }
@@ -48,7 +45,6 @@ namespace Game.State {
             if (_uninitializeGameHandler == null) { return; }
             if(_targetEntitiesUnregisteredChannel == null) { return; }
             _targetEntitiesUnregisteredChannel.UnregisterListener(_uninitializeGameHandler);
-            _targetEntitiesUnregisteredChannel.UnregisterListener(_gameOverSetHandler);
         }
     }
 }
