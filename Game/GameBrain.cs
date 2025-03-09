@@ -98,6 +98,8 @@ namespace Game {
             }
             
             sceneLoader.UnloadScenes(SceneData.ELevelType.Level_One);
+            
+            GameOverTriggered = true;
         }
         
         public async void UninitializeGame(bool isGameOver) {
