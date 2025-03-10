@@ -16,12 +16,10 @@ namespace Game {
         
         // Async Operations are cleared when all scenes are loaded
         bool IsLoading => _asyncOperations is { Count: > 0 };
-        public async Task<bool> WaitUntilLoadingComplete() {
+        public async Task WaitUntilLoadingComplete() {
             while (IsLoading) {
                 await Task.Delay(100);
             }
-
-            return true;
         }
         readonly List<AsyncOperation> _asyncOperations = new ();
         
@@ -68,8 +66,8 @@ namespace Game {
                     _asyncOperations.Add(environmentSceneOperation);
                 }
             }
-
-            StartCoroutine(UpdateLoadingSlider(_asyncOperations));
+            
+            _ = UpdateLoadingSlider(_asyncOperations);
 
             // Wait for all scenes to load
             while (_asyncOperations.Any(op => op.progress < 0.9f)) {
@@ -81,17 +79,16 @@ namespace Game {
                 asyncOp.allowSceneActivation = true;
             }
 
-            // Wait for all scenes to activate
-            foreach (var asyncOp in _asyncOperations) {
-                while (!asyncOp.isDone) {
-                    yield return null;
-                }
+            while (_asyncOperations.Any(op => !op.isDone)) {
+                loadingSlider.value = _asyncOperations.Average(op => op.progress);
+                yield return null;
             }
-
+            
             // Clear Async Operations
             _asyncOperations.Clear();
             
             // Loading Scenes will always be a new Level...
+            // Switch to PlayState
             var gameBrain = GameBrain.Instance;
             if(gameBrain == null) {
                 Debug.LogError("GameBrain is not set in the inspector", transform);
@@ -171,15 +168,46 @@ namespace Game {
             }
         }
         
-        IEnumerator UpdateLoadingSlider(List<AsyncOperation> asyncOperations) {
+        async Task UpdateLoadingSlider(List<AsyncOperation> asyncOperations) {
             loadingCanvas.gameObject.SetActive(true);
-            
+    
+            // Loading bar based on the average progress of all async operations
             while (asyncOperations.Any(op => !op.isDone)) {
                 loadingSlider.value = asyncOperations.Average(op => op.progress);
-                yield return null;
+                await Task.Yield();
             }
+
+            // Loading bar last progress based on the initialization of the EntityManager
+            while (EntityManager.Instance == null) {
+                await Task.Yield();
+            }
+    
+            // Fake progress for initialization
+            var fakeProgress = 0.9f;
+            var targetTime = 5f; // Max time to wait for initialization
+            var elapsedTime = 0f;
+
+            while (EntityManager.Instance == null) {
+                await Task.Yield();
+            }
+
+            Task initTask = EntityManager.Instance.WaitTillInitialized();
+    
+            while (!initTask.IsCompleted) {
+                elapsedTime += Time.deltaTime;
+                float t = Mathf.Clamp01(elapsedTime / targetTime);
+                loadingSlider.value = Mathf.Lerp(fakeProgress, 1f, t);
+                await Task.Yield();
+            }
+
+            // Loading bar last progress
+            loadingSlider.value = 1f;
             
+            // Needed to not have a black screen some time..
+            await Task.Delay(500);
+    
             loadingCanvas.gameObject.SetActive(false);
         }
+
     }
 }
