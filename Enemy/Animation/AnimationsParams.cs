@@ -31,6 +31,7 @@ namespace Behavior.Enemy.State.Animation {
             {NPCAnimationStates.Die, new AnimationDetails {StateName = Die, BlendDuration = 0.1f}},
             {NPCAnimationStates.Eat, new AnimationDetails {StateName = Eat, BlendDuration = 0.1f}},
             {NPCAnimationStates.WaitForExecution, new AnimationDetails {StateName = WaitForExecution, BlendDuration = 0.1f}},
+            {NPCAnimationStates.None, new AnimationDetails { StateName = Empty, BlendDuration = 0f }}
         };
         
         static readonly AnimationDetails EmptyDetails = new() { StateName = Empty, BlendDuration = 0.1f };
