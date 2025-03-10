@@ -22,6 +22,11 @@ namespace Enemy {
         [RequireInterface(typeof(IRequireNPCStateChannel))]
         [SerializeField] MonoBehaviour[] npcStateRelatedChannels;
         [SerializeField] string npcStateChannelBbvName = "NPCStateChanged";
+        
+        [Title("Attack Rotation")]
+        [RequireInterface(typeof(IRequireAttackRotationStoppedChannel))]
+        [SerializeField] MonoBehaviour[] attackRotationStoppedRelatedChannels;
+        [SerializeField] string attackRotationStoppedChannelBbvName = "AttackRotationStoppedChannel";
 
         void Start() {
             if(behaviorGraphAgent == null) {
@@ -32,6 +37,25 @@ namespace Enemy {
             AssignNpcStateChannel();
             AssignHealthChannel();
             AssignEntityCollisionChannel();
+            AssignAttackRotationStoppedChannel();
+        }
+
+        void AssignAttackRotationStoppedChannel() {
+            if (!behaviorGraphAgent.BlackboardReference.GetVariableValue(attackRotationStoppedChannelBbvName, out EnemyAttackRotateStopped enemyAttackRotationStoppedChannel)) {
+                Debug.LogError($"Blackboard variable: {npcStateChannelBbvName} could not be set, the variable name is incorrect or the variable does not exist in the blackboard");
+                return;
+            }
+            
+            foreach (var component in attackRotationStoppedRelatedChannels) {
+                if (!component.isActiveAndEnabled) { continue; }
+
+                if (component is IRequireAttackRotationStoppedChannel channel) {
+                    channel.AssignEventChannel(enemyAttackRotationStoppedChannel);
+                }
+                else {
+                    Debug.LogError($"Component: {component.name} does not implement the IRequireNPCStateChannel interface");
+                }
+            }
         }
 
         void AssignNpcStateChannel() {

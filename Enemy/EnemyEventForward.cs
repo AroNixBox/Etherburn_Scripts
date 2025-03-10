@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Behavior.Events.Interfaces;
 using Sensor;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -8,10 +9,11 @@ using UnityEngine.Events;
 
 namespace Enemy {
     [RequireComponent(typeof(Animator))]
-    public class EnemyEventForward : MonoBehaviour {
+    public class EnemyEventForward : MonoBehaviour, IRequireAttackRotationStoppedChannel {
         [SerializeField, Required] EnemyMover enemyMover;
         [SerializeField, Required] DamageDealingObject[] weapons;
         [SerializeField] List<AnimationEventAction> specialAnimEvents = new();
+        EnemyAttackRotateStopped _attackRotationStoppedChannel;
         Animator _animator;
 
         void Awake() {
@@ -26,6 +28,10 @@ namespace Enemy {
             foreach (var specialEvent in specialAnimEvents.Where(specialEvent => specialEvent.instantiator)) {
                 specialEvent.action.AddListener(specialEvent.InstantiateObject);
             }
+        }
+        
+        public void AssignEventChannel(EnemyAttackRotateStopped attackRotationStoppedChannel) {
+            _attackRotationStoppedChannel = attackRotationStoppedChannel;
         }
 
         // EnemyMover will be null when Enemy dies, all Components get destroyed except [EnemyEventForward.cs] and [Animator]
@@ -58,6 +64,10 @@ namespace Enemy {
             foreach (var weapon in weapons) {
                 weapon.CastForObjects(false);
             }
+        }
+        
+        void StopRotationTowardsPlayer(AnimationEvent evt) {
+            _attackRotationStoppedChannel?.SendEventMessage();
         }
         
         bool IsInAnimationTransition(AnimationEvent evt) {
