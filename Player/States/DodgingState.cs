@@ -31,11 +31,10 @@ namespace Player.States {
         
         // Values
         readonly float _dodgeStaminaCost;
-        readonly float _colliderHeight;
-        readonly Vector3 _colliderCenter;
         
+        // Sizes
+        readonly float _colliderHeight;
         readonly float _colliderHalfHeight;
-        readonly Vector3 _colliderHalfCenter;
         
         public DodgingState(References references) {
             // References
@@ -47,10 +46,8 @@ namespace Player.States {
             _health = references.HealthAttribute;
             
             _colliderHeight = _collider.height;
-            _colliderCenter = _collider.center;
             
             _colliderHalfHeight /= 2;
-            _colliderHalfCenter = new Vector3(_collider.center.x, _collider.height / 2, _collider.center.z);
             
             
             // Values
@@ -74,12 +71,12 @@ namespace Player.States {
 
         void ReduceColliderSize() {
             _collider.height = _colliderHalfHeight;
-            _collider.center = _colliderHalfCenter;
+            _collider.center = new Vector3(_collider.center.x, _collider.height / 2, _collider.center.z);
         }
         
         void ResetColliderSize() {
             _collider.height = _colliderHeight;
-            _collider.center = _colliderCenter;
+            _collider.center = new Vector3(_collider.center.x, _collider.height / 2, _collider.center.z);
         }
 
         void PlayAnimation() {
