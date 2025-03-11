@@ -20,6 +20,7 @@ namespace Player {
         [RequireInterface(typeof(IRequireAttributeEventChannel))]
         [SerializeField] MonoBehaviour[] ultEnergyRelatedChannels;
         public event Action AllUltEnergyListenersInitialized = delegate { };
+        
         void Start() {
             AssignHealthListeners();
             AssignStaminaListeners();

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Behavior.Events.Interfaces;
@@ -22,6 +23,20 @@ namespace Sensor {
         [SerializeField] bool weaponUpgrade;
         [ShowIf("@targetEntityType == EntityType.Player && weaponUpgrade")]
         [SerializeField] Player.Weapon.WeaponSO weaponSO;
+        [Title("Quest")]
+        [ShowIf("@targetEntityType == EntityType.Player")]
+        [SerializeField] bool quest;
+        [ShowIf("@targetEntityType == EntityType.Player && quest")]
+        [SerializeField] Player.Quest.QuestSO questSO;
+        [ShowIf("@targetEntityType == EntityType.Player && quest")]
+        [SerializeField] [EnumToggleButtons] QuestState questState;
+        enum QuestState { QuestBegin, QuestComplete }
+
+        [ShowIf("@targetEntityType == EntityType.Player && quest && questState == QuestState.QuestBegin")]
+        [SerializeField] UnityEvent onQuestBeginEvent;
+        [ShowIf("@targetEntityType == EntityType.Player && quest && questState == QuestState.QuestComplete")]
+        [SerializeField] UnityEvent onQuestCompleteEvent;
+
         
         [Title("Bonfire")]
         [ShowIf("@targetEntityType == EntityType.Player")]
@@ -125,6 +140,10 @@ namespace Sensor {
             if (bonfire) {
                 SaveBonfireProgress(entity);
             }
+            
+            if (quest && questSO != null) {
+                TriggerQuest(entity);
+            }
         }
         void UpgradeWeapon(Entity entity) {
             if (entity.TryGetComponent(out Player.Weapon.WeaponManager weaponManager)) {
@@ -139,7 +158,26 @@ namespace Sensor {
             
             saveManager.RegisterWeapon(weaponSO.name);
         }
+        
+        void TriggerQuest(Entity entity) {
+            if (!entity.TryGetComponent(out Player.Quest.QuestManager questManager)) {
+                return;
+            }
 
+            switch (questState) {
+                    case QuestState.QuestBegin:
+                        questManager.StartQuest(questSO);
+                        onQuestCompleteEvent?.Invoke();
+                        break;
+                    case QuestState.QuestComplete:
+                        questManager.CompleteQuest(questSO);
+                        onQuestCompleteEvent?.Invoke();
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+            }
+        }
+        
         void SaveBonfireProgress(Entity entity) {
             var saveManager = Game.Save.SaveManager.Instance;
             if (saveManager == null) {
