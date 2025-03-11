@@ -46,8 +46,7 @@ namespace Player.States {
             _health = references.HealthAttribute;
             
             _colliderHeight = _collider.height;
-            
-            _colliderHalfHeight /= 2;
+            _colliderHalfHeight = _colliderHeight / 2;
             
             
             // Values
