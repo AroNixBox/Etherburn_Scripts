@@ -24,6 +24,14 @@ namespace Game.State {
             
             _gameBrain.menuCamera.gameObject.SetActive(false);
             
+            var saveManager = Save.SaveManager.Instance;
+            if (saveManager == null) {
+                Debug.LogError("SaveManager is not set in the inspector");
+                return;
+            }
+            
+            saveManager.LoadSaveData();
+            
             WaitForInitialization();
         }
         

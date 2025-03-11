@@ -1,7 +1,10 @@
+using System;
 using Game;
+using Game.Save;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace UI.Menu {
@@ -9,6 +12,7 @@ namespace UI.Menu {
         [Header("User Interface")] 
         [Title("Buttons")] 
         [SerializeField, Required] Button startGameButton;
+        [SerializeField, Required] Button startNewGameButton;
         [SerializeField, Required] Button optionsButton;
         [SerializeField, Required] Button quitButton;
 
@@ -19,9 +23,25 @@ namespace UI.Menu {
         }
         void SetupButtonNavigation() {
             startGameButton.onClick.AddListener(StartGame);
+            startNewGameButton.onClick.AddListener(ClearSaveData);
             optionsButton.onClick.AddListener(OpenOptions);
             quitButton.onClick.AddListener(CloseGame);
         }
+
+        void ClearSaveData() {
+            var saveManager = SaveManager.Instance;
+            if(saveManager == null) {
+                Debug.LogError("SaveManager is not in the scene", transform);
+                return;
+            }
+            
+            if(saveManager.HasSaveData()) {
+                saveManager.ClearSaveData();
+            }
+            
+            StartGame();
+        }
+
         void StartGame() { 
             var sceneLoader = SceneLoader.Instance;
             if(sceneLoader == null) {
@@ -52,6 +72,13 @@ namespace UI.Menu {
 #else
             Application.Quit();
 #endif
+        }
+
+        void OnDestroy() {
+            startGameButton.onClick.RemoveListener(StartGame);
+            startNewGameButton.onClick.RemoveListener(ClearSaveData);
+            optionsButton.onClick.RemoveListener(OpenOptions);
+            quitButton.onClick.RemoveListener(CloseGame);
         }
     }
 }

@@ -17,11 +17,7 @@ namespace Game.Save {
         const string SaveName = "objectSaveData.json";
         protected override bool ShouldPersist => true;
 
-        protected override void Awake() {
-            LoadSaveData();
-        }
-
-        void LoadSaveData() {
+        public void LoadSaveData() {
             var savePath = Path.Combine(Application.persistentDataPath, SaveName);
             if (File.Exists(savePath)) {
                 string json = File.ReadAllText(savePath);
@@ -105,6 +101,10 @@ namespace Game.Save {
             if (File.Exists(savePath)) {
                 File.Delete(savePath);
             }
+        }
+        
+        public bool HasSaveData() {
+            return _objectStateData.Count > 0 || _objectPositionData.Count > 0 || _savedWeaponNames.Count > 0 || File.Exists(Path.Combine(Application.persistentDataPath, SaveName));
         }
 
         [System.Serializable]
