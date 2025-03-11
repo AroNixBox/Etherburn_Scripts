@@ -16,6 +16,11 @@ namespace Game.Save {
 
         const string SaveName = "objectSaveData.json";
         protected override bool ShouldPersist => true;
+        
+        protected override void Awake() {
+            base.Awake();
+            LoadSaveData();
+        }
 
         public void LoadSaveData() {
             var savePath = Path.Combine(Application.persistentDataPath, SaveName);
