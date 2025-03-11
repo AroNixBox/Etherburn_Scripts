@@ -13,7 +13,11 @@ public partial class CreateObjectAtCertainPositioAction : Action
 
     protected override Status OnStart()
     {
-        UnityEngine.Object.Instantiate(Object.Value, Position.Value, Quaternion.identity);
+        var obj = UnityEngine.Object.Instantiate(Object.Value, Position.Value, Quaternion.identity);
+        if (obj.scene != GameObject.scene) {
+            UnityEngine.SceneManagement.SceneManager.MoveGameObjectToScene(obj, GameObject.scene);
+        }
+
         return Status.Running;
     }
 

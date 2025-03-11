@@ -31,6 +31,10 @@ namespace Extensions {
             public void InstantiateObject() {
                 var obj = Instantiate(prefab, parent.position, parent.rotation, parent);
                 
+                if(parent.gameObject != null && obj.scene != parent.gameObject.scene) {
+                    UnityEngine.SceneManagement.SceneManager.MoveGameObjectToScene(obj, parent.gameObject.scene);
+                }
+                
                 // change local position and rotation
                 obj.transform.localPosition = spawnLocalPosition;
                 obj.transform.localEulerAngles = spawnLocalRotation;

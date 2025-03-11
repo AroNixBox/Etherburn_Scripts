@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace Effects.VFX {
     public class DecalGroundSpawner : MonoBehaviour {
@@ -33,8 +34,11 @@ namespace Effects.VFX {
                     if (Vector3.Dot(hit.normal, Vector3.up) > 0.9f) {
                         Quaternion decalRotation = Quaternion.FromToRotation(Vector3.up, hit.normal);
                         var hitPointAbove = hit.point + Vector3.up * 0.05f;
-                        Instantiate(decalParticles, hitPointAbove, decalRotation);
+                        var decalInstance = Instantiate(decalParticles, hitPointAbove, decalRotation);
 
+                        if (decalInstance.gameObject.scene != gameObject.scene) {
+                            SceneManager.MoveGameObjectToScene(decalInstance.gameObject, gameObject.scene);
+                        }
                         return;
                     }
                 }

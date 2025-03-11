@@ -29,6 +29,10 @@ namespace Enemy {
 
         Target CreateWarpTarget(Transform playerTransform) {
             var newTarget = Instantiate(warpTarget);
+            if (newTarget.scene != gameObject.scene) {
+                UnityEngine.SceneManagement.SceneManager.MoveGameObjectToScene(newTarget, gameObject.scene);
+            }
+            
             var newWarpTarget = new Target(newTarget.transform, playerTransform, transform, distanceToWarpTarget);
             return newWarpTarget;
         }

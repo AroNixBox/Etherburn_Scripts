@@ -13,7 +13,15 @@ public partial class SetTargetToPositionAction : Action
     GameObject _actualTarget;
     protected override Status OnStart() {
         var uniqueId = "Target " + Guid.NewGuid();
-        _actualTarget ??= new GameObject(uniqueId);
+        if (_actualTarget == null) {
+            _actualTarget = new GameObject(uniqueId);
+            
+            if(_actualTarget.scene != GameObject.scene) {
+                UnityEngine.SceneManagement.SceneManager.MoveGameObjectToScene(_actualTarget, GameObject.scene);
+            }
+        }
+        
+        
         Target.Value = _actualTarget;
         Target.Value.transform.position = Position.Value;
         return Status.Success;

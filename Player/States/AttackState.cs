@@ -80,6 +80,10 @@ namespace Player.States {
             // Spawn Particle Swash FX:
             var particleSystem = _attackAnimationEffect.effect.particleSystem;
             var particleInstance = Object.Instantiate(particleSystem, _references.vfxSpawnPointRight);
+            
+            if (particleInstance.gameObject.scene != _references.gameObject.scene) {
+                UnityEngine.SceneManagement.SceneManager.MoveGameObjectToScene(particleInstance.gameObject, _references.gameObject.scene);
+            }
 
             // Set the local position and rotation
             particleInstance.transform.localPosition = _attackAnimationEffect.effect.spawnPosition;
