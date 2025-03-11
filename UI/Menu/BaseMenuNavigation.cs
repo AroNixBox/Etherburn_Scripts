@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Player.Input;
 using Sirenix.OdinInspector;
@@ -14,18 +15,18 @@ namespace UI.Menu {
         [SerializeField] bool closable = true;
         [SerializeField, Required] [ShowIf("@closable")] Button closeButton;
         [BoxGroup("Selectables")]
-        [SerializeField, Required] List<Selectable> selectables = new List<Selectable>();
+        [SerializeField, Required] List<Selectable> selectables = new();
         
         [Button("Capture Selectables In Order")]
         [BoxGroup("Selectables")]
         void CaptureSelectablesInOrder() {
-    selectables.Clear();
-    selectables.AddRange(GetComponentsInChildren<Selectable>(true));
-}
+            selectables.Clear();
+            selectables.AddRange(GetComponentsInChildren<Selectable>(true));
+        }
         
         [Header("Events")]
-        [ShowIf("@closable")] public UnityEvent onCloseButtonPressed;
-        
+        [ShowIf("@closable")] 
+        public UnityEvent onCloseButtonPressed;
         EventSystem _sceneEventSystem;
 
         // Assuming this gets disabled when another window pops up and re-enabled when its opened
@@ -37,10 +38,9 @@ namespace UI.Menu {
                 return;
             }
             SetNavigationOrder();
+            
             // Check if the menu was opened with a controller
             if (InputUtils.WasLastInputController()) {
-                
-                
                 _sceneEventSystem.SetSelectedGameObject(firstSelectedButton.gameObject);
             }
 
@@ -58,7 +58,6 @@ namespace UI.Menu {
                 selectables[i].navigation = nav;
             }
         }
-
 
         void Start() {
             if (!closable) { return; }
@@ -81,6 +80,11 @@ namespace UI.Menu {
             } else if (change == InputDeviceChange.Removed && device is Gamepad) {
                 _sceneEventSystem.SetSelectedGameObject(null);
             }
+        }
+
+        void OnDisable() {
+            // Unsubscribe from device change events
+            InputSystem.onDeviceChange -= OnDeviceChange;
         }
     }
 }
