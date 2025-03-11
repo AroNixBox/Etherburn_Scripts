@@ -4,6 +4,7 @@ using System.Linq;
 using Behavior.Events.Interfaces;
 using Sensor;
 using Sirenix.OdinInspector;
+using Unity.Behavior;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -11,8 +12,10 @@ namespace Enemy {
     [RequireComponent(typeof(Animator))]
     public class EnemyEventForward : MonoBehaviour, IRequireAttackRotationStoppedChannel {
         [SerializeField, Required] EnemyMover enemyMover;
-        [SerializeField, Required] DamageDealingObject[] weapons;
+        [SerializeField, Required] BehaviorGraphAgent behaviorGraphAgent;
+        [SerializeField] string weaponsBbvName = "Weapons";
         [SerializeField] List<AnimationEventAction> specialAnimEvents = new();
+        DamageDealingObject[] _weapons;
         EnemyAttackRotateStopped _attackRotationStoppedChannel;
         Animator _animator;
 
@@ -24,6 +27,13 @@ namespace Enemy {
         }
 
         void Start() {
+            // Get the weapons from the behavior graph agent
+            if (!behaviorGraphAgent.BlackboardReference.GetVariableValue(weaponsBbvName, out List<GameObject> possibleWeapons)) {
+                Debug.LogError($"Blackboard variable: {weaponsBbvName} could not be set, the variable name is incorrect or the variable does not exist in the blackboard");
+            }
+            // Cast the weapons from behavior graph to DamageDealingObject
+            _weapons = possibleWeapons.Select(weapon => weapon.GetComponent<DamageDealingObject>()).ToArray();
+            
             // If Special Event is an Instantiator, then add the InstantiateObject method to the UnityEvent
             foreach (var specialEvent in specialAnimEvents.Where(specialEvent => specialEvent.instantiator)) {
                 specialEvent.action.AddListener(specialEvent.InstantiateObject);
@@ -50,18 +60,18 @@ namespace Enemy {
         // Animation Events
         void EnableHitDetection(AnimationEvent evt) {
             if (IsInAnimationTransition(evt)) { return; }
-            if(weapons.Length == 0) { return; } // [WeaponController.cs] will be null when Enemy dies, all Components get destroyed except [EnemyEventForward.cs] and [Animator]
+            if(_weapons.Length == 0) { return; } // [WeaponController.cs] will be null when Enemy dies, all Components get destroyed except [EnemyEventForward.cs] and [Animator]
 
-            foreach (var weapon in weapons) {
+            foreach (var weapon in _weapons) {
                 weapon.CastForObjects(true);
             }
         }
         
         void DisableHitDetection(AnimationEvent evt) {
             if (IsInAnimationTransition(evt)) { return; }
-            if(weapons.Length == 0) { return; } // [WeaponController.cs] will be null when Enemy dies, all Components get destroyed except [EnemyEventForward.cs] and [Animator]
+            if(_weapons.Length == 0) { return; } // [WeaponController.cs] will be null when Enemy dies, all Components get destroyed except [EnemyEventForward.cs] and [Animator]
 
-            foreach (var weapon in weapons) {
+            foreach (var weapon in _weapons) {
                 weapon.CastForObjects(false);
             }
         }
