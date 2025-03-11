@@ -12,6 +12,8 @@ namespace Game {
         [Required] public Camera menuCamera;
         
         [Title("User Interface")]
+        // Reactivate the Game Over Image to layer on top of everything
+        [SerializeField, Required] Canvas fadeOutCanvas;
         [Required] public UnityEngine.UI.Image fadeOutImage;
         public bool PauseToggleTriggered { get; set; }
         public bool GameOverTriggered { get; set; }
@@ -37,6 +39,8 @@ namespace Game {
         }
 
         void Start() {
+            fadeOutCanvas.gameObject.SetActive(false);
+            
             inputReader.Pause += () => PauseToggleTriggered = true;
             
             _stateMachine = new StateMachine();
@@ -54,7 +58,7 @@ namespace Game {
             At(playState, gameOverState, () => GameOverTriggered);
             
             At(pauseState, playState, () => PauseToggleTriggered && SceneLoader.Instance.IsInLevel());
-            At(pauseState, menuState, () => (PauseToggleTriggered && !SceneLoader.Instance.IsInLevel()) || HomePressed);
+            At(pauseState, menuState, () => (PauseToggleTriggered && !SceneLoader.Instance.IsInLevel()) || pauseState.ReadyForMainMenu);
             
             At(gameOverState, menuState, () => QuitTriggered);
             
@@ -86,10 +90,10 @@ namespace Game {
             _stateMachine.FixedTick();
         }
         
-        public async void UninitializeGame() {
+        public async System.Threading.Tasks.Task UninitializeGame() {
             if (isQuitting) return;
             
-            await FadeOutAsync();
+            _ = FadeOutAsync(2f);
             
             var sceneLoader = SceneLoader.Instance;
             if (sceneLoader == null) {
@@ -97,15 +101,18 @@ namespace Game {
                 return;
             }
             
-            sceneLoader.UnloadScenes(SceneData.ELevelType.Level_One);
+            await sceneLoader.UnloadScenes(SceneData.ELevelType.Level_One);
+            
+            // Reset the Game Over Image
+            ResetFadeOutImage();
             
             GameOverTriggered = true;
         }
         
-        public async void UninitializeGame(bool isGameOver) {
+        public async System.Threading.Tasks.Task UninitializeGame(bool isGameOver) {
             if (isQuitting) return;
-            
-            await FadeOutAsync();
+                
+            await FadeOutAsync(1);
             
             var sceneLoader = SceneLoader.Instance;
             if (sceneLoader == null) {
@@ -113,15 +120,18 @@ namespace Game {
                 return;
             }
             
-            sceneLoader.UnloadScenes(SceneData.ELevelType.Level_One);
+            await sceneLoader.UnloadScenes(SceneData.ELevelType.Level_One);
 
             if (isGameOver) {
                 GameOverTriggered = true;
             }
+            // Reset the Game Over Image
+            ResetFadeOutImage();
         }
 
-        async System.Threading.Tasks.Task FadeOutAsync() {
-            var duration = 1f;
+        async System.Threading.Tasks.Task FadeOutAsync(float duration) {
+            fadeOutCanvas.gameObject.SetActive(true);
+            
             var elapsedTime = 0f;
             var color = fadeOutImage.color;
             color.a = 0;
@@ -134,8 +144,7 @@ namespace Game {
                 await System.Threading.Tasks.Task.Yield();
             }
             
-            // Reset the Game Over Image
-            ResetFadeOutImage();
+            fadeOutCanvas.gameObject.SetActive(false);
         }
         void ResetFadeOutImage() {
             var color = fadeOutImage.color;

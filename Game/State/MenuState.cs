@@ -26,6 +26,15 @@ namespace Game.State {
             Cursor.visible = true;
             
             _gameBrain.menuCamera.gameObject.SetActive(true);
+            
+            // Load our Save Data, cant do this in PlayState, due to its too late.
+            var saveManager = Save.SaveManager.Instance;
+            if (saveManager == null) {
+                Debug.LogError("SaveManager is not set in the inspector");
+                return;
+            }
+            
+            saveManager.LoadSaveData();
         }
 
         public void Tick() {

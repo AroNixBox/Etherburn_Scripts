@@ -5,6 +5,7 @@ namespace Game.State {
     public class PauseState : IState {
         readonly GameBrain _gameBrain;
         readonly Player.Input.InputReader _inputReader;
+        public bool ReadyForMainMenu { get; private set; }
 
         public PauseState(Player.Input.InputReader inputReader, GameBrain gameBrain) {
             _gameBrain = gameBrain;
@@ -24,7 +25,19 @@ namespace Game.State {
             }
         }
 
-        public void Tick() { }
+        public void Tick() {
+            WaitForExit();
+        }
+        
+        async void WaitForExit() {
+            if(_gameBrain.HomePressed) {
+                _gameBrain.HomePressed = false;
+                if (SceneLoader.Instance.IsInLevel()) {
+                    await _gameBrain.UninitializeGame(false);
+                }
+                ReadyForMainMenu = true;
+            }
+        }
 
         public void FixedTick() { }
 
@@ -34,13 +47,7 @@ namespace Game.State {
             // Exit Condition is triggered after the PauseToggleTriggered is set to true,
             // so we can directly reset it here.
             _gameBrain.PauseToggleTriggered = false;
-            
-            if(_gameBrain.HomePressed) {
-                if (SceneLoader.Instance.IsInLevel()) {
-                    _gameBrain.UninitializeGame(false);
-                }
-                _gameBrain.HomePressed = false;
-            }
+            ReadyForMainMenu = false;
         }
     }
 }

@@ -131,7 +131,7 @@ namespace Game {
             return CurrentLevelType != SceneData.ELevelType.None;
         }
 
-        public void UnloadScenes(SceneData.ELevelType sceneLevelType) {
+        public Task UnloadScenes(SceneData.ELevelType sceneLevelType) {
             if(sceneData == null) {
                 Debug.LogError("SceneData is not set in the inspector", transform);
             }
@@ -166,6 +166,8 @@ namespace Game {
             if (systemsScene != null) {
                 SceneManager.UnloadSceneAsync(systemsScene.BuildIndex);
             }
+            
+            return Task.CompletedTask;
         }
         
         async Task UpdateLoadingSlider(List<AsyncOperation> asyncOperations) {
@@ -207,6 +209,8 @@ namespace Game {
             await Task.Delay(500);
     
             loadingCanvas.gameObject.SetActive(false);
+            // Reset Slider
+            loadingSlider.value = 0f;
         }
 
     }

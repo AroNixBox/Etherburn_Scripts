@@ -24,14 +24,6 @@ namespace Game.State {
             
             _gameBrain.menuCamera.gameObject.SetActive(false);
             
-            var saveManager = Save.SaveManager.Instance;
-            if (saveManager == null) {
-                Debug.LogError("SaveManager is not set in the inspector");
-                return;
-            }
-            
-            saveManager.LoadSaveData();
-            
             WaitForInitialization();
         }
         
@@ -40,10 +32,14 @@ namespace Game.State {
             _ = EntityManager.Instance
                 .GetEntityOfType(EntityType.Player, out _targetEntitiesUnregisteredChannel).transform;
 
-            _uninitializeGameHandler = _gameBrain.UninitializeGame;
+            _uninitializeGameHandler = UninitializeGameHandler;
             _targetEntitiesUnregisteredChannel.RegisterListener(_uninitializeGameHandler);
         }
-        
+
+        async void UninitializeGameHandler() {
+            await _gameBrain.UninitializeGame();
+        }
+
         public void Tick() { }
 
         public void FixedTick() { }
