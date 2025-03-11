@@ -108,6 +108,9 @@ namespace Player.States {
 
         // Reset the Flag that tells the dodge has ended
         public void OnExit() {
+            // Reset Collider Size if the event wasnt fired
+            ResetColliderSize();
+            
             // Reset State Leave Flag
             _references.OnDodgeStarted -= ReduceColliderSize;
             _references.OnDodgeStarted -= EnableInvincibility;
