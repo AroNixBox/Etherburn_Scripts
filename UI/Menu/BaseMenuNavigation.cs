@@ -12,10 +12,12 @@ namespace UI.Menu {
     public class BaseMenuNavigation : MonoBehaviour {
         [Header("User Interface")]
         [SerializeField, Required] Button firstSelectedButton;
+        [SerializeField] bool ensureSetFirstSelectedButtonActive;
         [SerializeField] bool closable = true;
         [SerializeField, Required] [ShowIf("@closable")] Button closeButton;
         [BoxGroup("Selectables")]
         [SerializeField, Required] List<Selectable> selectables = new();
+
         
         [Button("Capture Selectables In Order")]
         [BoxGroup("Selectables")]
@@ -40,7 +42,7 @@ namespace UI.Menu {
             SetNavigationOrder();
             
             // Check if the menu was opened with a controller
-            if (InputUtils.WasLastInputController()) {
+            if (InputUtils.WasLastInputController() || ensureSetFirstSelectedButtonActive) {
                 _sceneEventSystem.SetSelectedGameObject(firstSelectedButton.gameObject);
             }
 
