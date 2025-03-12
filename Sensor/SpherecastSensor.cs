@@ -28,8 +28,6 @@ namespace Sensor {
             
             Physics.SphereCast(worldOrigin, Radius, worldDirection, out _hitInfo, CastLength, Layermask,
                 QueryTriggerInteraction.Ignore);
-            
-            Debug.DrawRay(worldOrigin, worldDirection * CastLength, Color.red);
         }
 
         Vector3 GetCastDirection() {
