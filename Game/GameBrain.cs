@@ -54,11 +54,12 @@ namespace Game {
             At(menuState, playState, () => PlayTriggered);
             At(menuState, pauseState, () => PauseToggleTriggered);
             
-            At(playState, pauseState, () => PauseToggleTriggered);
+            At(playState, pauseState, () => PauseToggleTriggered && !playState.IsGameUnInitializing);
             At(playState, gameOverState, () => GameOverTriggered);
             
-            At(pauseState, playState, () => PauseToggleTriggered && SceneLoader.Instance.IsInLevel());
-            At(pauseState, menuState, () => (PauseToggleTriggered && !SceneLoader.Instance.IsInLevel()) || pauseState.ReadyForMainMenu);
+            At(pauseState, playState, () => PauseToggleTriggered && SceneLoader.Instance.IsInLevel() && !pauseState.IsGameUnInitializing);
+            At(pauseState, menuState, () => (PauseToggleTriggered && !SceneLoader.Instance.IsInLevel()) || pauseState.ReadyForMainMenu && !pauseState.IsGameUnInitializing);
+            At(pauseState, gameOverState, () => GameOverTriggered);
             
             At(gameOverState, menuState, () => QuitTriggered);
             

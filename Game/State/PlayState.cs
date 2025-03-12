@@ -6,6 +6,9 @@ namespace Game.State {
         readonly GameBrain _gameBrain;
         readonly Player.Input.InputReader _inputReader;
         
+        // Prevent the Player from going back into optionsstate/ menustate when already died, wait for game over
+        public bool IsGameUnInitializing { get; private set; }
+        
         TargetEntitiesUnregisteredChannel _targetEntitiesUnregisteredChannel;
         TargetEntitiesUnregisteredChannel.TargetEntitiesUnregisteredChannelEventHandler _uninitializeGameHandler;
         public PlayState(Player.Input.InputReader inputReader, GameBrain gameBrain) {
@@ -36,8 +39,9 @@ namespace Game.State {
             _targetEntitiesUnregisteredChannel.RegisterListener(_uninitializeGameHandler);
         }
 
-        async void UninitializeGameHandler() {
-            await _gameBrain.UninitializeGame();
+        void UninitializeGameHandler() {
+            IsGameUnInitializing = true;
+            _ = _gameBrain.UninitializeGame();
         }
 
         public void Tick() { }
@@ -45,6 +49,8 @@ namespace Game.State {
         public void FixedTick() { }
 
         public void OnExit() {
+            IsGameUnInitializing = false;
+            
             // We need to unregister here, because we can only die in PlayState!            
             if (_uninitializeGameHandler == null) { return; }
             if(_targetEntitiesUnregisteredChannel == null) { return; }

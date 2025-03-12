@@ -5,7 +5,12 @@ namespace Game.State {
     public class PauseState : IState {
         readonly GameBrain _gameBrain;
         readonly Player.Input.InputReader _inputReader;
+        
+        TargetEntitiesUnregisteredChannel _targetEntitiesUnregisteredChannel;
+        TargetEntitiesUnregisteredChannel.TargetEntitiesUnregisteredChannelEventHandler _uninitializeGameHandler;
         public bool ReadyForMainMenu { get; private set; }
+        // Prevent the Player from going back into playstate/ menustate when already died, wait for game over
+        public bool IsGameUnInitializing { get; private set; }
 
         public PauseState(Player.Input.InputReader inputReader, GameBrain gameBrain) {
             _gameBrain = gameBrain;
@@ -23,6 +28,25 @@ namespace Game.State {
             if (!SceneLoader.Instance.IsInUIScene(SceneData.EUISceneType.PauseMenu)) {
                 SceneLoader.Instance.LoadSceneAsync(SceneData.EUISceneType.PauseMenu);
             }
+
+            var entityManager = EntityManager.Instance;
+            if (entityManager != null) {
+                WaitForInitialization(entityManager);
+            }
+        }
+        
+        async void WaitForInitialization(EntityManager entityManager) {
+            await entityManager.WaitTillInitialized();
+            _ = entityManager
+                .GetEntityOfType(EntityType.Player, out _targetEntitiesUnregisteredChannel).transform;
+
+            _uninitializeGameHandler = UninitializeGameHandler;
+            _targetEntitiesUnregisteredChannel.RegisterListener(_uninitializeGameHandler);
+        }
+        
+        void UninitializeGameHandler() {
+            IsGameUnInitializing = true;
+            _ = _gameBrain.UninitializeGame();
         }
 
         public void Tick() {
@@ -48,6 +72,12 @@ namespace Game.State {
             // so we can directly reset it here.
             _gameBrain.PauseToggleTriggered = false;
             ReadyForMainMenu = false;
+            
+            IsGameUnInitializing = false;
+                
+            if (_uninitializeGameHandler == null) { return; }
+            if(_targetEntitiesUnregisteredChannel == null) { return; }
+            _targetEntitiesUnregisteredChannel.UnregisterListener(_uninitializeGameHandler);
         }
     }
 }
