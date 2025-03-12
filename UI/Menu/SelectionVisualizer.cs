@@ -62,6 +62,9 @@ namespace UI.Menu {
                 Debug.Log("Interactable element submitted");
             });
             eventTrigger.triggers.Add(submitEntry);
+            
+            // Disable all select images initially
+            selectImage.SetActive(false);
         }
 
         
