@@ -55,6 +55,11 @@ namespace ShaderControl {
             var dissolveMode = _currentMode == DissolveMode.Dissolve ? DissolveMode.Materialize : DissolveMode.Dissolve;
             _ = LerpDissolve(dissolveMode);
         }
+        
+        public void ChangeDissolveMode(bool materialize) {
+            var dissolveMode = materialize ? DissolveMode.Materialize : DissolveMode.Dissolve;
+            _ = LerpDissolve(dissolveMode);
+        }
 
         public async Task ChangeDissolveMode(DissolveMode dissolveMode) {
             if (_currentMode == dissolveMode) { return; }

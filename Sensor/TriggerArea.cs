@@ -161,13 +161,14 @@ namespace Sensor {
         
         void TriggerQuest(Entity entity) {
             if (!entity.TryGetComponent(out Player.Quest.QuestManager questManager)) {
+                Debug.LogError("QuestManager not found on Player");
                 return;
             }
-
+            
             switch (questState) {
                     case QuestState.QuestBegin:
                         questManager.StartQuest(questSO);
-                        onQuestCompleteEvent?.Invoke();
+                        onQuestBeginEvent?.Invoke();
                         break;
                     case QuestState.QuestComplete:
                         questManager.CompleteQuest(questSO);
