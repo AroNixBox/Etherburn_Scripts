@@ -13,15 +13,15 @@ namespace Player.Input {
             return Gamepad.all.Count > 0 && Gamepad.all.Any(gamepad => gamepad.lastUpdateTime > lastInputTime);
         }
         
-        public static bool WasLastInputPlayStationController(string deviceLayoutName) {
+        public static bool IsPlaystationControllerConnected(string deviceLayoutName) {
             return Gamepad.all.Count > 0 && InputSystem.IsFirstLayoutBasedOnSecond(deviceLayoutName, "DualShockGamepad");
         }
         
-        public static bool WasLastInputXboxController(string deviceLayoutName) {
+        public static bool IsXboxControllerConnected(string deviceLayoutName) {
             return Gamepad.all.Count > 0 && InputSystem.IsFirstLayoutBasedOnSecond(deviceLayoutName, "Gamepad");
         }
         
-        public static bool WasLastInputSwitchController(string deviceLayoutName) {
+        public static bool IsSwitchControllerConnected(string deviceLayoutName) {
             return Gamepad.all.Count > 0 && InputSystem.IsFirstLayoutBasedOnSecond(deviceLayoutName, "SwitchProControllerHID");
         }
         

@@ -175,13 +175,13 @@ namespace UI.Menu {
             }
             
             if (isGamepad) {
-                if (InputUtils.WasLastInputPlayStationController(deviceLayoutName)) {
+                if (InputUtils.IsPlaystationControllerConnected(deviceLayoutName)) {
                     return InputUtils.MapToPlayStationControl(controlPath);
                 }
-                if (InputUtils.WasLastInputXboxController(deviceLayoutName)) {
+                if (InputUtils.IsXboxControllerConnected(deviceLayoutName)) {
                     return InputUtils.MapToXboxControl(controlPath);
                 }
-                if (InputUtils.WasLastInputSwitchController(deviceLayoutName)) {
+                if (InputUtils.IsSwitchControllerConnected(deviceLayoutName)) {
                     return InputUtils.MapToSwitchControl(controlPath);
                 }
                 return controlPath;
