@@ -1,5 +1,10 @@
 using System.Linq;
+using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.Android;
+using UnityEngine.InputSystem.DualShock;
+using UnityEngine.InputSystem.Switch;
+using UnityEngine.InputSystem.XInput;
 
 namespace Player.Input {
     public static class InputUtils {
@@ -13,22 +18,53 @@ namespace Player.Input {
             return Gamepad.all.Count > 0 && Gamepad.all.Any(gamepad => gamepad.lastUpdateTime > lastInputTime);
         }
         
-        public static bool IsPlaystationControllerConnected(string deviceLayoutName) {
-            return Gamepad.all.Count > 0 && (
-                InputSystem.IsFirstLayoutBasedOnSecond(deviceLayoutName, "DualShockGamepad")
-                || InputSystem.IsFirstLayoutBasedOnSecond(deviceLayoutName, "DualShock4GamepadHID") 
-                || InputSystem.IsFirstLayoutBasedOnSecond(deviceLayoutName, "PS5DualSenseGamepad") 
-                || InputSystem.IsFirstLayoutBasedOnSecond(deviceLayoutName, "DualSenseGamepadHID") 
-                || InputSystem.IsFirstLayoutBasedOnSecond(deviceLayoutName, "XInputControllerWindows") 
-            );
+        public static bool IsPlaystationControllerConnected() {
+            if(Gamepad.all.Count <= 0) return false;
+
+            // Check the first gamepad layout
+            var gamepad = Gamepad.all[0];
+            if (gamepad == null) return false;
+            // Check if the device layout name is based on the DualShock or DualSense controller
+            return gamepad is
+                DualShockGamepad
+                or DualSenseGamepadHID
+                or DualShock3GamepadHID
+                or DualShock4GamepadHID;
         }
         
-        public static bool IsXboxControllerConnected(string deviceLayoutName) {
-            return Gamepad.all.Count > 0 && InputSystem.IsFirstLayoutBasedOnSecond(deviceLayoutName, "Gamepad");
+        public static bool IsXboxControllerConnected() {
+            if(Gamepad.all.Count <= 0) return false;
+
+            // Check the first gamepad layout
+            var gamepad = Gamepad.all[0];
+            if (gamepad == null) return false;
+            // Check if the device layout name is based on the DualShock or DualSense controller
+            return gamepad is
+                XboxOneGamepadAndroid 
+                or AndroidGamepadWithDpadAxes 
+                or AndroidGamepadWithDpadButtons 
+                or AndroidGamepad;
+        }
+
+        public static bool IsXIntputController() {
+            if(Gamepad.all.Count <= 0) return false;
+
+            // Check the first gamepad layout
+            var gamepad = Gamepad.all[0];
+            if (gamepad == null) return false;
+
+            // Check if the device layout name is based on the DualShock or DualSense controller
+            return gamepad is XInputController;
         }
         
-        public static bool IsSwitchControllerConnected(string deviceLayoutName) {
-            return Gamepad.all.Count > 0 && InputSystem.IsFirstLayoutBasedOnSecond(deviceLayoutName, "SwitchProControllerHID");
+        public static bool IsSwitchControllerConnected() {
+            if(Gamepad.all.Count <= 0) return false;
+
+            // Check the first gamepad layout
+            var gamepad = Gamepad.all[0];
+            if (gamepad == null) return false;
+
+            return gamepad is SwitchProControllerHID;
         }
         
         public static bool WasLastInputKeyboardAndMouse() {
@@ -98,14 +134,17 @@ namespace Player.Input {
             }
             
             if (isGamepad) {
-                if (IsPlaystationControllerConnected(deviceLayoutName)) {
+                if (IsPlaystationControllerConnected()) {
                     return MapToPlayStationControl(controlPath);
                 }
-                if (IsXboxControllerConnected(deviceLayoutName)) {
+                if (IsXboxControllerConnected()) {
                     return MapToXboxControl(controlPath);
                 }
-                if (IsSwitchControllerConnected(deviceLayoutName)) {
+                if (IsSwitchControllerConnected()) {
                     return MapToSwitchControl(controlPath);
+                }
+                if (IsXIntputController()) {
+                    Debug.Log("<color=red><b>Leck Fette haarige Eier</b></color>");
                 }
                 return controlPath;
             }
