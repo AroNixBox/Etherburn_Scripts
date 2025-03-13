@@ -11,6 +11,7 @@ namespace UI.Tutorial {
     public class TutorialPop : MonoBehaviour {
         [Header("References")]
         [SerializeField, Required] InputReader inputReader;
+        [SerializeField, Required] AudioSource audioSource;
         [SerializeField, Required] VideoPlayer videoPlayer;
         [SerializeField, Required] TutorialPopupSO tutorialPopupSO;
         [SerializeField, Required] Canvas popupCanvas;
@@ -25,6 +26,8 @@ namespace UI.Tutorial {
             
             titleText.text = tutorialPopupSO.title;
             descriptionText.text = ReplaceControlText(tutorialPopupSO.description);
+            videoPlayer.audioOutputMode = VideoAudioOutputMode.AudioSource;
+            videoPlayer.SetTargetAudioSource(0, audioSource);
             
             videoPlayer.gameObject.SetActive(false);
             popupCanvas.gameObject.SetActive(false);
@@ -112,6 +115,10 @@ namespace UI.Tutorial {
             }
             if (videoPlayer == null) {
                 Debug.LogError("Video Player is not assigned");
+                return false;
+            }
+            if (audioSource == null) {
+                Debug.LogError("Audio Source is not assigned");
                 return false;
             }
             
