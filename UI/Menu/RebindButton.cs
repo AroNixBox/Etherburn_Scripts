@@ -35,12 +35,12 @@ namespace UI.Menu {
             _ = inputAction.GetBindingDisplayString(
                 bindingIndex, 
                 // Name of the device layout that the binding is using (Gamepad, Keyboard&Mouse, etc.)
-                out var deviceLayoutName, 
+                out _, 
                 out var controlPath, 
                 InputBinding.DisplayStringOptions.DontUseShortDisplayNames);
             
             // For Future: Icons instead of text
-            var bindingName = InputUtils.GetBindingFancyName(inputAction, bindingIndex, controlPath, deviceLayoutName);
+            var bindingName = InputUtils.GetBindingFancyName(inputAction, bindingIndex, controlPath);
 
             bindingDisplayText.text = bindingName;
         }

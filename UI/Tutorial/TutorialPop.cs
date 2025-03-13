@@ -23,10 +23,26 @@ namespace UI.Tutorial {
             
             titleText.text = tutorialPopupSO.title;
             descriptionText.text = ReplaceControlText(tutorialPopupSO.description);
+            
+            // TODO: Hook into the Pause Event to close the window
         }
-
-        void Update() {
-            descriptionText.text = ReplaceControlText(tutorialPopupSO.description);
+        
+        public void OpenTutorialPopup() {
+            if (!AreReferencesAssigned()) { return; }
+            
+            // Disable the
+            
+            // Open the popup
+            ReplaceControlText(tutorialPopupSO.description);
+            popupCanvas.gameObject.SetActive(true);
+            
+            // Play the video if it exists
+            if (tutorialPopupSO.tutorialVideo != null) {
+                // VideoPlayer videoPlayer = popupCanvas.GetComponentInChildren<VideoPlayer>();
+                // videoPlayer.clip = tutorialPopupSO.tutorialVideo;
+                // videoPlayer.isLooping = tutorialPopupSO.loopVideo;
+                // videoPlayer.Play();
+            }
         }
 
         bool AreReferencesAssigned() {
@@ -93,12 +109,12 @@ namespace UI.Tutorial {
                 // Get the binding display string
                 _ = action.GetBindingDisplayString(
                     bindingIndex, 
-                    out var deviceLayoutName, 
+                    out _, 
                     out var controlPath, 
                     InputBinding.DisplayStringOptions.DontUseShortDisplayNames);
     
                 // Get the binding name
-                string bindingName = InputUtils.GetBindingFancyName(action, bindingIndex, controlPath, deviceLayoutName);
+                string bindingName = InputUtils.GetBindingFancyName(action, bindingIndex, controlPath);
                 
                 allBindings.Append("<b>");
                 // Append binding name
