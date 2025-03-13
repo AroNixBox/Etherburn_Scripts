@@ -35,16 +35,16 @@ namespace Game {
         
         void OnEnable() {
             // Prevent Hooking into the Player Death Event w/ Game Over Screen when quitting
-            Application.quitting += () => isQuitting = true;
+            Application.quitting += SetQuitting;
         }
 
         void Start() {
             fadeOutCanvas.gameObject.SetActive(false);
             
-            inputReader.Pause += () => PauseToggleTriggered = true;
+            inputReader.Pause += PauseGame;
             
             _stateMachine = new StateMachine();
-            _stateMachine.OnDebugStateChanged += state => Debug.Log($"Current State: {state}");
+            _stateMachine.OnDebugStateChanged += DebugStates;
             
             var menuState = new State.MenuState(inputReader, this);
             var gameOverState = new State.GameOverState(inputReader, this);
@@ -82,6 +82,11 @@ namespace Game {
             void At(IState from, IState to, Func<bool> condition) => _stateMachine.AddTransition(from, to, condition);
         }
         
+        void PauseGame() => PauseToggleTriggered = true;
+        void SetQuitting() => isQuitting = true;
+        void DebugStates(string state) {
+            Debug.Log($"Current State: {state}");
+        }
         public bool IsGamePaused => _stateMachine.GetCurrentState() is State.PauseState;
         void Update() {
             _stateMachine.Tick();
@@ -151,6 +156,18 @@ namespace Game {
             var color = fadeOutImage.color;
             color.a = 0;
             fadeOutImage.color = color;
+        }
+
+        void OnDestroy() {
+            if (inputReader != null) {
+                inputReader.Pause -= PauseGame;
+            }
+            
+            if (_stateMachine != null) {
+                _stateMachine.OnDebugStateChanged -= DebugStates;
+            }
+            
+            Application.quitting -= SetQuitting;
         }
     }
 }

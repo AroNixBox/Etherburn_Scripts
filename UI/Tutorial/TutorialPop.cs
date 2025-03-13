@@ -5,11 +5,13 @@ using Sirenix.OdinInspector;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Video;
 
 namespace UI.Tutorial {
     public class TutorialPop : MonoBehaviour {
         [Header("References")]
         [SerializeField, Required] InputReader inputReader;
+        [SerializeField, Required] VideoPlayer videoPlayer;
         [SerializeField, Required] TutorialPopupSO tutorialPopupSO;
         [SerializeField, Required] Canvas popupCanvas;
         [SerializeField, Required] TMP_Text titleText;
@@ -24,25 +26,58 @@ namespace UI.Tutorial {
             titleText.text = tutorialPopupSO.title;
             descriptionText.text = ReplaceControlText(tutorialPopupSO.description);
             
-            // TODO: Hook into the Pause Event to close the window
+            videoPlayer.gameObject.SetActive(false);
+            popupCanvas.gameObject.SetActive(false);
         }
         
         public void OpenTutorialPopup() {
             if (!AreReferencesAssigned()) { return; }
             
-            // Disable the
+            // Disable the Player Input Actions
+            inputReader.SwitchActionMap(InputReader.ActionMapName.UI);
+            
+            // Hook into the Pause event to close the popup when the game is paused
+            inputReader.Pause += ClosePopupForPauseMenu;
+            
+            // Show & Unlock Cursor
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
             
             // Open the popup
             ReplaceControlText(tutorialPopupSO.description);
             popupCanvas.gameObject.SetActive(true);
+            videoPlayer.gameObject.SetActive(true);
             
             // Play the video if it exists
             if (tutorialPopupSO.tutorialVideo != null) {
-                // VideoPlayer videoPlayer = popupCanvas.GetComponentInChildren<VideoPlayer>();
-                // videoPlayer.clip = tutorialPopupSO.tutorialVideo;
-                // videoPlayer.isLooping = tutorialPopupSO.loopVideo;
-                // videoPlayer.Play();
+                videoPlayer.clip = tutorialPopupSO.tutorialVideo;
+                videoPlayer.isLooping = tutorialPopupSO.loopVideo;
+                videoPlayer.Play();
             }
+        }
+        void ClosePopupForPauseMenu() {
+            inputReader.Pause -= ClosePopupForPauseMenu;
+            
+            popupCanvas.gameObject.SetActive(false);
+            videoPlayer.gameObject.SetActive(false);
+            
+            // Dont Switch the Actionmap back to Player since Pause Menu handles that.
+            // Dont unlock the cursor since Pause Menu handles that.
+        }
+        
+        public void ClosePopup() {
+            inputReader.Pause -= ClosePopupForPauseMenu;
+            
+            // Close the popup
+            popupCanvas.gameObject.SetActive(false);
+            videoPlayer.gameObject.SetActive(false);
+            
+            // Hide & Lock Cursor
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+            
+            // Disable the Player Input Actions
+            inputReader.SwitchActionMap(InputReader.ActionMapName.Player);
         }
 
         bool AreReferencesAssigned() {
@@ -73,6 +108,10 @@ namespace UI.Tutorial {
             
             if (descriptionText == null) {
                 Debug.LogError("Description Text is not assigned");
+                return false;
+            }
+            if (videoPlayer == null) {
+                Debug.LogError("Video Player is not assigned");
                 return false;
             }
             

@@ -16,7 +16,8 @@ namespace Player {
      * Everything assigned is not changed during runtime.
      */
     public partial class References : MonoBehaviour {
-        [Title("References")]
+        [Header("References")]
+        [Title("Player Components")]
         public InputReader input;
         public Mover mover;
         public Weapon.WeaponManager weaponManager;
@@ -27,7 +28,7 @@ namespace Player {
         public DissolveControl playerMeshDissolveControl;
 
         
-        [Header("Body Parts")]
+        [Title("Body Parts")]
         public Transform modelRoot;
         public Transform weaponSocket;
         public Vector3 InitialWeaponSocketPosition { get; private set; }
@@ -36,7 +37,7 @@ namespace Player {
         [Tooltip("Position where Swash Particle FX Should be spawned")]
         public Transform vfxSpawnPointRight;
         
-        [Header("Attributes")]
+        [Title("Attributes")]
         [ValidateInput("@Extensions.ClassExtensions.IsClass<IHealth, MonoBehaviour>(health)", "The assigned object must implement IHealth.")]
         [SerializeField] MonoBehaviour health;
         public IHealth HealthAttribute { get; private set; }
@@ -47,16 +48,18 @@ namespace Player {
         [SerializeField] MonoBehaviour ultimate;
         public IEnergy UltimateAttribute { get; private set; }
 
-        [Header("UI")]
+        [Title("UI")]
         [Tooltip("WeaponWheel UI")] 
         public RadialSelection radialSelection;
+        [Tooltip("Only Enable UI when the Game is fully loaded, drag all UI Canvases here")]
         [Required] public Canvas[] uiCanvases;
         
-        [Header("Audio")]
+        [Title("Audio")]
         public AudioSource weapon2DSource;
         public PlayerSounds playerSounds;
 
-
+        [Space(20)]
+        [Header("Settings")]
         [Title("Player Stats")] 
         [Tooltip("How fast do we start/ stop => running/ walking, the bigger the value, the slower")] 
         public float speedLerpRate = 10f;
