@@ -1,8 +1,6 @@
 using System.Linq;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.InputSystem.Switch;
-using UnityEngine.InputSystem.XInput;
 
 namespace Player.Input {
     public static class InputUtils {
@@ -24,10 +22,10 @@ namespace Player.Input {
             if (gamepad == null) return false;
             
             var desc = gamepad.description;
-            return !desc.product.ToLower().Contains("playstation") && 
-                   !desc.product.ToLower().Contains("dualshock") &&
-                   !desc.product.ToLower().Contains("sony") &&
-                   !desc.product.ToLower().Contains("dualsense");
+            return desc.product.ToLower().Contains("playstation") && 
+                   desc.product.ToLower().Contains("dualshock") &&
+                   desc.product.ToLower().Contains("sony") &&
+                   desc.product.ToLower().Contains("dualsense");
         }
 
         static bool IsXboxControllerConnected() {
@@ -39,8 +37,7 @@ namespace Player.Input {
             
             // Check by manufacturer and product name
             var desc = gamepad.description;
-            return desc.product.ToLower().Contains("xbox") ||
-                   desc.manufacturer.ToLower().Contains("microsoft");
+            return desc.product.ToLower().Contains("xbox");
         }
         
         public static bool IsSwitchControllerConnected() {
@@ -115,6 +112,10 @@ namespace Player.Input {
             }
             
             if (isGamepad) {
+                if(Gamepad.all.Count > 0) {
+                    Debug.Log("<color=greem><b>Gamepad: " + Gamepad.all[0].name + Gamepad.all[0].description + Gamepad.all[0].deviceId + "</b></color>");
+                }
+                
                 if (IsPlaystationControllerConnected()) {
                     return MapToPlayStationControl(controlPath);
                 }
@@ -124,8 +125,6 @@ namespace Player.Input {
                 if (IsSwitchControllerConnected()) {
                     return MapToSwitchControl(controlPath);
                 }
-                
-                Debug.Log("<color=red><b>All Gamepad Information: " + Gamepad.all[0].name + Gamepad.all[0].description + Gamepad.all[0].deviceId + "</b></color>");
                 return controlPath;
             }
             
