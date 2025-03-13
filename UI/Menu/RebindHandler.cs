@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Player.Input;
 using TMPro;
 using UnityEngine;
@@ -114,30 +115,92 @@ namespace UI.Menu {
 
             RebindNextPart(bindingIndex + 1);
         }
-
-        /// <summary>
-        /// Retrieve the name of a binding.
-        /// </summary>
-        /// <param name="actionName"></param>
-        /// <param name="bindingIndex"></param>
-        /// <returns></returns>
-        public string GetBindingName(string actionName, int bindingIndex) {
-            InputAction action = _inputActions.FindAction(actionName);
-            return action.GetBindingDisplayString(bindingIndex);
+        
+        /// <returns>Identifier of the DeviceLayout (PlaystationController, XBOX)</returns>
+        public string GetBindingName(InputActionReference inputActionReference, int bindingIndex, string controlPath, string deviceLayoutName) {
+            var action = GetAction(inputActionReference);
+            if (action == null) return "Invalid action";
+            
+            var binding = action.bindings[bindingIndex];
+            
+            Debug.Log($"Binding: {binding.name}, ControlPath: {controlPath}, DeviceLayoutName: {deviceLayoutName}");
+            
+            // Check if this is part of a composite
+            if (binding.isComposite) {
+                // Find all parts of this composite and concatenate them
+                string compositeName = "";
+                // Start from the next binding (first part)
+                int partIndex = bindingIndex + 1;
+                
+                // Collect all parts of the composite
+                while (partIndex < action.bindings.Count && action.bindings[partIndex].isPartOfComposite) {
+                    // Get the part's display name
+                    action.GetBindingDisplayString(partIndex, out var partDeviceLayout, out var partControlPath);
+                    
+                    string partName = GetSingleBindingName(action.bindings[partIndex], partControlPath, partDeviceLayout);
+                    string partBindingName = action.bindings[partIndex].name;
+                    
+                    // Add separator if not the first part
+                    if (!string.IsNullOrEmpty(compositeName)) {
+                        compositeName += " / ";
+                    }
+                    compositeName += partBindingName + ": " + partName;
+                    
+                    partIndex++;
+                }
+                
+                return compositeName;
+            }
+            // Handle part of composite (when specifically requesting a single part)
+            else if (binding.isPartOfComposite) {
+                return binding.name + ": " + GetSingleBindingName(binding, controlPath, deviceLayoutName);
+            }
+            // Handle normal bindings
+            else {
+                return GetSingleBindingName(binding, controlPath, deviceLayoutName);
+            }
         }
-
-        public string GetActionName(string actionName) {
+        
+        // Helper method to get name for a single binding
+        string GetSingleBindingName(InputBinding binding, string controlPath, string deviceLayoutName) {
+            // bindigs.groups can start with e.g. "GamepadOrKeyboard&Mouse;Gamepad" And then there can also be multiple split by ;
+            // Same thing goes for keyboard&mouse
+            var isGamepad = binding.groups != null && binding.groups.Split(';')
+                                .Any(group => group == "Gamepad");
+            var isKeyboardAndMouse = binding.groups != null && binding.groups.Split(';')
+                                .Any(group => group == "Keyboard&Mouse");
+            
+            if(!isGamepad && !isKeyboardAndMouse) {
+                Debug.Log("<color=red><b>binding groups: " + binding.groups + "</b></color>");
+            }
+            
+            if (isGamepad) {
+                if (InputUtils.WasLastInputPlayStationController(deviceLayoutName)) {
+                    return InputUtils.MapToPlayStationControl(controlPath);
+                }
+                if (InputUtils.WasLastInputXboxController(deviceLayoutName)) {
+                    return InputUtils.MapToXboxControl(controlPath);
+                }
+                if (InputUtils.WasLastInputSwitchController(deviceLayoutName)) {
+                    return InputUtils.MapToSwitchControl(controlPath);
+                }
+                return controlPath;
+            }
+            
+            return isKeyboardAndMouse ? InputUtils.MapToKeyboardAndMouseControl(controlPath) : controlPath;
+        }
+        public InputAction GetAction(InputActionReference actionReference) {
             if(_inputActions == null) {
                 Debug.LogError("Input Actions not found");
-                return string.Empty;
+                return null;
             }
             
-            if(_inputActions.FindAction(actionName) == null) {
+            if(_inputActions.FindAction(actionReference.action.name) == null) {
                 Debug.LogError("Action not found");
-                return string.Empty;
+                return null;
             }
             
-            return _inputActions.FindAction(actionName).name;
+            return _inputActions.FindAction(actionReference.action.name);
         }
         
         public bool IsChildOfComposite(string actionName, int bindingIndex) {

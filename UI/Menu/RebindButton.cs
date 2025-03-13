@@ -17,7 +17,6 @@ namespace UI.Menu {
         InputActionReference _inputActionReference;
         Button _rebindButton;
         string _inputActionName;
-        
         public void Initialize(InputActionReference inputActionReference, RebindHandler rebindHandler) {
             _rebindHandler = rebindHandler;
             _inputActionReference = inputActionReference;
@@ -30,7 +29,17 @@ namespace UI.Menu {
         }
         void SetBindingDisplayText() {
             var bindingIndex = GetNextNonCompositeChildIndex(_inputActionName, (int)deviceType);
-            var bindingName = _rebindHandler.GetBindingName(_inputActionName, bindingIndex);
+            var inputAction = _rebindHandler.GetAction(_inputActionReference);
+            
+            _ = inputAction.GetBindingDisplayString(
+                bindingIndex, 
+                // Name of the device layout that the binding is using (Gamepad, Keyboard&Mouse, etc.)
+                out var deviceLayoutName, 
+                out var controlPath, 
+                InputBinding.DisplayStringOptions.DontUseShortDisplayNames);
+            
+            // For Future: Icons instead of text
+            var bindingName = _rebindHandler.GetBindingName(_inputActionReference, bindingIndex, controlPath, deviceLayoutName);
 
             bindingDisplayText.text = bindingName;
         }
@@ -45,6 +54,7 @@ namespace UI.Menu {
             }
             return bindingIndex;
         }
+
         enum DeviceType {
             None = -1,
             KeyboardAndMouse = 0,

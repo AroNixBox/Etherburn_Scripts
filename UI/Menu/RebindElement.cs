@@ -11,16 +11,13 @@ namespace UI.Menu {
         [Title("User Interface")]
         [SerializeField] TMP_Text actionNameText;
         
-        string _inputActionName;
         void Start() {
-            _inputActionName = inputActionReference.action.name;
-            
             if(rebindHandler == null) {
                 Debug.LogError("Rebind Handler is not set");
                 return;
             }
             
-            actionNameText.text = rebindHandler.GetActionName(_inputActionName);
+            actionNameText.text = rebindHandler.GetAction(inputActionReference).name;
             
             var rebindButtonChildren = GetComponentsInChildren<RebindButton>();
             foreach (var rebindButton in rebindButtonChildren) {
