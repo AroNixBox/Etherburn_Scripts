@@ -13,21 +13,28 @@ namespace Player.Input {
 
             return Gamepad.all.Count > 0 && Gamepad.all.Any(gamepad => gamepad.lastUpdateTime > lastInputTime);
         }
-        
-        public static bool IsPlaystationControllerConnected(string deviceLayout) {
-            return deviceLayout.Contains("Dual")
-                   || deviceLayout.Contains("PS")
-                   || deviceLayout.Contains("PlayStation")
-                   || deviceLayout.Contains("Sony");
+
+        static bool IsPlaystationControllerConnected() {
+            var controllers = UnityEngine.Input.GetJoystickNames();
+            var activeController = controllers.FirstOrDefault(c => !string.IsNullOrEmpty(c));
+            
+            return activeController != null && (activeController.Contains("Dual")
+                                                || activeController.Contains("PS")
+                                                || activeController.Contains("DS") // DS = DualShock
+                                                || activeController.Contains("PlayStation")
+                                                || activeController.Contains("Sony"));
         }
 
-        static bool IsXboxControllerConnected(string deviceLayout) {
-            return deviceLayout.Contains("Xbox")
-                   || deviceLayout.Contains("XInput")
-                   || deviceLayout.Contains("Microsoft");
+        static bool IsXboxControllerConnected() {
+            var controllers = UnityEngine.Input.GetJoystickNames();
+            var activeController = controllers.FirstOrDefault(c => !string.IsNullOrEmpty(c));
+            
+            return activeController != null && (activeController.Contains("Xbox")
+                                                || activeController.Contains("XInput")
+                                                || activeController.Contains("Microsoft"));
         }
 
-        public static bool IsSwitchControllerConnected(string deviceLayout) {
+        public static bool IsSwitchControllerConnected() {
             // TODO: Add support for Switch Pro Controller
             return false;
         }
@@ -69,13 +76,10 @@ namespace Player.Input {
 
         // TODO: Do this initially!
         /// <param name="inputAction">Make sure you dont accidently pass in InputActionReference that is implicitly converted to an InputAction. Will not return the rebinded Key then.</param>
-        public static string GetBindingFancyName(InputAction inputAction, int bindingIndex, string controlPath, string deviceLayoutName) {
+        public static string GetBindingFancyName(InputAction inputAction, int bindingIndex, string controlPath) {
             if (inputAction == null) return "Invalid action";
             
             var binding = inputAction.bindings[bindingIndex];
-            
-            Debug.Log($"Binding: {binding.name}, ControlPath: {controlPath}, DeviceLayoutName: {deviceLayoutName}");
-            
             // Check if this is part of a composite, so we can return all bindings inside the composite
             if (binding.isComposite) {
                 // Find all parts of this composite and concatenate them
@@ -86,9 +90,12 @@ namespace Player.Input {
                 // Collect all parts of the composite
                 while (partIndex < inputAction.bindings.Count && inputAction.bindings[partIndex].isPartOfComposite) {
                     // Get the part's display name
-                    inputAction.GetBindingDisplayString(partIndex, out var partDeviceLayout, out var partControlPath);
+                    inputAction.GetBindingDisplayString(partIndex, 
+                        // TODO: Unity Bug, always. This returns correct, but we cant read the active controller Layout. Always returns "XInputControllerWindows"
+                        out _, 
+                        out var partControlPath);
                     
-                    string partName = GetSingleBindingName(inputAction.bindings[partIndex], partControlPath, partDeviceLayout);
+                    string partName = GetSingleBindingName(inputAction.bindings[partIndex], partControlPath);
                     string partBindingName = inputAction.bindings[partIndex].name;
                     
                     // Add separator if not the first part
@@ -105,15 +112,15 @@ namespace Player.Input {
             
             // Handle part of composite (when specifically requesting a single part)
             if (binding.isPartOfComposite) {
-                return binding.name + ": " + GetSingleBindingName(binding, controlPath, deviceLayoutName);
+                return binding.name + ": " + GetSingleBindingName(binding, controlPath);
             }
             
             // Handle normal bindings
-            return GetSingleBindingName(binding, controlPath, deviceLayoutName);
+            return GetSingleBindingName(binding, controlPath);
         }
         
         // Helper method to get name for a single binding
-        static string GetSingleBindingName(InputBinding binding, string controlPath, string deviceLayoutName) {
+        static string GetSingleBindingName(InputBinding binding, string controlPath) {
             // bindigs.groups can start with e.g. "GamepadOrKeyboard&Mouse;Gamepad" And then there can also be multiple split by ;
             // Same thing goes for keyboard&mouse
             var isGamepad = binding.groups != null && binding.groups.Split(';')
@@ -126,18 +133,13 @@ namespace Player.Input {
             }
             
             if (isGamepad) {
-                var controllers = UnityEngine.Input.GetJoystickNames();
-                var activeController = controllers.FirstOrDefault(c => !string.IsNullOrEmpty(c));
-                
-                Debug.Log($"<color=purple>Active Controller: {activeController}</color>");
-                
-                if (IsPlaystationControllerConnected(activeController)) {
+                if (IsPlaystationControllerConnected()) {
                     return MapToPlayStationControl(controlPath);
                 }
-                if (IsXboxControllerConnected(activeController)) {
+                if (IsXboxControllerConnected()) {
                     return MapToXboxControl(controlPath);
                 }
-                if (IsSwitchControllerConnected(activeController)) {
+                if (IsSwitchControllerConnected()) {
                     return MapToSwitchControl(controlPath);
                 }
                 return controlPath;
@@ -213,12 +215,12 @@ namespace Player.Input {
         }
         public static string MapToPlayStationControl(string controlPath) {
             return controlPath switch {
-                "buttonSouth" => "⊙",
+                "buttonSouth" => "X",
                 "buttonNorth" => "▲",
-                "buttonEast" => "○",
-                "buttonWest" => "✖",
-                "start" => "start ⏸",
-                "select" => "select ☰",
+                "buttonEast" => "O",
+                "buttonWest" => "□",
+                "start" => "start",
+                "select" => "select",
                 "leftTrigger" => "L2",
                 "rightTrigger" => "R2",
                 "leftShoulder" => "L1",
@@ -241,8 +243,8 @@ namespace Player.Input {
                 "buttonNorth" => "Y",
                 "buttonEast" => "B",
                 "buttonWest" => "X",
-                "start" => "Menu ≡",
-                "select" => "View ⧉",
+                "start" => "Menu",
+                "select" => "View",
                 "leftTrigger" => "LT",
                 "rightTrigger" => "RT",
                 "leftShoulder" => "LB",
