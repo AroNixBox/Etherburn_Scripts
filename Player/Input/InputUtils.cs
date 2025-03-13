@@ -14,34 +14,23 @@ namespace Player.Input {
             return Gamepad.all.Count > 0 && Gamepad.all.Any(gamepad => gamepad.lastUpdateTime > lastInputTime);
         }
         
-        public static bool IsPlaystationControllerConnected() {
-            if(Gamepad.all.Count <= 0) return false;
-
-            // Check the first gamepad layout
-            var gamepad = Gamepad.all[0];
-            if (gamepad == null) return false;
-            
-            var desc = gamepad.description;
-            return desc.product.ToLower().Contains("playstation") && 
-                   desc.product.ToLower().Contains("dualshock") &&
-                   desc.product.ToLower().Contains("sony") &&
-                   desc.product.ToLower().Contains("dualsense");
+        public static bool IsPlaystationControllerConnected(string deviceLayout) {
+            return InputSystem.IsFirstLayoutBasedOnSecond(deviceLayout, "DualShock3GamepadHID")
+                   || InputSystem.IsFirstLayoutBasedOnSecond(deviceLayout, "DualShock4GamepadHID")
+                   || InputSystem.IsFirstLayoutBasedOnSecond(deviceLayout, "DualSenseGamepadHID")
+                   || InputSystem.IsFirstLayoutBasedOnSecond(deviceLayout, "DualShockGamepad");
         }
 
-        static bool IsXboxControllerConnected() {
-            if(Gamepad.all.Count <= 0) return false;
-
-            // Check the first gamepad layout
-            var gamepad = Gamepad.all[0];
-            if (gamepad == null) return false;
-            
-            // Check by manufacturer and product name
-            var desc = gamepad.description;
-            return desc.product.ToLower().Contains("xbox");
+        static bool IsXboxControllerConnected(string deviceLayout) {
+            return InputSystem.IsFirstLayoutBasedOnSecond(deviceLayout, "XboxOneGamepadAndroid")
+                   || InputSystem.IsFirstLayoutBasedOnSecond(deviceLayout, "AndroidGamepadWithDpadAxes")
+                   || InputSystem.IsFirstLayoutBasedOnSecond(deviceLayout, "AndroidGamepadWithDpadButtons")
+                   || InputSystem.IsFirstLayoutBasedOnSecond(deviceLayout, "AndroidGamepad");
         }
-        
-        public static bool IsSwitchControllerConnected() {
-            return false; // TODO:
+
+        public static bool IsSwitchControllerConnected(string deviceLayout) {
+            // TODO: Add support for Switch Pro Controller
+            return false;
         }
         
         public static bool WasLastInputKeyboardAndMouse() {
@@ -52,6 +41,32 @@ namespace Player.Input {
             return Gamepad.all.Count > 0;
         }
         
+        // Debug Method to log all available input layouts
+        static void LogAllInputLayouts() {
+            Debug.Log("=== All Available Input Layouts ===");
+    
+            // Get all layout names
+            var layoutNames = InputSystem.ListLayouts();
+    
+            foreach (var layoutName in layoutNames) {
+                try {
+                    var layout = InputSystem.LoadLayout(layoutName);
+                    if (layout == null)
+                    {
+                        Debug.LogWarning($"Layout '{layoutName}' not found.");
+                        continue;
+                    }
+                    
+                    Debug.Log($"Layout Name: {layoutName}");
+                }
+                catch (System.Exception e)
+                {
+                    Debug.LogWarning($"Couldn't load details for layout '{layoutName}': {e.Message}");
+                }
+            }
+    
+            Debug.Log("=== End of Input Layouts ===");
+        }
 
         // TODO: Do this initially!
         /// <param name="inputAction">Make sure you dont accidently pass in InputActionReference that is implicitly converted to an InputAction. Will not return the rebinded Key then.</param>
@@ -60,7 +75,7 @@ namespace Player.Input {
             
             var binding = inputAction.bindings[bindingIndex];
             
-            UnityEngine.Debug.Log($"Binding: {binding.name}, ControlPath: {controlPath}, DeviceLayoutName: {deviceLayoutName}");
+            Debug.Log($"Binding: {binding.name}, ControlPath: {controlPath}, DeviceLayoutName: {deviceLayoutName}");
             
             // Check if this is part of a composite, so we can return all bindings inside the composite
             if (binding.isComposite) {
@@ -113,21 +128,15 @@ namespace Player.Input {
             
             if (isGamepad) {
                 var controllers = UnityEngine.Input.GetJoystickNames();
-                foreach (var gamepad in controllers) {
-                    Debug.Log("<color=blue><b>Gamepad: " + gamepad + "</b></color>");
-                }
-
-                if (Gamepad.current != null) {
-                    Debug.Log($"<color=green>Gamepad.current: {Gamepad.current}, type: {Gamepad.current.GetType()}, vendor: {Gamepad.current.description.manufacturer}, product: {Gamepad.current.description.product}, interface: {Gamepad.current.description.interfaceName}<color>");
-                }
+                var activeController = controllers.FirstOrDefault(c => !string.IsNullOrEmpty(c));
                 
-                if (IsPlaystationControllerConnected()) {
+                if (IsPlaystationControllerConnected(activeController)) {
                     return MapToPlayStationControl(controlPath);
                 }
-                if (IsXboxControllerConnected()) {
+                if (IsXboxControllerConnected(activeController)) {
                     return MapToXboxControl(controlPath);
                 }
-                if (IsSwitchControllerConnected()) {
+                if (IsSwitchControllerConnected(activeController)) {
                     return MapToSwitchControl(controlPath);
                 }
                 return controlPath;
