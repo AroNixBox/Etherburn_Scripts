@@ -33,6 +33,145 @@ namespace Player.Input {
             return Gamepad.all.Count > 0;
         }
         
+
+        /// <param name="inputAction">Make sure you dont accidently pass in InputActionReference that is implicitly converted to an InputAction. Will not return the rebinded Key then.</param>
+        public static string GetBindingFancyName(InputAction inputAction, int bindingIndex, string controlPath, string deviceLayoutName) {
+            if (inputAction == null) return "Invalid action";
+            
+            var binding = inputAction.bindings[bindingIndex];
+            
+            UnityEngine.Debug.Log($"Binding: {binding.name}, ControlPath: {controlPath}, DeviceLayoutName: {deviceLayoutName}");
+            
+            // Check if this is part of a composite, so we can return all bindings inside the composite
+            if (binding.isComposite) {
+                // Find all parts of this composite and concatenate them
+                string compositeName = "";
+                // Start from the next binding (first part)
+                int partIndex = bindingIndex + 1;
+                
+                // Collect all parts of the composite
+                while (partIndex < inputAction.bindings.Count && inputAction.bindings[partIndex].isPartOfComposite) {
+                    // Get the part's display name
+                    inputAction.GetBindingDisplayString(partIndex, out var partDeviceLayout, out var partControlPath);
+                    
+                    string partName = GetSingleBindingName(inputAction.bindings[partIndex], partControlPath, partDeviceLayout);
+                    string partBindingName = inputAction.bindings[partIndex].name;
+                    
+                    // Add separator if not the first part
+                    if (!string.IsNullOrEmpty(compositeName)) {
+                        compositeName += " / ";
+                    }
+                    compositeName += partBindingName + ": " + partName;
+                    
+                    partIndex++;
+                }
+                
+                return compositeName;
+            }
+            
+            // Handle part of composite (when specifically requesting a single part)
+            if (binding.isPartOfComposite) {
+                return binding.name + ": " + GetSingleBindingName(binding, controlPath, deviceLayoutName);
+            }
+            
+            // Handle normal bindings
+            return GetSingleBindingName(binding, controlPath, deviceLayoutName);
+        }
+        
+        // Helper method to get name for a single binding
+        static string GetSingleBindingName(InputBinding binding, string controlPath, string deviceLayoutName) {
+            // bindigs.groups can start with e.g. "GamepadOrKeyboard&Mouse;Gamepad" And then there can also be multiple split by ;
+            // Same thing goes for keyboard&mouse
+            var isGamepad = binding.groups != null && binding.groups.Split(';')
+                                .Any(group => group == "Gamepad" || group == "XInputControllerWindows" );
+            var isKeyboardAndMouse = binding.groups != null && binding.groups.Split(';')
+                                .Any(group => group == "Keyboard&Mouse");
+            
+            if(!isGamepad && !isKeyboardAndMouse) {
+                UnityEngine.Debug.Log("<color=red><b>binding groups: " + binding.groups + "</b></color>");
+            }
+            
+            if (isGamepad) {
+                if (IsPlaystationControllerConnected(deviceLayoutName)) {
+                    return MapToPlayStationControl(controlPath);
+                }
+                if (IsXboxControllerConnected(deviceLayoutName)) {
+                    return MapToXboxControl(controlPath);
+                }
+                if (IsSwitchControllerConnected(deviceLayoutName)) {
+                    return MapToSwitchControl(controlPath);
+                }
+                return controlPath;
+            }
+            
+            return isKeyboardAndMouse ? MapToKeyboardAndMouseControl(controlPath) : controlPath;
+        }
+        public static int GetNextNonCompositeChildIndex(InputActionReference inputActionReference, int startIndex) {
+            var bindingIndex = startIndex;
+            while (IsChildOfComposite(inputActionReference, bindingIndex)) {
+                bindingIndex++;
+            }
+            return bindingIndex;
+        }
+        static bool IsChildOfComposite(InputActionReference inputActionReference, int bindingIndex) {
+            return inputActionReference.action.bindings[bindingIndex].isPartOfComposite;
+        }
+        public static int GetBindingIndex(InputActionReference inputActionReference, EDeviceType deviceType) {
+            var action = inputActionReference.action;
+
+            string deviceName = GetDeviceName(deviceType);
+
+            // First pass: Look for direct non-composite matches
+            for (int i = 0; i < action.bindings.Count; i++) {
+                var binding = action.bindings[i];
+    
+                if (binding.isPartOfComposite) {
+                    continue;
+                }
+    
+                if (!binding.isComposite && binding.groups != null && 
+                    binding.groups.Split(';').Any(group => group == deviceName)) {
+                    return i;
+                }
+            }
+
+            // Second pass: Check composite parts for the device type
+            for (int i = 0; i < action.bindings.Count; i++) {
+                var binding = action.bindings[i];
+        
+                if (binding is { isPartOfComposite: true, groups: not null } && 
+                    binding.groups.Split(';').Any(group => group == deviceName)) {
+                    // Found a matching composite part, find its parent composite
+                    int parentIndex = i;
+                    while (parentIndex > 0 && !action.bindings[parentIndex].isComposite) {
+                        parentIndex--;
+                    }
+            
+                    if (action.bindings[parentIndex].isComposite) {
+                        return parentIndex; // Return parent composite's index
+                    }
+                }
+            }
+
+            // No matching binding found
+            return -1;
+        }
+        
+        static string GetDeviceName(EDeviceType deviceType) {
+            return deviceType switch {
+                EDeviceType.Gamepad => "Gamepad",
+                EDeviceType.KeyboardAndMouse => "Keyboard&Mouse",
+                _ => null
+            };
+        }
+        public static EDeviceType[] GetDeviceTypes() {
+            return new[] { EDeviceType.Gamepad, EDeviceType.KeyboardAndMouse };
+        }
+
+        public enum EDeviceType {
+            KeyboardAndMouse,
+            Gamepad
+        }
         public static string MapToPlayStationControl(string controlPath) {
             return controlPath switch {
                 "buttonSouth" => "⊙",
