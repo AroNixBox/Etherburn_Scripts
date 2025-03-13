@@ -19,7 +19,7 @@ namespace Player.Input {
                 || InputSystem.IsFirstLayoutBasedOnSecond(deviceLayoutName, "DualShock4GamepadHID") 
                 || InputSystem.IsFirstLayoutBasedOnSecond(deviceLayoutName, "PS5DualSenseGamepad") 
                 || InputSystem.IsFirstLayoutBasedOnSecond(deviceLayoutName, "DualSenseGamepadHID") 
-                || InputSystem.IsFirstLayoutBasedOnSecond(deviceLayoutName, "XInputControllerWindow") 
+                || InputSystem.IsFirstLayoutBasedOnSecond(deviceLayoutName, "XInputControllerWindows") 
             );
         }
         
