@@ -113,7 +113,9 @@ namespace Player.Input {
             
             if (isGamepad) {
                 if(Gamepad.all.Count > 0) {
-                    Debug.Log("<color=greem><b>Gamepad: " + Gamepad.all[0].name + Gamepad.all[0].description + Gamepad.all[0].deviceId + "</b></color>");
+                    foreach (var gamepad in Gamepad.all) {
+                        Debug.Log("<color=green><b>Gamepad: " + gamepad.name + gamepad.description + gamepad.deviceId + "</b></color>");
+                    }
                 }
                 
                 if (IsPlaystationControllerConnected()) {
