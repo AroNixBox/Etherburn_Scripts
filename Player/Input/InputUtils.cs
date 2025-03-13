@@ -1,8 +1,6 @@
 using System.Linq;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.InputSystem.Android;
-using UnityEngine.InputSystem.DualShock;
 using UnityEngine.InputSystem.Switch;
 using UnityEngine.InputSystem.XInput;
 
@@ -24,47 +22,29 @@ namespace Player.Input {
             // Check the first gamepad layout
             var gamepad = Gamepad.all[0];
             if (gamepad == null) return false;
-            // Check if the device layout name is based on the DualShock or DualSense controller
-            return gamepad is
-                DualShockGamepad
-                or DualSenseGamepadHID
-                or DualShock3GamepadHID
-                or DualShock4GamepadHID;
+            
+            var desc = gamepad.description;
+            return !desc.product.ToLower().Contains("playstation") && 
+                   !desc.product.ToLower().Contains("dualshock") &&
+                   !desc.product.ToLower().Contains("sony") &&
+                   !desc.product.ToLower().Contains("dualsense");
         }
-        
-        public static bool IsXboxControllerConnected() {
+
+        static bool IsXboxControllerConnected() {
             if(Gamepad.all.Count <= 0) return false;
 
             // Check the first gamepad layout
             var gamepad = Gamepad.all[0];
             if (gamepad == null) return false;
-            // Check if the device layout name is based on the DualShock or DualSense controller
-            return gamepad is
-                XboxOneGamepadAndroid 
-                or AndroidGamepadWithDpadAxes 
-                or AndroidGamepadWithDpadButtons 
-                or AndroidGamepad;
-        }
-
-        public static bool IsXIntputController() {
-            if(Gamepad.all.Count <= 0) return false;
-
-            // Check the first gamepad layout
-            var gamepad = Gamepad.all[0];
-            if (gamepad == null) return false;
-
-            // Check if the device layout name is based on the DualShock or DualSense controller
-            return gamepad is XInputController;
+            
+            // Check by manufacturer and product name
+            var desc = gamepad.description;
+            return desc.product.ToLower().Contains("xbox") ||
+                   desc.manufacturer.ToLower().Contains("microsoft");
         }
         
         public static bool IsSwitchControllerConnected() {
-            if(Gamepad.all.Count <= 0) return false;
-
-            // Check the first gamepad layout
-            var gamepad = Gamepad.all[0];
-            if (gamepad == null) return false;
-
-            return gamepad is SwitchProControllerHID;
+            return false; // TODO:
         }
         
         public static bool WasLastInputKeyboardAndMouse() {
@@ -76,6 +56,7 @@ namespace Player.Input {
         }
         
 
+        // TODO: Do this initially!
         /// <param name="inputAction">Make sure you dont accidently pass in InputActionReference that is implicitly converted to an InputAction. Will not return the rebinded Key then.</param>
         public static string GetBindingFancyName(InputAction inputAction, int bindingIndex, string controlPath, string deviceLayoutName) {
             if (inputAction == null) return "Invalid action";
@@ -130,7 +111,7 @@ namespace Player.Input {
                                 .Any(group => group == "Keyboard&Mouse");
             
             if(!isGamepad && !isKeyboardAndMouse) {
-                UnityEngine.Debug.Log("<color=red><b>binding groups: " + binding.groups + "</b></color>");
+                Debug.Log("<color=red><b>binding groups: " + binding.groups + "</b></color>");
             }
             
             if (isGamepad) {
@@ -143,9 +124,8 @@ namespace Player.Input {
                 if (IsSwitchControllerConnected()) {
                     return MapToSwitchControl(controlPath);
                 }
-                if (IsXIntputController()) {
-                    Debug.Log("<color=red><b>Leck Fette haarige Eier</b></color>");
-                }
+                
+                Debug.Log("<color=red><b>All Gamepad Information: " + Gamepad.all[0].name + Gamepad.all[0].description + Gamepad.all[0].deviceId + "</b></color>");
                 return controlPath;
             }
             
