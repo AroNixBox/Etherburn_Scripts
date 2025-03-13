@@ -14,7 +14,13 @@ namespace Player.Input {
         }
         
         public static bool IsPlaystationControllerConnected(string deviceLayoutName) {
-            return Gamepad.all.Count > 0 && InputSystem.IsFirstLayoutBasedOnSecond(deviceLayoutName, "DualShockGamepad");
+            return Gamepad.all.Count > 0 && (
+                InputSystem.IsFirstLayoutBasedOnSecond(deviceLayoutName, "DualShockGamepad")
+                || InputSystem.IsFirstLayoutBasedOnSecond(deviceLayoutName, "DualShock4GamepadHID") 
+                || InputSystem.IsFirstLayoutBasedOnSecond(deviceLayoutName, "PS5DualSenseGamepad") 
+                || InputSystem.IsFirstLayoutBasedOnSecond(deviceLayoutName, "DualSenseGamepadHID") 
+                || InputSystem.IsFirstLayoutBasedOnSecond(deviceLayoutName, "XInputControllerWindow") 
+            );
         }
         
         public static bool IsXboxControllerConnected(string deviceLayoutName) {
@@ -83,7 +89,7 @@ namespace Player.Input {
             // bindigs.groups can start with e.g. "GamepadOrKeyboard&Mouse;Gamepad" And then there can also be multiple split by ;
             // Same thing goes for keyboard&mouse
             var isGamepad = binding.groups != null && binding.groups.Split(';')
-                                .Any(group => group == "Gamepad" || group == "XInputControllerWindows" );
+                                .Any(group => group is "Gamepad");
             var isKeyboardAndMouse = binding.groups != null && binding.groups.Split(';')
                                 .Any(group => group == "Keyboard&Mouse");
             
