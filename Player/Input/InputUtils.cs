@@ -15,17 +15,16 @@ namespace Player.Input {
         }
         
         public static bool IsPlaystationControllerConnected(string deviceLayout) {
-            return InputSystem.IsFirstLayoutBasedOnSecond(deviceLayout, "DualShock3GamepadHID")
-                   || InputSystem.IsFirstLayoutBasedOnSecond(deviceLayout, "DualShock4GamepadHID")
-                   || InputSystem.IsFirstLayoutBasedOnSecond(deviceLayout, "DualSenseGamepadHID")
-                   || InputSystem.IsFirstLayoutBasedOnSecond(deviceLayout, "DualShockGamepad");
+            return deviceLayout.Contains("Dual")
+                   || deviceLayout.Contains("PS")
+                   || deviceLayout.Contains("PlayStation")
+                   || deviceLayout.Contains("Sony");
         }
 
         static bool IsXboxControllerConnected(string deviceLayout) {
-            return InputSystem.IsFirstLayoutBasedOnSecond(deviceLayout, "XboxOneGamepadAndroid")
-                   || InputSystem.IsFirstLayoutBasedOnSecond(deviceLayout, "AndroidGamepadWithDpadAxes")
-                   || InputSystem.IsFirstLayoutBasedOnSecond(deviceLayout, "AndroidGamepadWithDpadButtons")
-                   || InputSystem.IsFirstLayoutBasedOnSecond(deviceLayout, "AndroidGamepad");
+            return deviceLayout.Contains("Xbox")
+                   || deviceLayout.Contains("XInput")
+                   || deviceLayout.Contains("Microsoft");
         }
 
         public static bool IsSwitchControllerConnected(string deviceLayout) {
@@ -129,6 +128,8 @@ namespace Player.Input {
             if (isGamepad) {
                 var controllers = UnityEngine.Input.GetJoystickNames();
                 var activeController = controllers.FirstOrDefault(c => !string.IsNullOrEmpty(c));
+                
+                Debug.Log($"<color=purple>Active Controller: {activeController}</color>");
                 
                 if (IsPlaystationControllerConnected(activeController)) {
                     return MapToPlayStationControl(controlPath);
