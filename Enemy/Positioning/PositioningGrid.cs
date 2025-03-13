@@ -6,6 +6,7 @@ using Game;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.Serialization;
 
 namespace Enemy.Positioning {
     public class PositioningGrid : MonoBehaviour {
@@ -25,9 +26,11 @@ namespace Enemy.Positioning {
         [Tooltip("Four Corners of the Grid")]
         [SerializeField] Transform[] boundsTransforms;
         
+        [FormerlySerializedAs("navMeshReachabilityChecker")]
         [BoxGroup("SaveLoadGroup")]
-        [Tooltip("Position from where we check if a position is reachable on the NavMesh, should be an Enemy on the NavMesh")]
-        [SerializeField] Transform navMeshReachabilityChecker;
+        [Tooltip("Positiosn from where we check if a position is reachable on the NavMesh, should be an Enemy on the NavMesh")]
+        [InfoBox("Need multiple NavMeshReachabilityCheckers, the unity path check alogrithm ends after a specific range, so we need multiple checks")]
+        [SerializeField] Transform[] navMeshReachabilityCheckers;
         
         // Query
         [BoxGroup("Query Settings")]
@@ -378,9 +381,19 @@ namespace Enemy.Positioning {
             for (var i = 0; i < hitCount; i++) {
                 var samplePosition = hits[i].point;
                 if (!NavMesh.SamplePosition(samplePosition, out var navMeshHit, .25f, NavMesh.AllAreas)) { continue; }
-
-                if (!NavMesh.CalculatePath(navMeshReachabilityChecker.position, navMeshHit.position, NavMesh.AllAreas,
-                        path) || path.status != NavMeshPathStatus.PathComplete) { continue; }
+                
+                bool isReachable = false;
+                // Fix for NavMesh.CalculatePath ends after a specific range
+                // Check through all NavMeshReachabilityChecker
+                foreach (var navMeshReachabilityChecker in navMeshReachabilityCheckers) {
+                    // Check if the NavMeshReachabilityChecker is on the NavMesh
+                    // Check if the NavMeshReachabilityChecker is reachable from the sample position
+                    if (!NavMesh.CalculatePath(navMeshReachabilityChecker.position, navMeshHit.position, NavMesh.AllAreas,
+                            path) || path.status != NavMeshPathStatus.PathComplete) { continue; }
+                    
+                    isReachable = true;
+                }
+                if (!isReachable) { continue; }
                 if (!(navMeshHit.position.y > highestYPosition)) { continue; }
                 
                 highestYPosition = navMeshHit.position.y;
