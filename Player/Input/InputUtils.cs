@@ -116,6 +116,10 @@ namespace Player.Input {
                 foreach (var gamepad in controllers) {
                     Debug.Log("<color=blue><b>Gamepad: " + gamepad + "</b></color>");
                 }
+
+                if (Gamepad.current != null) {
+                    Debug.Log($"<color=green>Gamepad.current: {Gamepad.current}, type: {Gamepad.current.GetType()}, vendor: {Gamepad.current.description.manufacturer}, product: {Gamepad.current.description.product}, interface: {Gamepad.current.description.interfaceName}<color>");
+                }
                 
                 if (IsPlaystationControllerConnected()) {
                     return MapToPlayStationControl(controlPath);
