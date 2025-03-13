@@ -112,10 +112,9 @@ namespace Player.Input {
             }
             
             if (isGamepad) {
-                if(Gamepad.all.Count > 0) {
-                    foreach (var gamepad in Gamepad.all) {
-                        Debug.Log("<color=green><b>Gamepad: " + gamepad.name + gamepad.description + gamepad.deviceId + "</b></color>");
-                    }
+                var controllers = UnityEngine.Input.GetJoystickNames();
+                foreach (var gamepad in controllers) {
+                    Debug.Log("<color=blue><b>Gamepad: " + gamepad + "</b></color>");
                 }
                 
                 if (IsPlaystationControllerConnected()) {
