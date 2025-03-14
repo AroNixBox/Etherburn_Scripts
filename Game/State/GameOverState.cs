@@ -6,16 +6,31 @@ namespace Game.State {
     public class GameOverState : IState{
         readonly GameBrain _gameBrain;
         readonly InputReader _inputReader;
+        readonly GameOverType _gameOverType;
 
-        public GameOverState(InputReader inputReader, GameBrain gameBrain) {
+        public enum GameOverType {
+            Lost,
+            Won
+        }
+        SceneData.EUISceneType GetGameOverType() {
+            return _gameOverType switch {
+                GameOverType.Lost => SceneData.EUISceneType.GameOver,
+                GameOverType.Won => SceneData.EUISceneType.WinScreen,
+                _ => SceneData.EUISceneType.GameOver
+            };
+        }
+        
+        public GameOverState(InputReader inputReader, GameBrain gameBrain, GameOverType gameOverType) {
             _inputReader = inputReader;
             _gameBrain = gameBrain;
+            _gameOverType = gameOverType;
         }
         public void OnEnter() {
             // Entry Condition
             _gameBrain.GameOverTriggered = false;
+            _gameBrain.WinTriggered = false;
             
-            SceneLoader.Instance.LoadSceneAsync(SceneData.EUISceneType.GameOver);
+            SceneLoader.Instance.LoadSceneAsync(GetGameOverType());
             
             _inputReader.SwitchActionMap(InputReader.ActionMapName.UI);
             
@@ -34,7 +49,7 @@ namespace Game.State {
         }
 
         public void OnExit() {
-            SceneLoader.Instance.UnloadScene(SceneData.EUISceneType.GameOver);
+            SceneLoader.Instance.UnloadScene(GetGameOverType());
             
             // Quit Untrigger
             _gameBrain.QuitTriggered = false;

@@ -46,7 +46,8 @@ namespace Game {
             None,
             MainMenu,
             GameOver,
-            PauseMenu
+            PauseMenu,
+            WinScreen
         }
     }
 }

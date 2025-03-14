@@ -17,6 +17,7 @@ namespace Game {
         [Required] public UnityEngine.UI.Image fadeOutImage;
         public bool PauseToggleTriggered { get; set; }
         public bool GameOverTriggered { get; set; }
+        public bool WinTriggered { get; set; }
         public bool HomePressed { get; set; }
         public bool QuitTriggered { get; set; }
         public bool PlayTriggered { get; set; }
@@ -47,7 +48,8 @@ namespace Game {
             _stateMachine.OnDebugStateChanged += DebugStates;
             
             var menuState = new State.MenuState(inputReader, this);
-            var gameOverState = new State.GameOverState(inputReader, this);
+            var gameOverState = new State.GameOverState(inputReader, this, State.GameOverState.GameOverType.Lost);
+            var winState = new State.GameOverState(inputReader, this, State.GameOverState.GameOverType.Won);
             var playState = new State.PlayState(inputReader, this);
             var pauseState = new State.PauseState(inputReader, this);
             
@@ -56,12 +58,14 @@ namespace Game {
             
             At(playState, pauseState, () => PauseToggleTriggered && !playState.IsGameUnInitializing);
             At(playState, gameOverState, () => GameOverTriggered);
+            At(playState, winState, () => WinTriggered);
             
             At(pauseState, playState, () => PauseToggleTriggered && SceneLoader.Instance.IsInLevel() && !pauseState.IsGameUnInitializing);
             At(pauseState, menuState, () => (PauseToggleTriggered && !SceneLoader.Instance.IsInLevel()) || pauseState.ReadyForMainMenu && !pauseState.IsGameUnInitializing);
             At(pauseState, gameOverState, () => GameOverTriggered);
             
             At(gameOverState, menuState, () => QuitTriggered);
+            At(winState, menuState, () => QuitTriggered);
             
             IState initialState = menuState;
             
@@ -88,6 +92,7 @@ namespace Game {
             Debug.Log($"Current State: {state}");
         }
         public bool IsGamePaused => _stateMachine.GetCurrentState() is State.PauseState;
+
         void Update() {
             _stateMachine.Tick();
         }
@@ -96,6 +101,7 @@ namespace Game {
             _stateMachine.FixedTick();
         }
         
+        // Can be called from the EventHandler => EntityManager when Player Died
         public async System.Threading.Tasks.Task UninitializeGame() {
             if (isQuitting) return;
             
@@ -115,8 +121,13 @@ namespace Game {
             GameOverTriggered = true;
         }
         
-        public async System.Threading.Tasks.Task UninitializeGame(bool isGameOver) {
+        // So we can call this from PauseState to uninitialize the game without calling the GameOverScreen
+        public async System.Threading.Tasks.Task UninitializeGame(bool isGameOver, bool isWin) {
             if (isQuitting) return;
+            if(isGameOver && isWin) {
+                Debug.LogError("Game Over and Win cannot be triggered at the same time");
+                return;
+            }
                 
             await FadeOutAsync(1);
             
@@ -130,6 +141,10 @@ namespace Game {
 
             if (isGameOver) {
                 GameOverTriggered = true;
+            }
+            
+            if (isWin) {
+                WinTriggered = true;
             }
             // Reset the Game Over Image
             ResetFadeOutImage();
