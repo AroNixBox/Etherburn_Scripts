@@ -99,7 +99,7 @@ namespace Game {
         public async System.Threading.Tasks.Task UninitializeGame() {
             if (isQuitting) return;
             
-            _ = FadeOutAsync(2f);
+            await FadeOutAsync(2f);
             
             var sceneLoader = SceneLoader.Instance;
             if (sceneLoader == null) {
