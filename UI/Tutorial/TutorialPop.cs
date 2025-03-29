@@ -128,7 +128,7 @@ namespace UI.Tutorial {
         string ReplaceControlText(string text) {
             // If no special symbol or no action reference, return original text
             if (!text.Contains("<inputDevices>") || tutorialPopupSO.inputActionReference == null) {
-                Debug.LogError("No input devices symbol found or no action reference");
+                // Simply if the <inputDevices> symbol is not in the text, means it got left out
                 return text;
             }
         

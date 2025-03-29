@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Game.Save;
 using ShaderControl;
 using Sirenix.OdinInspector;
@@ -17,7 +18,7 @@ namespace Player.Quest {
             LoadQuestProgress();
         }
         
-        public void StartQuest(QuestSO quest) {
+        public bool StartQuest(QuestSO quest) {
             if (!_activeQuests.Contains(quest) && !_completedQuests.Contains(quest)) {
                 var questItem = Instantiate(quest.collectiblePrefab, playerQuestItemParent);
                 questItem.transform.localScale = quest.collectibleScaleFixedOnPlayer;
@@ -33,11 +34,15 @@ namespace Player.Quest {
                 
                 // TODO: Add ScreenUI Hint to show where to bring the Item
                 // TODO: How do we target the ScreenUI Hint? The Reciever is a trigger area that has a bool enabled..
+                
+                return true;
             }
+            
+            return false;
         }
 
-        public async void CompleteQuest(QuestSO quest) {
-            if (!_activeQuests.Contains(quest)) { return; }
+        public async Task<bool> CompleteQuest(QuestSO quest) {
+            if (!_activeQuests.Contains(quest)) { return false; }
             
             // End the quest Data
             _activeQuests.Remove(quest);
@@ -48,15 +53,16 @@ namespace Player.Quest {
             var questItem = playerQuestItemParent
                 .GetComponentsInChildren<QuestItem>()
                 .FirstOrDefault(item => item.associatedQuest == quest);
-            if (questItem == null) { return; }
+            if (questItem == null) { return true; }
             var dissolveControl = questItem.GetComponent<DissolveControl>();
             if (dissolveControl != null) {
                 await dissolveControl.ChangeDissolveMode(DissolveControl.DissolveMode.Dissolve);
             }
             
             Destroy(questItem.gameObject);
-                
-            // TODO: Remove ScreenUI Hint
+
+
+            return true;
         }
 
         void SaveQuestProgress() {

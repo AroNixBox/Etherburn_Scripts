@@ -159,7 +159,7 @@ namespace Sensor {
             saveManager.RegisterWeapon(weaponSO.name);
         }
         
-        void TriggerQuest(Entity entity) {
+        async void TriggerQuest(Entity entity) {
             if (!entity.TryGetComponent(out Player.Quest.QuestManager questManager)) {
                 Debug.LogError("QuestManager not found on Player");
                 return;
@@ -167,12 +167,16 @@ namespace Sensor {
             
             switch (questState) {
                     case QuestState.QuestBegin:
-                        questManager.StartQuest(questSO);
-                        onQuestBeginEvent?.Invoke();
+                        var questStarted = questManager.StartQuest(questSO);
+                        if (questStarted) {
+                            onQuestBeginEvent?.Invoke();
+                        }
                         break;
                     case QuestState.QuestComplete:
-                        questManager.CompleteQuest(questSO);
-                        onQuestCompleteEvent?.Invoke();
+                        var questCompleted = await questManager.CompleteQuest(questSO);
+                        if(questCompleted) {
+                            onQuestCompleteEvent?.Invoke();
+                        }
                         break;
                     default:
                         throw new ArgumentOutOfRangeException();
