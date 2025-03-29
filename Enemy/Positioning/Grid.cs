@@ -74,6 +74,8 @@ namespace Enemy.Positioning {
                 }
             }
             
+            return;
+            
             // 2D Array of the Debug Text
             var debugTextArray = new Dictionary<Vector2Int, TextMeshPro>();
 
@@ -165,24 +167,50 @@ namespace Enemy.Positioning {
             if (GetGridObject(x, z) == null) {
                 // Find the closest existing grid cell
                 float closestDistanceSqr = float.MaxValue;
-                int closestX = x, closestZ = z;
-
-                for (var dx = -1; dx <= 1; dx++) {
-                    for (var dz = -1; dz <= 1; dz++) {
-                        var newX = Mathf.Clamp(x + dx, 0, Width - 1);
-                        var newZ = Mathf.Clamp(z + dz, 0, Height - 1);
-                        if (GetGridObject(newX, newZ) == null) continue;
-                        var distanceSqr = (new Vector3(newX, 0, newZ) - new Vector3(x, 0, z)).sqrMagnitude;
-                        if (!(distanceSqr < closestDistanceSqr)) { continue; }
-                        
-                        closestDistanceSqr = distanceSqr;
-                        closestX = newX;
-                        closestZ = newZ;
+                int closestX = -1, closestZ = -1;
+                bool foundValidCell = false;
+                
+                // Start with radius 1 and increase if needed
+                int searchRadius = 1;
+                int maxSearchRadius = Mathf.Max(Width, Height); // Max possible search radius
+                
+                while (!foundValidCell && searchRadius <= maxSearchRadius) {
+                    // Search in the current radius
+                    for (var dx = -searchRadius; dx <= searchRadius; dx++) {
+                        for (var dz = -searchRadius; dz <= searchRadius; dz++) {
+                            // Skip cells from inner search radii that we've already checked
+                            if (Mathf.Abs(dx) < searchRadius && Mathf.Abs(dz) < searchRadius) {
+                                continue;
+                            }
+                            
+                            var newX = Mathf.Clamp(x + dx, 0, Width - 1);
+                            var newZ = Mathf.Clamp(z + dz, 0, Height - 1);
+                            
+                            var gridObject = GetGridObject(newX, newZ);
+                            if (gridObject == null) continue;
+                            
+                            var distanceSqr = (newX - rawX) * (newX - rawX) + (newZ - rawZ) * (newZ - rawZ);
+                            if (!(distanceSqr < closestDistanceSqr)) continue;
+                            
+                            closestDistanceSqr = distanceSqr;
+                            closestX = newX;
+                            closestZ = newZ;
+                            foundValidCell = true;
+                        }
                     }
+                    
+                    // Increase search radius for next iteration
+                    searchRadius++;
                 }
-
-                x = closestX;
-                z = closestZ;
+                
+                // Update coordinates if we found a valid cell
+                if (foundValidCell) {
+                    x = closestX;
+                    z = closestZ;
+                } else {
+                    Debug.LogError($"Could not find any valid grid cell near world position: {worldPosition}");
+                    // Keep original values as fallback
+                }
             }
         }
     
