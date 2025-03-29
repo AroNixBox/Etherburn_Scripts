@@ -8,6 +8,7 @@ namespace Extensions {
     public class VisionTargetQuery<T> : IDisposable where T : MonoBehaviour {
         readonly Transform _head;
         readonly Transform[] _rayCheckOrigins;
+        readonly Transform _customForwardOrigin;
         readonly float _detectionRadius;
         readonly float _visionConeAngle;
         readonly bool _debug;
@@ -15,9 +16,10 @@ namespace Extensions {
         readonly Collider[] _colliders;
         
         RedrawScope _redrawScope;
-        VisionTargetQuery(Transform head, Transform[] rayCheckOrigins, int maxTargets, float detectionRadius, float visionConeAngle, bool debug) {
+        VisionTargetQuery(Transform head, Transform[] rayCheckOrigins, Transform customForwardOrigin, int maxTargets, float detectionRadius, float visionConeAngle, bool debug) {
             _head = head;
             _rayCheckOrigins = rayCheckOrigins;
+            _customForwardOrigin = customForwardOrigin;
             _detectionRadius = detectionRadius;
             _visionConeAngle = visionConeAngle;
             
@@ -195,7 +197,8 @@ namespace Extensions {
         }
         bool IsInVisionCone(Vector3 targetPosition) {
             Vector3 directionToTarget = (targetPosition - _head.position).normalized;
-            float angle = Vector3.Angle(_head.forward, directionToTarget);
+            Vector3 forwardDirection = _customForwardOrigin != null ? _customForwardOrigin.forward : _head.forward;            
+            float angle = Vector3.Angle(forwardDirection, directionToTarget);
             return angle <= _visionConeAngle / 2f;
         }
         
@@ -278,6 +281,7 @@ namespace Extensions {
         public class Builder {
             Transform _head;
             Transform[] _rayCheckOrigins;
+            Transform _customForwardOrigin;
             int _maxTargets;
             float _detectionRadius;
             float _visionConeAngle;
@@ -312,9 +316,14 @@ namespace Extensions {
                 _debug = debug;
                 return this;
             }
+            
+            public Builder SetCustomForwardOrigin(Transform customForwardOrigin) {
+                _customForwardOrigin = customForwardOrigin;
+                return this;
+            }
 
             public VisionTargetQuery<U> Build<U>() where U : MonoBehaviour {
-                return new VisionTargetQuery<U>(_head, _rayCheckOrigins, _maxTargets, _detectionRadius, _visionConeAngle, _debug);
+                return new VisionTargetQuery<U>(_head, _rayCheckOrigins, _customForwardOrigin, _maxTargets, _detectionRadius, _visionConeAngle, _debug);
             }
         }
     }

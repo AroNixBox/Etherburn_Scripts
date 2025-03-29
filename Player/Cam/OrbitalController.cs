@@ -1,5 +1,3 @@
-using System;
-using System.Data;
 using System.Linq;
 using Extensions;
 using Player.Input;
@@ -90,6 +88,9 @@ namespace Player.Cam {
             _visionEnemyWarpTargetQuery = new VisionTargetQuery<Entity>.Builder()
                 .SetHead(headHeight)
                 .SetRayCheckOrigins(rayCheckOrigins)
+                // TODO:
+                // Temp. Solution, we want the forward of the actual rotation-target of the camera
+                .SetCustomForwardOrigin(transform.GetChild(0))
                 .SetMaxTargets(maxTargets)
                 .SetDetectionRadius(_detectionRadius)
                 .SetVisionConeAngle(visionConeAngle)
@@ -104,7 +105,7 @@ namespace Player.Cam {
 
         void ToggleLook(bool isLooking) {
             _isLooking = isLooking;
-            if (_isLooking) return;
+            if (_isLooking) { return; }
             
             // Reset on cancel
             _lookDirection = Vector2.zero;
@@ -117,17 +118,24 @@ namespace Player.Cam {
             if (LockedOnEnemyTarget != null) {
                 // Remove lock-on visual
                 uiOnScreenFocus.RemoveTarget();
-                
+        
                 // Disable target
                 LockedOnEnemyTarget = null;
-                
-                // Preserve current rotation as target to prevent jumps
-                _targetXAngle = _currentXAngle;
+
+                // Keep the current angles, so no weird flip happens
+                Vector3 currentEulerAngles = _transform.eulerAngles;
+        
+                // Correctly handle both X and Y angles to avoid flipping
+                _currentYAngle = currentEulerAngles.y;
+                _currentXAngle = currentEulerAngles.x > 180 ? currentEulerAngles.x - 360 : currentEulerAngles.x;
+        
+                // Set target angles to match current angles to prevent interpolation jumps
                 _targetYAngle = _currentYAngle;
-                
-                // Ensure angles are properly normalized
-                if (_targetXAngle > 180) _targetXAngle -= 360;
-                _targetXAngle = Mathf.Clamp(_targetXAngle, -upperVerticalLimit, lowerVerticalLimit);
+                _targetXAngle = _currentXAngle;
+        
+                // Apply vertical limits
+                _currentXAngle = Mathf.Clamp(_currentXAngle, -upperVerticalLimit, lowerVerticalLimit);
+                _targetXAngle = _currentXAngle; // Ensure target matches the clamped value
             } else {
                 // Find new target
                 var entityManager = EntityManager.Instance;
@@ -135,14 +143,14 @@ namespace Player.Cam {
                     Debug.LogError("Entity Manager is not in the Scene!", transform);
                     return;
                 }
-            
-                var allEnemies = entityManager.GetEntitiesOfType(lockOnEntityType, out _); 
+
+                var allEnemies = entityManager.GetEntitiesOfType(lockOnEntityType, out _);
                 var allEntitiesInVisionCone = _visionEnemyWarpTargetQuery.GetAllTargetsInVisionConeSorted(allEnemies);
                 LockedOnEnemyTarget = allEntitiesInVisionCone.FirstOrDefault(entity => entity.EntityType == lockOnEntityType);
-                
+
                 // Set lock-on visual if target found
                 if (LockedOnEnemyTarget == null) return;
-                
+
                 uiOnScreenFocus.SetTarget(LockedOnEnemyTarget.TryGetComponent(out EnemyBodyParts bodyParts)
                     ? bodyParts.head
                     : LockedOnEnemyTarget.transform);
@@ -207,36 +215,37 @@ namespace Player.Cam {
         }
 
         void UpdateLockOnAngles() {
-            // Calculate direction to target
+            // Richtung zum Ziel berechnen
             Vector3 directionToTarget = LockedOnEnemyTarget.transform.position - _transform.position;
             Quaternion lookRotation = Quaternion.LookRotation(directionToTarget);
-            
-            // Extract Euler angles
+
+            // Euler-Winkel extrahieren
             Vector3 targetEulerAngles = lookRotation.eulerAngles;
-            
-            // Normalize X angle to -180 to 180 range
+
+            // Normalisierung beider Winkel in -180° bis 180° Bereich
             if (targetEulerAngles.x > 180) targetEulerAngles.x -= 360;
-            
-            // Apply vertical limits
+            if (targetEulerAngles.y > 180) targetEulerAngles.y -= 360;
+
+            // Vertikale Grenzen anwenden
             targetEulerAngles.x = Mathf.Clamp(targetEulerAngles.x, -upperVerticalLimit, lowerVerticalLimit);
-            
-            // Update target angles
+    
+            // Target-Winkel aktualisieren
             _targetXAngle = targetEulerAngles.x;
             _targetYAngle = targetEulerAngles.y;
+    
+            // Kürzeste Drehung finden (wenn nötig)
+            float deltaY = Mathf.DeltaAngle(_currentYAngle, _targetYAngle);
+            _targetYAngle = _currentYAngle + deltaY;
         }
 
         void InterpolateToTargetRotation() {
-            // Select appropriate smoothing speed based on mode
             float smoothingSpeed = LockedOnEnemyTarget != null ? lockOnSmoothSpeed : cameraSmoothingFactor;
-            
-            // Calculate smooth factor for this frame
             float smoothFactor = 1.0f - Mathf.Exp(-smoothingSpeed * Time.deltaTime);
-            
-            // Apply exponential smoothing for more natural camera movement
+
+            // Interpoliere über kürzesten Weg
             _currentXAngle = Mathf.Lerp(_currentXAngle, _targetXAngle, smoothFactor);
             _currentYAngle = Mathf.Lerp(_currentYAngle, _targetYAngle, smoothFactor);
-            
-            // Apply rotation
+
             _transform.rotation = Quaternion.Euler(_currentXAngle, _currentYAngle, 0);
         }
         
