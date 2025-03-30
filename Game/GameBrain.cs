@@ -16,6 +16,7 @@ namespace Game {
         [SerializeField, Required] Canvas fadeOutCanvas;
         [Required] public UnityEngine.UI.Image fadeOutImage;
         public bool PauseToggleTriggered { get; set; }
+        public bool RunToggleable { get; set; }
         public bool GameOverTriggered { get; set; }
         public bool WinTriggered { get; set; }
         public bool HomePressed { get; set; }

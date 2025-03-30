@@ -1,4 +1,5 @@
 ﻿using Extensions.FSM;
+using Game;
 using Interfaces.Attribute;
 using UnityEngine;
 
@@ -29,7 +30,11 @@ namespace Player.States {
         // Dynamic values
         float _currentSpeed;
         Vector2 _currentVelocity;
-
+        GameBrain _gameBrain;
+        
+        bool _wasRunKeyJustPressed;
+        bool _isRunToggled;
+        
         #endregion
         public GroundLocomotionState(References references) {
             // References
@@ -48,6 +53,8 @@ namespace Player.States {
         }
         
         public void OnEnter() {
+            _gameBrain = GameBrain.Instance;
+            
             ReadAnimatorValues();
             PlayAnimation();
             
@@ -67,9 +74,30 @@ namespace Player.States {
         }
 
         public void Tick() {
-            bool isRunning = _references.RunKeyPressed && _stamina.HasEnough(_runStaminaCostPerSecond * Time.deltaTime);
+            // Determine if running should be active based on toggle mode or direct input
+            bool isRunning;
+            
+            if (_gameBrain != null && _gameBrain.RunToggleable) {
+                // Toggle mode: switch run state when key is pressed (not held)
+                if (_references.RunKeyPressed && !_wasRunKeyJustPressed) {
+                    _isRunToggled = !_isRunToggled;
+                }
+                _wasRunKeyJustPressed = _references.RunKeyPressed;
+                
+                // Check if running should be active (toggle is on and enough stamina)
+                isRunning = _isRunToggled && _stamina.HasEnough(_runStaminaCostPerSecond * Time.deltaTime);
+                
+                // Reset toggle if out of stamina
+                if (_isRunToggled && !isRunning) {
+                    _isRunToggled = false;
+                }
+            } else {
+                // Standard mode: run only while key is held and enough stamina
+                isRunning = _references.RunKeyPressed && _stamina.HasEnough(_runStaminaCostPerSecond * Time.deltaTime);
+            }
+            
             bool hasMoveInput = Mathf.Abs(_references.MovementInput.x) >= Epsilon || Mathf.Abs(_references.MovementInput.y) >= Epsilon;
-
+            
             UpdateMovementValues(hasMoveInput, isRunning);
             AdjustValuesNearZero();
             UpdateAnimator();
