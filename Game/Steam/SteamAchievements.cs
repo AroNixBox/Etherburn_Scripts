@@ -6,12 +6,20 @@ namespace Game.Steam {
         public enum SteamAchievement {
             BBQed,
             HowDidIGetHere,
-            BiggerSword
+            BiggerSword,
+            LockedAndLoaded,
+            DragonSlayer,
+            StillCountsAsOne,
+            DeathIsOnlyTheBeginning,
         }
         static readonly Dictionary<SteamAchievement, string> AchievementData = new() {
             { SteamAchievement.BBQed, "ACH_BBQED" },
             { SteamAchievement.HowDidIGetHere, "ACH_HOW_DID_I_GET_HERE" },
-            { SteamAchievement.BiggerSword, "ACH_BIGGER_SWORD" }
+            { SteamAchievement.BiggerSword, "ACH_BIGGER_SWORD" },
+            { SteamAchievement.LockedAndLoaded, "ACH_LOCKED_AND_LOADED" },
+            { SteamAchievement.DragonSlayer, "ACH_DRAGON_SLAYER" },
+            { SteamAchievement.StillCountsAsOne, "ACH_STILL_COUNTS_AS_ONE" },
+            { SteamAchievement.DeathIsOnlyTheBeginning, "ACH_DEATH_IS_ONLY_THE_BEGINNING" },
         };
         
         public static void UnlockAchievement(SteamAchievement achievementKey) {
