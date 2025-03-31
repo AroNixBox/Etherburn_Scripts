@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Player.Input;
 using TMPro;
 using UnityEngine;
@@ -12,7 +13,6 @@ namespace UI.Menu {
 
         PlayerInputActions _inputActions;
         Action _rebindCanceled;
-        Action _rebindCompleted;
         Action<InputAction, int> _rebindStarted;
 
         void Awake() {
@@ -66,19 +66,24 @@ namespace UI.Menu {
             var excludingKeyboardDevice = "<Keyboard>/escape";
             var excludingDevice = InputUtils.WasLastInputController() ? excludingGamepadDevice : excludingKeyboardDevice;
 
-            var rebind = actionToRebind.PerformInteractiveRebinding(bindingIndex)
+            var rebind = actionToRebind
+                .PerformInteractiveRebinding(bindingIndex)
                 .WithCancelingThrough(excludingDevice)
+                // BUG: Remapping a key resets all processors of all bindings
+                // SOLUTION: Modern Problems require Modern Solutions
+                // Currently simply every slider/ toggle that updates a binding processor
+                // overrides the binding processor on disable, so the pre-value is reapplied
+                // no idea wtf is going on
                 .OnComplete(operation => {
                     rebindOverlay.gameObject.SetActive(false);
-
+                    
                     // Reenable all the disabled maps
                     foreach (var disabledMap in disabledMaps) {
                         inputReader.EnableActionMap(disabledMap);
                     }
 
-                    operation.Dispose();
                     rebindCompleted?.Invoke();
-                    _rebindCompleted?.Invoke();
+                    operation.Dispose();
                 })
                 .OnCancel(operation => {
                     Debug.Log("Rebind canceled - Checking active input devices:");
@@ -96,9 +101,7 @@ namespace UI.Menu {
 
                     operation.Dispose();
                 });
-
-            rebind.Start();
-
+            
             _rebindStarted?.Invoke(actionToRebind, bindingIndex);
             rebind.Start();
         }

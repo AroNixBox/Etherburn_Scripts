@@ -114,7 +114,14 @@ namespace UI.Menu {
                 inputAction.ApplyParameterOverride(processorName + ":y", sliderValue, inputDeviceActionBinding);
             }
         }
-        
+
+        // BUG: Remapping a key resets all processors of all bindings
+        // SOLUTION: Modern Problems require Modern Solutions
+        // Workaround, On Disable Update the Binding Processor
+        void OnDisable() {
+            UpdateBindingProcessor(slider.value);
+        }
+
         enum EInputType {
             Gamepad,
             KeyboardMouse

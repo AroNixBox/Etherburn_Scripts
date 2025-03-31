@@ -213,7 +213,7 @@ namespace Enemy.Positioning {
                 currentGridObject = _grid.GetGridObject(currentX, currentZ);
 
                 if (currentGridObject == null) {
-                    Debug.LogError("Player is not on the grid, please check the bounds.");
+                    Debug.LogError($"Player is not on the grid, please check the bounds at {_positioningAnker.transform.position}");
                     return;
                 }
             }
